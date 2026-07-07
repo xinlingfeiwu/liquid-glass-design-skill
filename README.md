@@ -10,7 +10,7 @@ The refraction core uses inverse lens mapping: a canvas-generated displacement m
 
 Scan the QR code to join the `liquid-glass-skill` group chat.
 
-<img src="docs/qq-group-qrcode.png" alt="liquid-glass-skill QQ group QR code" width="320">
+<img src="docs/qq-group-qrcode-20260707.png" alt="liquid-glass-skill QQ group QR code" width="320">
 
 ## What Is Included
 
