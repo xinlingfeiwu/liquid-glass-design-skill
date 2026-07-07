@@ -1,0 +1,519 @@
+:root {
+  color-scheme: dark;
+  /* Material tokens — bright, crystal-clear glass */
+  --lg-tint: rgba(32, 42, 56, 0.20);
+  --lg-highlight:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.48), rgba(255, 255, 255, 0.16) 38%, rgba(255, 255, 255, 0.035) 58%, rgba(255, 255, 255, 0.22));
+  --lg-border: rgba(255, 255, 255, 0.52);
+  --lg-blur: 0.2px;
+  --lg-fallback-blur: 6px;
+  --lg-saturate: 1.55;
+  --lg-brightness: 1.1;
+  --lg-contrast: 1.14;
+  --lg-radius: 26px;
+  --lg-filter-url: none;
+  --lg-light-x: 84%;
+  --lg-light-y: 12%;
+  --lg-glare: 0.56;
+  --lg-elastic-x: 0px;
+  --lg-elastic-y: 0px;
+  --lg-shadow:
+    0 18px 42px rgba(31, 38, 50, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.76),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.24),
+    inset 0 0 22px rgba(255, 255, 255, 0.18),
+    inset 0 0 38px rgba(126, 226, 255, 0.08);
+  --lg-shadow-active:
+    0 22px 54px rgba(31, 38, 50, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.30),
+    inset 0 0 28px rgba(255, 255, 255, 0.26),
+    inset 0 0 44px rgba(126, 226, 255, 0.12),
+    0 0 34px rgba(255, 255, 255, 0.18);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  color: #fff;
+  background: #10131a;
+  overflow: hidden;
+}
+
+.lg-filter-root {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* ---------------------------------------------------------------------------
+ * Demo scene — bright, saturated, detailed. Refraction is only as visible
+ * as the backdrop is interesting: gradients give color, the rings, dots
+ * and type give the high-frequency detail that the lens visibly bends.
+ * ------------------------------------------------------------------------- */
+
+.app-shell {
+  position: relative;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.visual-stage {
+  position: relative;
+  min-height: calc(100vh - 48px);
+  overflow: hidden;
+  border-radius: 42px;
+  background:
+    radial-gradient(120% 90% at 12% 4%, rgba(255, 205, 160, 0.92), transparent 52%),
+    radial-gradient(110% 100% at 88% 12%, rgba(122, 194, 255, 0.9), transparent 58%),
+    radial-gradient(120% 110% at 78% 96%, rgba(255, 158, 180, 0.72), transparent 56%),
+    radial-gradient(100% 90% at 18% 92%, rgba(126, 232, 202, 0.66), transparent 54%),
+    linear-gradient(168deg, #8ec9f2 0%, #b5a8e8 48%, #f2b9c4 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.22),
+    0 36px 120px rgba(16, 19, 26, 0.5);
+}
+
+.scene-layers,
+.scene-layers > * {
+  position: absolute;
+  inset: 0;
+}
+
+/* Sun disc + soft haze */
+.sun-disc {
+  top: 9%;
+  left: 61%;
+  width: 220px;
+  height: 220px;
+  inset: auto;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 244, 214, 0.98) 0 32%, rgba(255, 214, 150, 0.55) 58%, transparent 72%);
+  filter: blur(2px);
+}
+
+/* Concentric rings — crisp curves that reveal edge lensing instantly */
+.detail-rings {
+  background:
+    repeating-radial-gradient(circle at 12% 8%, transparent 0 34px, rgba(255, 255, 255, 0.6) 34px 36px),
+    repeating-radial-gradient(circle at 24% 68%, transparent 0 42px, rgba(255, 255, 255, 0.55) 42px 44px),
+    repeating-radial-gradient(circle at 82% 22%, transparent 0 56px, rgba(255, 255, 255, 0.45) 56px 58px);
+  opacity: 0.65;
+}
+
+/* Dot lattice — high-frequency detail across the whole stage */
+.detail-dots {
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.7) 1.4px, transparent 1.9px);
+  background-size: 30px 30px;
+  opacity: 0.55;
+}
+
+/* Drifting soft shapes */
+.blob {
+  inset: auto;
+  border-radius: 50%;
+  mix-blend-mode: soft-light;
+  filter: blur(6px);
+}
+
+.blob-a {
+  top: 52%;
+  left: -6%;
+  width: 42%;
+  height: 46%;
+  background: radial-gradient(circle at 40% 36%, rgba(255, 255, 255, 0.85), transparent 66%);
+}
+
+.blob-b {
+  top: 4%;
+  left: 30%;
+  width: 30%;
+  height: 34%;
+  background: radial-gradient(circle at 60% 50%, rgba(255, 255, 255, 0.7), transparent 68%);
+}
+
+/* Crisp line band behind the transport bar — this is what the lens bends */
+.horizon-lines {
+  top: auto;
+  bottom: 0;
+  height: 34%;
+  background:
+    linear-gradient(180deg, transparent 0 12%, rgba(255, 255, 255, 0.75) 13%, transparent 15%),
+    linear-gradient(180deg, transparent 0 30%, rgba(255, 220, 150, 0.75) 31%, transparent 33%),
+    linear-gradient(180deg, transparent 0 48%, rgba(255, 255, 255, 0.6) 49%, transparent 51%),
+    linear-gradient(180deg, transparent 0 64%, rgba(140, 220, 255, 0.7) 65%, transparent 67%),
+    linear-gradient(180deg, transparent 0 80%, rgba(255, 255, 255, 0.55) 81%, transparent 83%),
+    repeating-linear-gradient(90deg, transparent 0 58px, rgba(255, 255, 255, 0.24) 58px 60px);
+  opacity: 0.85;
+}
+
+/* ---------------------------------------------------------------------------
+ * Liquid Glass material
+ * One class, no injected layers: refraction comes from backdrop-filter,
+ * lighting from the fill gradient, border, shadows and two pseudo-elements.
+ * ------------------------------------------------------------------------- */
+
+.lg-surface {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: #fff;
+  border: 1px solid var(--lg-border);
+  border-radius: var(--lg-radius);
+  background: var(--lg-highlight), var(--lg-tint);
+  box-shadow: var(--lg-shadow);
+  transform: translate3d(0, 0, 0);
+  /* Cross-browser baseline: every engine gets believable frosted glass. */
+  backdrop-filter: blur(var(--lg-fallback-blur)) saturate(var(--lg-saturate)) brightness(var(--lg-brightness)) contrast(var(--lg-contrast));
+  -webkit-backdrop-filter: blur(var(--lg-fallback-blur)) saturate(var(--lg-saturate)) brightness(var(--lg-brightness)) contrast(var(--lg-contrast));
+}
+
+/* Chromium path: true refraction, near-zero blur so lensing stays crisp. */
+html.lg-svg-ok .lg-surface[data-lg-refraction] {
+  backdrop-filter: var(--lg-filter-url) blur(var(--lg-blur)) saturate(var(--lg-saturate)) brightness(var(--lg-brightness)) contrast(var(--lg-contrast));
+  -webkit-backdrop-filter: var(--lg-filter-url) blur(var(--lg-blur)) saturate(var(--lg-saturate)) brightness(var(--lg-brightness)) contrast(var(--lg-contrast));
+}
+
+/* Specular lighting: corner glints + a glossy top sheen — the sparkle. */
+.lg-surface::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at var(--lg-light-x) var(--lg-light-y), rgb(255 255 255 / calc(var(--lg-glare) * 0.82)), transparent 22%),
+    radial-gradient(circle at calc(100% - var(--lg-light-x)) calc(100% - var(--lg-light-y)), rgb(126 226 255 / calc(var(--lg-glare) * 0.32)), transparent 30%),
+    radial-gradient(circle at 12% 6%, rgba(255, 255, 255, 0.36), transparent 28%),
+    linear-gradient(115deg, transparent 0 36%, rgba(255, 255, 255, 0.22) 48%, transparent 62%),
+    radial-gradient(120% 70% at 50% -20%, rgba(255, 255, 255, 0.34), transparent 56%);
+  opacity: 0.98;
+  transition: opacity 0.22s ease, background 0.22s ease;
+}
+
+/* Inner rim: a fine bright line just inside the border. */
+.lg-surface::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.62),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 0 18px rgba(255, 255, 255, 0.10);
+}
+
+.lg-clear {
+  --lg-tint: rgba(255, 255, 255, 0.24);
+  --lg-border: rgba(255, 255, 255, 0.62);
+}
+
+.lg-tinted {
+  --lg-tint: rgba(18, 27, 42, 0.34);
+}
+
+.lg-panel {
+  padding: 20px 24px;
+}
+
+/* ---------------------------------------------------------------------------
+ * Controls
+ * ------------------------------------------------------------------------- */
+
+.top-strip {
+  position: absolute;
+  z-index: 4;
+  top: 24px;
+  left: 24px;
+  display: flex;
+  gap: 10px;
+}
+
+.lg-button {
+  --lg-radius: 999px;
+  display: inline-grid;
+  place-items: center;
+  min-width: 76px;
+  min-height: 44px;
+  padding: 0 18px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-shadow: 0 1px 12px rgba(31, 38, 50, 0.65);
+  transition:
+    transform 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+    --lg-glare 0.24s ease,
+    background 0.24s ease,
+    box-shadow 0.24s ease;
+  transform: translate3d(var(--lg-elastic-x), var(--lg-elastic-y), 0);
+}
+
+.lg-button:hover,
+.lg-button:focus-visible,
+.lg-button.is-active {
+  --lg-tint: rgba(255, 255, 255, 0.26);
+  --lg-glare: 0.72;
+  box-shadow: var(--lg-shadow-active);
+  transform: translate3d(var(--lg-elastic-x), calc(var(--lg-elastic-y) - 1px), 0);
+  outline: none;
+}
+
+.lg-button:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.85);
+  outline-offset: 2px;
+}
+
+.lg-button:active {
+  --lg-glare: 0.84;
+  transform: translate3d(var(--lg-elastic-x), var(--lg-elastic-y), 0) scale(0.985);
+}
+
+.lyric-stack {
+  position: absolute;
+  z-index: 2;
+  left: 8%;
+  right: 8%;
+  top: 24%;
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  text-align: center;
+  color: #fff;
+  text-shadow: 0 6px 30px rgba(20, 24, 34, 0.55);
+}
+
+.lyric-stack p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 1.35rem;
+}
+
+.lyric-stack h1 {
+  margin: 0;
+  font-size: 5.75rem;
+  line-height: 0.92;
+}
+
+.label {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.status-panel {
+  position: absolute;
+  z-index: 3;
+  top: 22%;
+  right: 9%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 4px 20px;
+  width: 260px;
+  padding: 22px 24px;
+  --lg-radius: 30px;
+}
+
+.status-panel .label {
+  grid-column: 1 / -1;
+}
+
+.status-panel strong {
+  display: block;
+  font-size: 1.35rem;
+}
+
+.status-panel span {
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 800;
+}
+
+.transport-bar {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  bottom: 24px;
+  display: grid;
+  grid-template-columns: minmax(180px, 0.85fr) auto minmax(160px, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  width: min(1120px, calc(100vw - 88px));
+  min-height: 90px;
+  padding: 12px 20px;
+  transform: translateX(-50%);
+  --lg-radius: 46px;
+}
+
+.track-meta {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+}
+
+.mini-cover {
+  width: 56px;
+  aspect-ratio: 1;
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.86), transparent 20%),
+    conic-gradient(from 45deg, #ff9d76, #ffd98b, #7cc4ff, #c9a6ff, #ff9d76);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.32),
+    0 14px 30px rgba(20, 24, 34, 0.28);
+}
+
+.track-meta strong,
+.track-meta span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.track-meta strong {
+  font-size: 0.98rem;
+}
+
+.track-meta span {
+  margin-top: 4px;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 0.78rem;
+}
+
+.transport-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon-button {
+  min-width: 58px;
+  padding-inline: 15px;
+}
+
+.play-button {
+  --lg-radius: 50%;
+  width: 72px;
+  height: 72px;
+  min-width: 72px;
+  min-height: 72px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 1rem;
+}
+
+.progress {
+  height: 6px;
+  min-width: 120px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.30);
+  overflow: hidden;
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.24),
+    inset 0 -1px 2px rgba(16, 20, 28, 0.24);
+}
+
+.progress i {
+  display: block;
+  width: 62%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.7));
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.45);
+}
+
+.mode-button {
+  min-width: 82px;
+}
+
+/* ---------------------------------------------------------------------------
+ * Responsive + accessibility fallbacks — part of the material contract.
+ * ------------------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  body {
+    overflow: auto;
+  }
+
+  .app-shell {
+    padding: 14px;
+  }
+
+  .visual-stage {
+    min-height: 820px;
+    border-radius: 30px;
+  }
+
+  .top-strip {
+    top: 16px;
+    left: 16px;
+  }
+
+  .lyric-stack h1 {
+    font-size: 4rem;
+  }
+
+  .status-panel {
+    top: 43%;
+    left: 50%;
+    right: auto;
+    width: min(360px, calc(100vw - 48px));
+    transform: translateX(-50%);
+  }
+
+  .transport-bar {
+    grid-template-columns: 1fr;
+    width: calc(100vw - 36px);
+    padding: 16px;
+    --lg-radius: 32px;
+  }
+
+  .transport-actions {
+    justify-content: center;
+  }
+
+  .mode-button {
+    justify-self: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lg-button,
+  .lg-button:hover,
+  .lg-button:focus-visible,
+  .lg-button.is-active,
+  .lg-button:active {
+    transform: none;
+    transition: background 0.16s ease, box-shadow 0.16s ease;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .lg-surface {
+    --lg-tint: rgba(12, 16, 22, 0.62);
+    --lg-border: rgba(255, 255, 255, 0.55);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .lg-surface,
+  html.lg-svg-ok .lg-surface[data-lg-refraction] {
+    background: rgba(22, 27, 35, 0.92);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
