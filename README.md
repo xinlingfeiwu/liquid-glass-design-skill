@@ -4,7 +4,7 @@ An AI-agent skill and template kit for building high-end Liquid Glass interfaces
 
 The refraction core uses inverse lens mapping: a canvas-generated displacement map whose interior is identity and whose edges magnify the backdrop, driven through a per-surface SVG `feDisplacementMap` at a measured — never guessed — scale.
 
-![Liquid Glass preview](docs/preview.png)
+![Liquid Glass preview](docs/preview-20260708.png)
 
 ## Join The QQ Group
 
