@@ -54,6 +54,17 @@ Key rules:
 - When a project needs a dedicated warped material layer, keep that layer behind a separate sharp content layer; do not rasterize or displace live foreground DOM.
 - Preserve foreground art geometry inside glass. For circular meters, records, avatars, album art, and preview dials, use an inner `aspect-ratio` locked element and center it inside the wide card instead of stretching gradients or rings across the container.
 
+## Layout Safety Contract
+
+Liquid Glass amplifies layout mistakes because transparent surfaces reveal every collision behind them. Treat layout constraints as part of the material implementation:
+
+- Give each major surface a stable anchor: bottom center dock, side rail, top toolbar, focal card, or contextual popover.
+- Use explicit `min()`, `max()`, `clamp()`, grid tracks, or container-relative constraints for fixed-format surfaces. Avoid viewport-only guesses when two surfaces share vertical space.
+- Reserve measured clear space between focal content and global command bars. If a dock floats over content by design, dim or crop the underlying content deliberately instead of accidental overlap.
+- Lock ratio-sensitive children with `aspect-ratio` and `object-fit` or equivalent geometry. The outer glass may be fluid; the inner artwork should not stretch.
+- Keep filter SVG roots hidden and outside layout flow. Broad child selectors should exclude them.
+- Verify final geometry with `getBoundingClientRect()` at the same viewports used for screenshots.
+
 ## SVG Filter Contract
 
 Use an inline SVG `<defs>` block near the root of the document. Keep it hidden

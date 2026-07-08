@@ -11,21 +11,23 @@ Use this skill to design, implement, or review high-quality Liquid Glass UI. Tre
 
 ## Workflow
 
-1. Inspect the target UI first: identify the content layer, control/navigation layer, background complexity, motion density, and accessibility constraints.
-2. Build or locate a **designed, high-information backdrop** before tuning glass. Use dark, bright, photographic/media-like, and high-frequency line/grid details, but compose them as a real product scene. Never judge Liquid Glass on a flat gradient alone, and never turn the whole screen into noisy test pattern wallpaper.
-3. Choose the material variant:
+1. Classify the task first: new UI, existing UI upgrade, component/template extraction, or design review. Use `references/practical-workflows.md` for the matching playbook.
+2. Inspect the target UI: identify the content layer, command/control layer, background complexity, motion density, accessibility constraints, and the user's main visual complaint.
+3. Do a composition pass before material tuning. Define one focal surface, one command surface, and one secondary information group. Remove scattered floating cards, accidental overlaps, and unanchored decorative test details before changing lens parameters.
+4. Build or locate a **designed, high-information backdrop** before tuning glass. Use dark, bright, photographic/media-like, and high-frequency line/grid details, but compose them as a real product scene. Never judge Liquid Glass on a flat gradient alone, and never turn the whole screen into noisy test pattern wallpaper.
+5. Choose the material variant:
    - **Regular** for most controls, panels, bars, and menus.
    - **Clear** only above visually rich media when a dimming layer and bold foreground content preserve legibility.
    - **Tinted** for primary actions, selected states, or environments where clear glass loses contrast.
-4. Choose the implementation path:
+6. Choose the implementation path:
    - Use CSS + a per-surface SVG filter fed by a canvas-generated inverse-lens displacement map for production web/Electron surfaces. This is the default quality path.
    - Use React components from `assets/templates/react-liquid-glass/` when a component API is useful.
    - Use a map-on-content strategy when Safari/Firefox parity matters more than true live backdrop refraction.
    - Use the vanilla template in `assets/templates/vanilla-liquid-glass/` for plain HTML/CSS/JS or for extracting patterns into another framework.
    - Consider WebGL/WebGPU only for large dynamic scenes, shader-grade Fresnel/glare/blur, merged blob shapes, or when CSS/SVG cannot maintain quality or browser support.
-5. Apply the material selectively. Prefer bars, floating controls, popovers, pills, cards, and selection indicators. Do not blanket the content layer in glass.
-6. Produce a rendered showcase, not just component files. The first example must prove the glass on multiple backdrop conditions and include small/large/round/text-heavy surfaces.
-7. Verify against the checklist before calling the work complete.
+7. Apply the material selectively. Prefer bars, floating controls, popovers, pills, cards, and selection indicators. Do not blanket the content layer in glass.
+8. Produce a rendered showcase, not just component files. The first example must prove the glass on multiple backdrop conditions and include small/large/round/text-heavy surfaces.
+9. Verify geometry, optics, accessibility, and browser fallback against the checklist before calling the work complete.
 
 ## Core Rules
 
@@ -46,10 +48,12 @@ Use this skill to design, implement, or review high-quality Liquid Glass UI. Tre
 - Tune chromatic dispersion by surface size. Large horizontal bars usually need very low dispersion; small rim-heavy pills can carry more color detail.
 - Reject outputs that only look acceptable in one curated screenshot. A good material survives dark, bright, image-like, and high-frequency backgrounds.
 - Reject demos that feel like technical filter tests rather than a designed interface. The first screen should communicate an app surface, control deck, editor, dashboard, media view, or other believable UI context.
+- Reject layouts where glass surfaces collide, float without an anchor, or make the main content compete with secondary samples. Premium glass starts with calm hierarchy.
 
 ## Resource Guide
 
 - Read `references/principles.md` for design hierarchy, material variants, motion, and accessibility principles.
+- Read `references/practical-workflows.md` when deciding how to start: build from scratch, upgrade an existing UI, review weak output, adopt templates, or run visual QA.
 - Read `references/golden-glass-style.md` before tuning visual quality or judging whether an effect feels premium. It defines the inverse-lens displacement pattern and the rejection criteria.
 - Read `references/showcase-quality.md` before creating demos, screenshots, README previews, or template examples. It defines the minimum visual proof expected from this skill.
 - Read `references/web-implementation.md` when implementing CSS/SVG/JS or React, especially the per-surface filter/map pattern and the JS/React contracts.
@@ -84,6 +88,8 @@ Complete Liquid Glass work only when:
 - The demo/verification backdrop includes dark, bright, image-like, and high-frequency detail backgrounds so refraction cannot hide.
 - High-frequency detail proves refraction without overwhelming the visual direction; the showcase still reads as a designed interface.
 - The delivered example is a rendered, runnable showcase, not merely a folder or code snippet.
+- The main focal surface, secondary information group, and command/dock surface have measured non-overlap at target desktop and mobile viewports.
+- Centered command bars are mathematically centered in the stage, not visually guessed from nearby panels.
 - Hover, press, focus, and selected states feel alive but do not flicker or resize layout.
 - Reduced motion/transparency/contrast preferences have explicit fallbacks.
 - Performance remains smooth under normal interaction; map generation is cached and shape-driven.

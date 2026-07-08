@@ -15,6 +15,18 @@ Do not ship a demo that only looks good on a flat gradient. Weak glass hides on 
 
 High-information does not mean visual clutter. Treat crisp lines, dots, grids, waveforms, and chart marks as optical test details placed near glass edges, not as a full-screen decorative texture. The showcase must still look like a designed product surface.
 
+## Composition Quality Bar
+
+Before judging the material, the page must already feel designed:
+
+- One focal surface dominates the scene. Secondary cards support it instead of competing with it.
+- Global controls sit on an obvious anchor such as the bottom center, top rail, or side rail.
+- Related metrics are grouped into a rail, cluster, or panel. Do not scatter three or four floating cards around the viewport just to show more glass.
+- Backdrop detail is densest near glass edges where refraction proves itself. Large quiet zones protect type and hierarchy.
+- The first viewport has enough negative space for the glass to breathe; no key surface should visually touch, hide behind, or crowd another key surface.
+- If a dock is the global command surface, center it against the stage and make its width intentional. Do not let nearby cards make the dock feel off-center.
+- The scene should pass a screenshot-only test: a viewer should understand the role of each surface without reading implementation notes.
+
 ## Required Surface Set
 
 Every showcase should include:
@@ -77,5 +89,7 @@ If the screenshot could be mistaken for a generic blur card, reject it and retun
 - The material looks good only on one background scene.
 - High-frequency lines cover the whole screen and make the composition feel noisy or cheap.
 - The glass is strong but the UI has no believable product context, hierarchy, or focal point.
+- The demo looks like a collection of glass samples instead of one coherent interface.
+- A bottom dock collides with the main card, equalizer, chart, or other foreground artwork at common desktop sizes.
 - Wide cards stretch circular dials, avatars, records, or preview art into ovals.
 - Long docks use showcase-level dispersion and turn backdrop lines into colored vertical artifacts.

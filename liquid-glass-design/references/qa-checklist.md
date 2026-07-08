@@ -25,10 +25,27 @@ Run this checklist before finalizing Liquid Glass UI.
 ## Layout
 
 - Resize from mobile to wide desktop.
+- Test at least one wide desktop viewport, one laptop viewport, and one mobile viewport. Common desktop success does not prove responsive success.
 - Check long labels, icon-only controls, dense toolbars, and compact pills.
 - Ensure hover/active/focus states do not change element dimensions.
+- Measure collision-sensitive surfaces with `getBoundingClientRect()`: main card vs dock, rail vs focus surface, popover vs viewport, and top controls vs hero/content.
+- Require positive gaps between intentional non-overlapping surfaces at target viewports. Do not rely on screenshots alone for close calls.
+- For globally centered docks/bars, compare the dock center to the stage center. A centered dock should have `centerDelta <= 1px` after layout settles.
+- Confirm decorative meters, equalizers, and artwork do not disappear under command bars when the viewport changes.
 - Confirm popovers and menus do not stack glass inside glass.
 - In React/grid/flex demos, confirm component-owned filter SVG nodes stay out of layout and do not become extra items that push controls into another row.
+
+Quick browser console check:
+
+```js
+const stage = document.querySelector(".visual-stage")?.getBoundingClientRect();
+const dock = document.querySelector(".transport-bar")?.getBoundingClientRect();
+const focus = document.querySelector(".media-card")?.getBoundingClientRect();
+console.table({
+  dockCenterDelta: stage && dock ? Math.abs((dock.left + dock.width / 2) - (stage.left + stage.width / 2)) : null,
+  focusDockGap: focus && dock ? dock.top - focus.bottom : null
+});
+```
 
 ## Accessibility
 
