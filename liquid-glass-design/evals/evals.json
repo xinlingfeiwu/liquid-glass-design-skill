@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "1.0",
+  "description": "Manual and automated regression prompts for the liquid-glass-design skill.",
+  "cases": [
+    {
+      "id": "upgrade-overlapping-demo",
+      "prompt": "Use $liquid-glass-design to upgrade an existing Liquid Glass demo. The screenshot shows the bottom dock overlapping the main card/equalizer, the dock is not visually centered, and the glass feels weak. Keep the existing product context and improve the implementation.",
+      "assertions": [
+        "The response fixes layout hierarchy before tuning optical parameters.",
+        "The response preserves the product context instead of replacing the scene with a generic background.",
+        "The response verifies dock centering and non-overlap using browser geometry or scripts/check-visual-geometry.mjs.",
+        "The response strengthens refraction with measured displacement maps and shape-specific profiles.",
+        "The response updates or regenerates any preview image after visual changes."
+      ]
+    },
+    {
+      "id": "new-react-component",
+      "prompt": "Use $liquid-glass-design to create a reusable React LiquidGlass component and showcase page for a premium analytics dashboard.",
+      "assertions": [
+        "The component exposes variant, radius, profile, strength, magnify, dispersion, blur, tint, glare, and interactive props.",
+        "The showcase chooses a named composition recipe or equivalent design rationale.",
+        "The implementation keeps children sharp and filter SVG nodes out of layout flow.",
+        "The showcase exercises small pills, circular/square art, text panels, and a long dock or command rail.",
+        "The implementation includes reduced motion, reduced transparency, and fallback behavior."
+      ]
+    },
+    {
+      "id": "weak-output-review",
+      "prompt": "Use $liquid-glass-design to review a screenshot of a Liquid Glass interface that looks cluttered, blurry, and low-end. Identify what is wrong and patch the code.",
+      "assertions": [
+        "The review orders issues by composition, geometry, optical material, foreground clarity, accessibility, performance, and fallback.",
+        "The patch removes scattered or competing glass samples before adding stronger effects.",
+        "The optical changes avoid blur-only glass and use rim refraction plus restrained chromatic detail.",
+        "The final answer includes screenshot or runnable-demo verification.",
+        "The final answer does not claim success without measurable checks for overlap or clipping."
+      ]
+    }
+  ]
+}

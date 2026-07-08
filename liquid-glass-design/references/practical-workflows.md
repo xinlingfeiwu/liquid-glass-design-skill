@@ -5,7 +5,7 @@ Use this reference when turning the skill into actual work. Pick one workflow, t
 ## Workflow A: Build A New Liquid Glass UI
 
 1. Define the product scene in one sentence: editor, dashboard, media surface, command deck, map, camera, terminal, or other believable context.
-2. Choose a composition before writing CSS:
+2. Choose a composition recipe from `design-recipes.md` before writing CSS:
    - one focal object or content surface;
    - one primary command surface such as a dock, toolbar, segmented control, or floating action cluster;
    - one secondary information group, usually grouped as a rail or stack instead of scattered cards.
@@ -18,7 +18,7 @@ Use this reference when turning the skill into actual work. Pick one workflow, t
 
 1. Preserve the app's real task and information hierarchy. Do not replace the product with a generic demo background.
 2. Take a screenshot and mark collision zones: overlapping panels, cramped gaps, clipped rims, text over busy imagery, and controls that are not anchored to a layout system.
-3. Fix layout before optics:
+3. Select the closest recipe from `design-recipes.md`, then fix layout before optics:
    - group related small cards into one rail or panel;
    - center global docks relative to the stage, not relative to nearby content;
    - reserve explicit clear space between docks, cards, and floating panels;
@@ -69,6 +69,12 @@ console.table({ gap, centerDelta });
 ```
 
 4. Treat negative gaps, clipped edges, or `centerDelta > 1` on intentionally centered docks as defects.
-5. Disable SVG filter support or test Safari/Firefox fallback.
-6. Test reduced motion and reduced transparency.
-7. Update the README preview only after the local screenshot matches the current implementation.
+5. Or run the bundled helper when Playwright is available:
+
+```bash
+node liquid-glass-design/scripts/check-visual-geometry.mjs --url http://127.0.0.1:4173 --screenshot-dir ./shots
+```
+
+6. Disable SVG filter support or test Safari/Firefox fallback.
+7. Test reduced motion and reduced transparency.
+8. Update the README preview only after the local screenshot matches the current implementation.

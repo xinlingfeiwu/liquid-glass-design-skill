@@ -47,6 +47,12 @@ console.table({
 });
 ```
 
+Bundled script check when the page is runnable and Playwright is installed:
+
+```bash
+node liquid-glass-design/scripts/check-visual-geometry.mjs --url http://127.0.0.1:4173 --screenshot-dir ./shots
+```
+
 ## Accessibility
 
 - Test `prefers-reduced-motion`.

@@ -1,7 +1,7 @@
 interface:
   display_name: "Liquid Glass Design"
-  short_description: "Refined Liquid Glass UI workflows"
-  default_prompt: "Use $liquid-glass-design to craft a polished Liquid Glass interface with SVG refraction, motion, and accessible fallbacks."
+  short_description: "Premium Liquid Glass UI workflows"
+  default_prompt: "Use $liquid-glass-design to create, upgrade, and verify a premium Liquid Glass interface with SVG refraction, strong composition, motion, and accessible fallbacks."
 
 policy:
   allow_implicit_invocation: true

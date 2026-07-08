@@ -15,8 +15,10 @@ Scan the QR code to join the `liquid-glass-skill` group chat.
 ## What Is Included
 
 - `liquid-glass-design/SKILL.md` - the skill entrypoint (workflow, rules, defaults, acceptance criteria).
-- `liquid-glass-design/references/` - practical workflows, design principles, showcase quality gates, the golden-glass quality bar, web implementation contracts, GitHub research, and QA checklists.
+- `liquid-glass-design/references/` - practical workflows, design recipes, prompt patterns, showcase quality gates, the golden-glass quality bar, web implementation contracts, GitHub research, and QA checklists.
 - `liquid-glass-design/scripts/generate-displacement-map.mjs` - a zero-dependency PNG displacement map generator that prints the exact `feDisplacementMap` scale.
+- `liquid-glass-design/scripts/check-visual-geometry.mjs` - a Playwright-based QA helper for overlap, dock centering, viewport containment, and screenshots.
+- `liquid-glass-design/evals/evals.json` - regression prompts for checking whether the skill produces practical, premium Liquid Glass outcomes.
 - `liquid-glass-design/assets/templates/vanilla-liquid-glass/` - a no-build HTML/CSS/JS Optic Deck showcase with per-surface filters, lens profiles, pointer glare, multi-background optical QA, and lens maps.
 - `liquid-glass-design/assets/templates/react-liquid-glass/` - a React/Vite `<LiquidGlass>` component template with profile/tuning props and the same redesigned showcase-grade demo scene.
 
@@ -40,6 +42,12 @@ Then ask Codex:
 
 ```text
 Use $liquid-glass-design to redesign this toolbar as a Liquid Glass control layer.
+```
+
+Stronger prompt:
+
+```text
+Use $liquid-glass-design to upgrade this existing UI into premium Liquid Glass without replacing the product context. Fix hierarchy, overlap, clipped rims, and dock/toolbar centering before tuning glass. Verify with screenshots plus browser geometry checks.
 ```
 
 ### Claude Code
@@ -112,10 +120,23 @@ The command outputs a PNG data URI (or `--mode png --output map.png`) and prints
 
 Options: `--width`, `--height`, `--radius`, `--profile`, `--magnify`, `--bend`, `--spread`, `--bezel-ratio`, `--mode data-uri|png`, `--output`.
 
+## Run Visual Geometry QA
+
+When a demo page is running and the project has Playwright installed:
+
+```bash
+node liquid-glass-design/scripts/check-visual-geometry.mjs \
+  --url http://127.0.0.1:4173 \
+  --screenshot-dir ./shots
+```
+
+The script checks dock centering, focus/dock overlap, rail/focus overlap, viewport containment, and can save screenshots for desktop and mobile viewports.
+
 ## Design Rules
 
 - Use glass on controls and navigation, not as a blanket content layer.
 - Start with composition: one focal surface, one command surface, one grouped secondary information area.
+- Choose a design recipe before coding: Command Deck, Lens Inspector, Media Glass Stage, Instrument Bay, Mobile Focus Sheet, or a custom equivalent.
 - One filter and one map per distinct surface shape.
 - Inverse lens mapping: identity center, edge magnification, measured scale, shape-specific profile.
 - Keep blur near zero on the refractive path; punch comes from `contrast`.
@@ -131,6 +152,7 @@ Options: `--width`, `--height`, `--radius`, `--profile`, `--magnify`, `--bend`, 
 
 ```bash
 node --check liquid-glass-design/scripts/generate-displacement-map.mjs
+node --check liquid-glass-design/scripts/check-visual-geometry.mjs
 node --check liquid-glass-design/assets/templates/vanilla-liquid-glass/liquid-glass.js
 node --check liquid-glass-design/assets/templates/react-liquid-glass/src/displacementMap.js
 ```
