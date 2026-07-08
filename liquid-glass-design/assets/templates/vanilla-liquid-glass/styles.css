@@ -407,7 +407,7 @@ html.lg-svg-ok .lg-surface[data-lg-refraction].lg-map-ready {
 }
 
 .media-topline strong {
-  color: rgba(16, 26, 39, 0.88);
+  color: rgba(5, 10, 18, 0.98);
   font-size: 1.08rem;
 }
 
@@ -643,6 +643,16 @@ html.lg-svg-ok .lg-surface[data-lg-refraction].lg-map-ready {
   --lg-tint: rgba(5, 13, 22, 0.44);
 }
 
+.transport-actions .lg-button {
+  --lg-tint: rgba(5, 13, 22, 0.34);
+}
+
+.transport-actions .lg-button:hover,
+.transport-actions .lg-button:focus-visible,
+.transport-actions .lg-button.is-active {
+  --lg-tint: rgba(5, 13, 22, 0.42);
+}
+
 .icon-button {
   min-width: 58px;
   padding-inline: 15px;
@@ -684,7 +694,7 @@ html.lg-svg-ok .lg-surface[data-lg-refraction].lg-map-ready {
 }
 
 .mode-button.lg-clear {
-  color: rgba(17, 26, 36, 0.9);
+  color: rgba(5, 9, 14, 0.98);
   text-shadow: 0 1px 10px rgba(255, 255, 255, 0.22);
 }
 
