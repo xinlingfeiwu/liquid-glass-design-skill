@@ -11,6 +11,7 @@ const repoRoot = resolve(skillDir, "..");
 const outputDir = resolve(repoRoot, "dist");
 const EXCLUDE_PARTS = new Set([".git", "node_modules", "dist", ".vite", "coverage", "__pycache__"]);
 const EXCLUDE_SUFFIXES = [".log", ".DS_Store"];
+const EXCLUDE_PREFIXES = ["liquid-glass-design/evals/baselines/"];
 const LEAN_EXCLUDE_PATHS = new Set([
   "liquid-glass-design/agents/openai.yaml",
   "liquid-glass-design/references/github-research.md",
@@ -34,7 +35,10 @@ function outputPaths(lean) {
 
 function isExcluded(path, { lean = false } = {}) {
   const parts = path.split("/");
-  const baseExcluded = parts.some((part) => EXCLUDE_PARTS.has(part)) || EXCLUDE_SUFFIXES.some((suffix) => path.endsWith(suffix));
+  const baseExcluded =
+    parts.some((part) => EXCLUDE_PARTS.has(part)) ||
+    EXCLUDE_SUFFIXES.some((suffix) => path.endsWith(suffix)) ||
+    EXCLUDE_PREFIXES.some((prefix) => path.startsWith(prefix));
   if (baseExcluded) return true;
   if (!lean) return false;
   return LEAN_EXCLUDE_PATHS.has(path) || parts.some((part) => LEAN_EXCLUDE_PARTS.has(part));
@@ -72,6 +76,7 @@ async function main() {
       totalBytes,
       outputs: [relative(repoRoot, zipPath), relative(repoRoot, skillPath)],
       excluded: Array.from(EXCLUDE_PARTS).sort(),
+      excludedPathPrefixes: EXCLUDE_PREFIXES,
       leanExcluded: lean ? {
         paths: Array.from(LEAN_EXCLUDE_PATHS).sort(),
         parts: Array.from(LEAN_EXCLUDE_PARTS).sort()

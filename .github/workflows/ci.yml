@@ -17,20 +17,7 @@ jobs:
           node-version: 20
 
       - name: Validate skill structure
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          skill = Path("liquid-glass-design/SKILL.md")
-          text = skill.read_text(encoding="utf-8")
-          assert text.startswith("---\n"), "SKILL.md must start with frontmatter"
-          end = text.find("\n---", 4)
-          assert end != -1, "SKILL.md frontmatter must close"
-          frontmatter = text[4:end]
-          assert "name: liquid-glass-design" in frontmatter
-          assert "description:" in frontmatter
-          assert (Path("liquid-glass-design/agents/openai.yaml")).exists()
-          assert (Path("liquid-glass-design/LICENSE")).exists()
-          PY
+        run: npm run validate
 
       - name: Node syntax checks
         run: npm run check
@@ -59,34 +46,45 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p artifacts/screenshots
-          python3 -m http.server 4173 --directory liquid-glass-design/assets/templates/vanilla-liquid-glass > /tmp/liquid-glass-http.log 2>&1 &
+          python3 -m http.server 4173 --directory liquid-glass-design/assets > /tmp/liquid-glass-http.log 2>&1 &
           server_pid=$!
           trap 'kill "$server_pid" 2>/dev/null || true' EXIT
           for _ in $(seq 1 60); do
-            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then
+            if curl -fsS http://127.0.0.1:4173/templates/vanilla-liquid-glass/ >/dev/null; then
               break
             fi
             sleep 0.5
           done
           node liquid-glass-design/scripts/check-visual-geometry.mjs \
-            --url http://127.0.0.1:4173 \
+            --url http://127.0.0.1:4173/templates/vanilla-liquid-glass/ \
             --browser chromium \
             --expect-svg-filter enabled \
             --screenshot-dir artifacts/screenshots \
             --baseline-dir liquid-glass-design/evals/baselines \
             --pixel-threshold 0.10 \
             --pixel-channel-threshold 24 \
+            --roi-roles dock,focus \
+            --roi-pixel-threshold 0.03 \
+            --reduced-motion \
             --contrast \
-            --min-contrast 3
+            --min-contrast 4.5
           node liquid-glass-design/scripts/check-visual-geometry.mjs \
-            --url http://127.0.0.1:4173 \
+            --url http://127.0.0.1:4173/templates/vanilla-liquid-glass/ \
+            --browser webkit \
+            --expect-svg-filter disabled \
+            --viewport 1440x900 \
+            --screenshot-dir artifacts/screenshots \
+            --contrast \
+            --min-contrast 4.5
+          node liquid-glass-design/scripts/check-visual-geometry.mjs \
+            --url http://127.0.0.1:4173/templates/vanilla-liquid-glass/ \
             --browser webkit \
             --force-fallback \
             --expect-svg-filter disabled \
             --viewport 1440x900 \
             --screenshot-dir artifacts/screenshots \
             --contrast \
-            --min-contrast 3
+            --min-contrast 4.5
 
       - name: Upload visual QA screenshots
         if: always()

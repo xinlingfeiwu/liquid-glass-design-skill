@@ -18,6 +18,7 @@ Scan the QR code to join the `liquid-glass-skill` group chat.
 
 - `liquid-glass-design/SKILL.md` - the skill entrypoint (workflow, rules, defaults, acceptance criteria).
 - `liquid-glass-design/references/` - practical workflows, design recipes, prompt patterns, showcase quality gates, the golden-glass single source of truth, web/Electron implementation contracts, GitHub research, and QA checklists.
+- `liquid-glass-design/assets/core/liquid-glass-core.js` - shared SDF, lens-profile, displacement-pixel, and browser support logic used by every template and script.
 - `liquid-glass-design/scripts/generate-displacement-map.mjs` - a zero-dependency PNG displacement map generator that prints the exact `feDisplacementMap` scale.
 - `liquid-glass-design/scripts/check-visual-geometry.mjs` - a Playwright-based QA helper for overlap, dock centering, viewport containment, fallback behavior, contrast estimates, screenshots, and committed PNG baselines.
 - `liquid-glass-design/scripts/package-skill.mjs` - creates full or lean `.skill` packages while excluding `node_modules`, `dist`, caches, logs, and other heavy local artifacts.
@@ -93,11 +94,10 @@ Any agent that supports Markdown skills can consume `liquid-glass-design/SKILL.m
 No build step:
 
 ```bash
-cd liquid-glass-design/assets/templates/vanilla-liquid-glass
-python3 -m http.server 4173
+npm run dev:vanilla
 ```
 
-Open `http://127.0.0.1:4173`.
+Open `http://127.0.0.1:4173/templates/vanilla-liquid-glass/`.
 
 Chromium-based browsers (Chrome, Edge, Electron) get true SVG refraction. Safari and Firefox get a graceful frosted-glass fallback automatically.
 
@@ -116,6 +116,8 @@ No framework required:
 ```bash
 npm run dev:web-component
 ```
+
+Open `http://127.0.0.1:4174/templates/web-component-liquid-glass/`.
 
 Use it in any HTML-rendering stack:
 
@@ -172,10 +174,10 @@ When a demo page is running and the project has Playwright installed:
 ```bash
 npm i -D playwright && npx playwright install chromium
 node liquid-glass-design/scripts/check-visual-geometry.mjs \
-  --url http://127.0.0.1:4173 \
+  --url http://127.0.0.1:4173/templates/vanilla-liquid-glass/ \
   --screenshot-dir ./shots \
   --contrast \
-  --min-contrast 3
+  --min-contrast 4.5
 ```
 
 The script checks dock centering, focus/dock overlap, rail/focus overlap, viewport containment, JS console errors, SVG-filter readiness/fallback, estimated text contrast, and can save screenshots for desktop and mobile viewports. It accepts either `playwright` or `playwright-core`.
@@ -184,10 +186,12 @@ For visual regression, compare against the committed baseline PNGs in `liquid-gl
 
 ```bash
 node liquid-glass-design/scripts/check-visual-geometry.mjs \
-  --url http://127.0.0.1:4173 \
+  --url http://127.0.0.1:4173/templates/vanilla-liquid-glass/ \
   --baseline-dir liquid-glass-design/evals/baselines \
   --pixel-threshold 0.10 \
-  --pixel-channel-threshold 24
+  --pixel-channel-threshold 24 \
+  --roi-roles dock,focus \
+  --roi-pixel-threshold 0.03
 ```
 
 Only update baselines when the visual change is intentional:
@@ -201,7 +205,11 @@ To verify the fallback path:
 
 ```bash
 npm run qa:vanilla:fallback
+npm run qa:vanilla:webkit-detect
+npm run qa:vanilla:reduced-motion
 ```
+
+Committed baseline PNGs are CI regression assets and are excluded from packaged `.skill` files; use `npm run package:skill` or the lean package without shipping screenshot history to end users.
 
 ## Design Rules
 

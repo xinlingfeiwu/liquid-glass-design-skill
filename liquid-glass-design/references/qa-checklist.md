@@ -50,7 +50,7 @@ console.table({
 Bundled script check when the page is runnable and Playwright is installed:
 
 ```bash
-node liquid-glass-design/scripts/check-visual-geometry.mjs --url http://127.0.0.1:4173 --screenshot-dir ./shots --contrast --min-contrast 3
+node liquid-glass-design/scripts/check-visual-geometry.mjs --url http://127.0.0.1:4173/templates/vanilla-liquid-glass/ --screenshot-dir ./shots --contrast --min-contrast 4.5
 ```
 
 Prefer adding semantic hooks in product code so the script can auto-discover surfaces:
@@ -65,7 +65,7 @@ Prefer adding semantic hooks in product code so the script can auto-discover sur
 For pixel regression, compare against committed viewport baselines. Update them only when the visual change is intentional and the PNG diff is reviewed. Use `--full-page` for exploratory captures, not cross-platform CI baselines:
 
 ```bash
-node liquid-glass-design/scripts/check-visual-geometry.mjs --url http://127.0.0.1:4173 --baseline-dir liquid-glass-design/evals/baselines --pixel-threshold 0.10 --pixel-channel-threshold 24
+node liquid-glass-design/scripts/check-visual-geometry.mjs --url http://127.0.0.1:4173/templates/vanilla-liquid-glass/ --baseline-dir liquid-glass-design/evals/baselines --pixel-threshold 0.10 --pixel-channel-threshold 24 --roi-roles dock,focus --roi-pixel-threshold 0.03
 npm run qa:vanilla:update-baseline
 git diff -- liquid-glass-design/evals/baselines
 ```
@@ -95,5 +95,7 @@ git diff -- liquid-glass-design/evals/baselines
 
 - Chromium/Electron: expect full SVG backdrop-filter path where supported.
 - Safari/Firefox: expect graceful blur/tint/shadow fallback unless the implementation uses a cross-browser map-on-content strategy or the engine proves URL-filter support via feature detection.
-- Run `npm run qa:vanilla:fallback` to force the fallback path and prove panels remain nonblank, legible, and error-free.
+- Run `npm run qa:vanilla:webkit-detect` without `--force-fallback` to prove Safari/WebKit detection chooses the fallback path.
+- Run `npm run qa:vanilla:fallback` to prove the explicit escape hatch keeps panels nonblank, legible, and error-free.
+- Run `npm run qa:vanilla:reduced-motion` to prove `prefers-reduced-motion: reduce` disables transform transitions.
 - Verify unsupported browsers do not show broken filters, blank panels, or unreadable transparent controls.

@@ -83,7 +83,7 @@ console.table({ gap, centerDelta });
 5. Or run the bundled helper when Playwright is available:
 
 ```bash
-node liquid-glass-design/scripts/check-visual-geometry.mjs --url http://127.0.0.1:4173 --screenshot-dir ./shots
+node liquid-glass-design/scripts/check-visual-geometry.mjs --url http://127.0.0.1:4173/templates/vanilla-liquid-glass/ --screenshot-dir ./shots
 ```
 
 6. Disable SVG filter support or test Safari/Firefox fallback.

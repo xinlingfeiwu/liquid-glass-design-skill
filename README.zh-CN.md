@@ -66,9 +66,10 @@ node liquid-glass-design/scripts/package-skill.mjs --lean
 Vanilla：
 
 ```bash
-cd liquid-glass-design/assets/templates/vanilla-liquid-glass
-python3 -m http.server 4173
+npm run dev:vanilla
 ```
+
+打开 `http://127.0.0.1:4173/templates/vanilla-liquid-glass/`。
 
 React：
 
@@ -83,6 +84,8 @@ Web Component：
 ```bash
 npm run dev:web-component
 ```
+
+打开 `http://127.0.0.1:4174/templates/web-component-liquid-glass/`。
 
 任意 HTML/框架里可直接使用：
 
@@ -99,20 +102,22 @@ npm run dev:web-component
 ```bash
 npm i -D playwright && npx playwright install chromium
 node liquid-glass-design/scripts/check-visual-geometry.mjs \
-  --url http://127.0.0.1:4173 \
+  --url http://127.0.0.1:4173/templates/vanilla-liquid-glass/ \
   --screenshot-dir ./shots \
   --contrast \
-  --min-contrast 3
+  --min-contrast 4.5
 ```
 
 像素回归默认对比仓库内提交的 baseline：
 
 ```bash
 node liquid-glass-design/scripts/check-visual-geometry.mjs \
-  --url http://127.0.0.1:4173 \
+  --url http://127.0.0.1:4173/templates/vanilla-liquid-glass/ \
   --baseline-dir liquid-glass-design/evals/baselines \
   --pixel-threshold 0.10 \
-  --pixel-channel-threshold 24
+  --pixel-channel-threshold 24 \
+  --roi-roles dock,focus \
+  --roi-pixel-threshold 0.03
 ```
 
 只有视觉变化是有意的，才更新 baseline：
@@ -126,7 +131,11 @@ git diff -- liquid-glass-design/evals/baselines
 
 ```bash
 npm run qa:vanilla:fallback
+npm run qa:vanilla:webkit-detect
+npm run qa:vanilla:reduced-motion
 ```
+
+仓库里的 baseline PNG 只用于 CI 视觉回归，不会进入 full/lean `.skill` 分发包。
 
 ## 校验
 

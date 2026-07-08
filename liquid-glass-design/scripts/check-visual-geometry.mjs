@@ -43,8 +43,11 @@ Options:
   --full-page                     Capture full-page screenshots. Default: viewport only
   --pixel-threshold 0.01          Max changed-pixel ratio allowed
   --pixel-channel-threshold 16    Per-pixel channel delta threshold
+  --roi-roles dock,focus          Optional role crops for stricter pixel checks
+  --roi-pixel-threshold 0.01      Max changed-pixel ratio inside role crops
   --expect-svg-filter enabled|disabled|auto
   --force-fallback                Force template fallback path before page scripts run
+  --reduced-motion                Emulate prefers-reduced-motion: reduce
   --contrast                      Estimate text/background contrast from screenshots
   --contrast-selector ".label"    Text selector for contrast checks
   --min-contrast 4.5              Minimum estimated contrast ratio
@@ -214,6 +217,44 @@ function comparePngBuffers(actualBuffer, baselineBuffer, channelThreshold) {
   return { pass: true, reason: "compared", changedRatio: changed / pixels, changedPixels: changed, pixels };
 }
 
+function comparePngRegionBuffers(actualBuffer, baselineBuffer, channelThreshold, rect) {
+  const actual = decodePng(actualBuffer);
+  const baseline = decodePng(baselineBuffer);
+  if (actual.width !== baseline.width || actual.height !== baseline.height) {
+    return {
+      pass: false,
+      reason: "dimension-mismatch",
+      actual: `${actual.width}x${actual.height}`,
+      baseline: `${baseline.width}x${baseline.height}`,
+      changedRatio: 1
+    };
+  }
+
+  const left = Math.max(0, Math.floor(rect.left));
+  const top = Math.max(0, Math.floor(rect.top));
+  const right = Math.min(actual.width, Math.ceil(rect.right));
+  const bottom = Math.min(actual.height, Math.ceil(rect.bottom));
+  const pixels = Math.max(0, right - left) * Math.max(0, bottom - top);
+  if (pixels === 0) {
+    return { pass: true, reason: "outside-screenshot", changedRatio: 0, changedPixels: 0, pixels: 0 };
+  }
+
+  let changed = 0;
+  for (let y = top; y < bottom; y += 1) {
+    for (let x = left; x < right; x += 1) {
+      const index = (y * actual.width + x) * 4;
+      const delta =
+        Math.abs(actual.rgba[index] - baseline.rgba[index]) +
+        Math.abs(actual.rgba[index + 1] - baseline.rgba[index + 1]) +
+        Math.abs(actual.rgba[index + 2] - baseline.rgba[index + 2]) +
+        Math.abs(actual.rgba[index + 3] - baseline.rgba[index + 3]);
+      if (delta > channelThreshold) changed += 1;
+    }
+  }
+
+  return { pass: true, reason: "compared", changedRatio: changed / pixels, changedPixels: changed, pixels };
+}
+
 async function loadPlaywright() {
   const errors = [];
   try {
@@ -273,11 +314,13 @@ function estimateContrasts(screenshot, items, minContrast) {
       { x: rect.right - inset, y: rect.bottom - inset }
     ]);
     const ratio = foreground && background ? contrastRatio(foreground, background) : 0;
+    const minimum = Number.isFinite(item.minContrast) ? item.minContrast : minContrast;
     return {
       selector: item.selector,
       text: item.text,
       ratio: round(ratio),
-      pass: ratio >= minContrast,
+      pass: ratio >= minimum,
+      limit: minimum,
       foreground,
       background: background ? { r: round(background.r), g: round(background.g), b: round(background.b) } : null
     };
@@ -307,11 +350,14 @@ async function main() {
   const updateBaseline = Boolean(args["update-baseline"]);
   const pixelThreshold = Number(args["pixel-threshold"] ?? 0.01);
   const pixelChannelThreshold = Number(args["pixel-channel-threshold"] ?? 16);
+  const roiRoles = String(args["roi-roles"] || "").split(",").map((role) => role.trim()).filter(Boolean);
+  const roiPixelThreshold = Number(args["roi-pixel-threshold"] ?? pixelThreshold);
   const expectSvgFilter = String(args["expect-svg-filter"] || "auto");
   const runContrast = Boolean(args.contrast);
   const fullPage = Boolean(args["full-page"]);
   const contrastSelector = String(args["contrast-selector"] || '[data-lg-contrast], .hero-copy h1, .hero-copy span, .lg-surface strong, .lg-surface .label, .lg-button span, .track-meta span');
   const minContrast = Number(args["min-contrast"] ?? 4.5);
+  const reducedMotion = Boolean(args["reduced-motion"]);
 
   await ensureDir(screenshotDir);
   await ensureDir(baselineDir);
@@ -344,6 +390,9 @@ async function main() {
         await page.addInitScript(() => {
           window.__LG_FORCE_FALLBACK__ = true;
         });
+      }
+      if (reducedMotion) {
+        await page.emulateMedia({ reducedMotion: "reduce" });
       }
       const pageErrors = [];
       const consoleErrors = [];
@@ -382,6 +431,19 @@ async function main() {
             surfaceCount: surfaces.length,
             mapReadyCount: surfaces.filter((element) => element.classList.contains("lg-map-ready")).length,
             firstBackdropFilter: surfaces[0] ? (getComputedStyle(surfaces[0]).backdropFilter || getComputedStyle(surfaces[0]).webkitBackdropFilter || "") : ""
+          },
+          motion: {
+            reducedMotionMatches: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+            transformTransitions: Array.from(document.querySelectorAll(".lg-button, [data-lg-interactive], liquid-glass[interactive]"))
+              .map((element) => {
+                const style = getComputedStyle(element);
+                return {
+                  selector: element.tagName.toLowerCase(),
+                  transitionProperty: style.transitionProperty,
+                  transitionDuration: style.transitionDuration
+                };
+              })
+              .filter((item) => item.transitionProperty.split(",").map((part) => part.trim()).includes("transform"))
           }
         };
       }, selectors);
@@ -396,6 +458,7 @@ async function main() {
               selector,
               text: (element.textContent || "").trim().replace(/\s+/g, " ").slice(0, 80),
               color: style.color,
+              minContrast: Number.parseFloat(element.getAttribute("data-lg-contrast-min") || ""),
               rect: {
                 left: box.left,
                 top: box.top,
@@ -426,6 +489,28 @@ async function main() {
           const comparison = comparePngBuffers(screenshot, await readFile(baselinePath), pixelChannelThreshold);
           const pass = comparison.pass && comparison.changedRatio <= pixelThreshold;
           diffs.push({ viewport: viewport.label, status: comparison.reason, baselinePath, pass, changedRatio: round(comparison.changedRatio), threshold: pixelThreshold });
+          if (roiRoles.length) {
+            const baseline = await readFile(baselinePath);
+            roiRoles.forEach((role) => {
+              const roleRect = rects[role];
+              if (!roleRect) {
+                diffs.push({ viewport: viewport.label, role, status: "missing-role", baselinePath, pass: false });
+                return;
+              }
+              const roiComparison = comparePngRegionBuffers(screenshot, baseline, pixelChannelThreshold, roleRect);
+              const roiPass = roiComparison.pass && roiComparison.changedRatio <= roiPixelThreshold;
+              diffs.push({
+                viewport: viewport.label,
+                role,
+                status: `roi-${roiComparison.reason}`,
+                baselinePath,
+                pass: roiPass,
+                changedRatio: round(roiComparison.changedRatio),
+                threshold: roiPixelThreshold,
+                pixels: roiComparison.pixels
+              });
+            });
+          }
         } else {
           diffs.push({ viewport: viewport.label, status: "missing-baseline", baselinePath, pass: false });
         }
@@ -463,8 +548,14 @@ async function main() {
       } else if (expectSvgFilter === "disabled") {
         checks.push({ name: "svg-filter-disabled", pass: !pageState.filter.htmlHasSvgOk, value: pageState.filter.htmlHasSvgOk, limit: false });
       }
+      if (reducedMotion) {
+        checks.push(
+          { name: "reduced-motion-media", pass: pageState.motion.reducedMotionMatches, value: pageState.motion.reducedMotionMatches, limit: true },
+          { name: "no-transform-transitions", pass: pageState.motion.transformTransitions.length === 0, value: pageState.motion.transformTransitions, limit: [] }
+        );
+      }
 
-      results.push({ viewport: viewport.label, browser: browserName, selectors, rects, filter: pageState.filter, checks });
+      results.push({ viewport: viewport.label, browser: browserName, selectors, rects, filter: pageState.filter, motion: pageState.motion, checks });
       await page.close();
     }
   } finally {
@@ -474,7 +565,7 @@ async function main() {
   const failed = [
     ...results.flatMap((result) => result.checks.filter((check) => !check.pass).map((check) => ({ type: "geometry", viewport: result.viewport, ...check }))),
     ...diffs.filter((diff) => !diff.pass).map((diff) => ({ type: "pixel", ...diff })),
-    ...contrasts.filter((contrast) => !contrast.pass).map((contrast) => ({ type: "contrast", ...contrast, limit: minContrast }))
+    ...contrasts.filter((contrast) => !contrast.pass).map((contrast) => ({ type: "contrast", ...contrast }))
   ];
 
   console.log(JSON.stringify({ url: args.url, browser: browserName, results, failed, screenshots, diffs, contrasts }, null, 2));
