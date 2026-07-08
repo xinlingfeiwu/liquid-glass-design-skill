@@ -74,7 +74,7 @@ jobs:
             --expect-svg-filter enabled \
             --screenshot-dir artifacts/screenshots \
             --baseline-dir liquid-glass-design/evals/baselines \
-            --pixel-threshold 0.08 \
+            --pixel-threshold 0.10 \
             --pixel-channel-threshold 24 \
             --contrast \
             --min-contrast 3

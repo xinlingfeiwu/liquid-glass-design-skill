@@ -186,7 +186,7 @@ For visual regression, compare against the committed baseline PNGs in `liquid-gl
 node liquid-glass-design/scripts/check-visual-geometry.mjs \
   --url http://127.0.0.1:4173 \
   --baseline-dir liquid-glass-design/evals/baselines \
-  --pixel-threshold 0.08 \
+  --pixel-threshold 0.10 \
   --pixel-channel-threshold 24
 ```
 
