@@ -18,7 +18,7 @@ Scan the QR code to join the `liquid-glass-skill` group chat.
 
 - `liquid-glass-design/SKILL.md` - the skill entrypoint (workflow, rules, defaults, acceptance criteria).
 - `liquid-glass-design/references/` - practical workflows, design recipes, prompt patterns, showcase quality gates, the golden-glass single source of truth, web/Electron implementation contracts, GitHub research, and QA checklists.
-- `liquid-glass-design/assets/core/liquid-glass-core.js` - shared SDF, lens-profile, displacement-pixel, and browser support logic used by every template and script.
+- `liquid-glass-design/assets/core/liquid-glass-core.js` - shared SDF, lens-profile, displacement-pixel, adaptive tint, and browser support logic used by every template and script.
 - `liquid-glass-design/scripts/generate-displacement-map.mjs` - a zero-dependency PNG displacement map generator that prints the exact `feDisplacementMap` scale.
 - `liquid-glass-design/scripts/check-visual-geometry.mjs` - a Playwright-based QA helper for overlap, dock centering, viewport containment, fallback behavior, contrast estimates, screenshots, and committed PNG baselines.
 - `liquid-glass-design/scripts/package-skill.mjs` - creates full or lean `.skill` packages while excluding `node_modules`, `dist`, caches, logs, and other heavy local artifacts.
@@ -124,7 +124,7 @@ Use it in any HTML-rendering stack:
 ```html
 <script type="module" src="./liquid-glass-element.js"></script>
 
-<liquid-glass radius="34" profile="prominent" strength="142" dispersion="0.035" interactive>
+<liquid-glass radius="34" profile="prominent" strength="142" dispersion="0.035" adaptive interactive>
   Controls
 </liquid-glass>
 ```
@@ -146,12 +146,36 @@ The component API:
   glare={0.56}
   elasticity={0.12}
   tint="rgba(20, 25, 32, .32)"
+  adaptive              // or { sampleInset, fallbackLuminance, brightTintAlpha, darkTintAlpha }
   interactive
   ref={surfaceRef}
 >
   Controls
 </LiquidGlass>
 ```
+
+## Adaptive Glass
+
+Use adaptive glass when a control crosses mixed backdrops, such as bright media, dark panels, saturated gradients, or detailed product content. The runtime samples a few points behind the surface at low frequency and writes CSS variables for tint, border, saturation, brightness, and contrast:
+
+```html
+<button
+  class="lg-surface lg-button"
+  data-lg-refraction
+  data-lg-adaptive
+  data-lg-adaptive-inset="0.18"
+>
+  Play
+</button>
+```
+
+```jsx
+<LiquidGlass adaptive={{ sampleInset: 0.18 }} interactive>
+  Play
+</LiquidGlass>
+```
+
+The surface exposes `data-lg-adaptive-mode="bright|balanced|dark"` and `data-lg-adaptive-luminance` for debugging. It updates on mount, resize, scroll, and explicit scene/background changes — not every animation frame.
 
 ## Generate A Displacement Map
 
@@ -180,7 +204,7 @@ node liquid-glass-design/scripts/check-visual-geometry.mjs \
   --min-contrast 4.5
 ```
 
-The script checks dock centering, focus/dock overlap, rail/focus overlap, viewport containment, JS console errors, SVG-filter readiness/fallback, estimated text contrast, and can save screenshots for desktop and mobile viewports. It accepts either `playwright` or `playwright-core`.
+The script checks dock centering, focus/dock overlap, rail/focus overlap, viewport containment, JS console errors, SVG-filter readiness/fallback, adaptive tint sync, estimated text contrast, and can save screenshots for desktop and mobile viewports. It accepts either `playwright` or `playwright-core`.
 
 For visual regression, compare against the committed baseline PNGs in `liquid-glass-design/evals/baselines/`:
 

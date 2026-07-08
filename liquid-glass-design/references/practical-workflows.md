@@ -54,8 +54,8 @@ Reject the result if the answer to composition, optics, clarity, or geometry is 
 2. Keep the public contracts stable:
    - CSS: `.lg-surface`, `.lg-panel`, `.lg-button`, `.lg-clear`, `.lg-tinted`;
    - JS: `createLiquidGlassDisplacementMap(options)` and `syncLiquidGlassMap(...)`;
-   - Web Component: `<liquid-glass radius profile strength magnify dispersion blur tint interactive>`;
-   - React: `<LiquidGlass variant radius profile strength magnify dispersion blur tint supersample interactive ref>`.
+   - Web Component: `<liquid-glass radius profile strength magnify dispersion blur tint adaptive interactive>`;
+   - React: `<LiquidGlass variant radius profile strength magnify dispersion blur tint supersample adaptive interactive ref>`.
 3. Keep the filter root hidden and out of layout. In React, component-owned SVG filter nodes must not become flex/grid children.
 4. Retune surface profiles after resizing. Reusing one map/strength across buttons, cards, and docks is a common reason the effect feels weak or jagged.
 5. Generate a fresh preview with a cache-busting filename after visual changes.

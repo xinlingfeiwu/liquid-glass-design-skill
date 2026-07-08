@@ -48,6 +48,7 @@ Use these values for README previews, first-run demos, and optical proof screens
 - Border: a real 1px border, plus a fine inner rim and a bright 1px top edge (`inset 0 1px 0 rgba(255,255,255,.55)`).
 - Blur: near zero on the refractive path. Real refraction does the optical work; heavy blur destroys it. The blur-only fallback may use the fallback blur from the active defaults table.
 - Color ops: saturation makes the backdrop's color glow through the glass; keep contrast controlled or the material turns muddy.
+- Adaptive tint: for controls moving across mixed light/dark content, estimate backdrop luminance at low frequency and tune tint, border, brightness, saturation, and contrast with CSS variables. Do not sample every frame; update on mount, resize, scroll, and intentional scene/background changes.
 - Specular light: two or three small radial glints near corners plus a quiet top sheen — never a full-card white sweep.
 - Directional light: pointer-aware controls should move the primary glint toward the pointer and add only 1-3px of elastic drift. Panels may keep static light.
 - Refraction: visible mostly near edges and curved corners; the center is identity.
@@ -100,6 +101,7 @@ One SVG filter per distinct surface shape:
 - Hover/active states energize the material with light and depth.
 - Pointer light moves the glint without resizing the layout.
 - The effect adapts to black, bright, saturated, and photographic backgrounds.
+- Adaptive surfaces expose their sampled mode (`bright`, `balanced`, or `dark`) for debugging and QA.
 - A showcase screenshot proves the material on detailed content, not only on a flattering gradient.
 - Small pills, circular controls, text panels, and large bars each feel tuned rather than sharing one weak map.
 - The scene has a clear product composition first; optical probes such as grids, dots, and waveforms support the glass instead of taking over the entire viewport.
@@ -116,6 +118,7 @@ Reject an implementation if it:
 - Shows missing edges, clipping, or obvious filter offset.
 - Uses a guessed `feDisplacementMap` scale instead of the measured one.
 - Uses high transparency on complex backgrounds without tint or dimming.
+- Claims adaptive glass but uses a static tint that fails over either bright or dark content.
 - Shares one weak displacement map across very different surface sizes.
 - Recomputes maps continuously during simple movement.
 - Animates geometry or regenerates maps in response to pointer movement.
@@ -128,12 +131,13 @@ Reject an implementation if it:
 
 1. Fix geometry and clipping first.
 2. Tune the fill: tint opacity, highlight gradient, border.
-3. Tune `contrast`/`saturate`/`brightness` (keep blur near zero on the refractive path).
-4. Tune the lens: `magnify` (0.2-2, default 1), `strength` percentage (default 100), `bezelRatio` (default 0.62), `spread` (default 0.58).
-5. Choose the profile: `thin`, `standard`, `soft`, or `prominent`.
-6. Tune `dispersion` (default 0.035, 0 disables the extra passes). Use lower values for large bars and higher values only for small rim-heavy controls.
-7. Tune hover/press/focus light and pointer glare.
-8. Only then tune motion timing.
+3. If the surface moves over mixed content, enable adaptive tint and confirm the bright/dark modes before hand-tuning.
+4. Tune `contrast`/`saturate`/`brightness` (keep blur near zero on the refractive path).
+5. Tune the lens: `magnify` (0.2-2, default 1), `strength` percentage (default 100), `bezelRatio` (default 0.62), `spread` (default 0.58).
+6. Choose the profile: `thin`, `standard`, `soft`, or `prominent`.
+7. Tune `dispersion` (default 0.035, 0 disables the extra passes). Use lower values for large bars and higher values only for small rim-heavy controls.
+8. Tune hover/press/focus light and pointer glare.
+9. Only then tune motion timing.
 
 Reduce after visual proof is established. If you start too subtle, the result often reads as generic blur and hides the core Liquid Glass behavior.
 Reduce dispersion before it becomes a visible rainbow stripe across whole surfaces; premium glass shows color separation at the rim, not across every line behind the card.

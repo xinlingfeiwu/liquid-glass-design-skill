@@ -14,6 +14,7 @@
 - Extracted shared Liquid Glass core math/support logic into `assets/core/liquid-glass-core.js` so the generator, vanilla template, React template, and Web Component no longer drift independently.
 - Added ROI pixel checks, reduced-motion QA, WCAG 4.5 contrast enforcement, and a reusable `quick_validate.py` structure/forbidden-term validator.
 - Excluded committed visual baselines from packaged `.skill` archives to keep distributed packages lightweight.
+- Added adaptive glass tinting: shared backdrop-luminance sampling, `data-lg-adaptive`, React `adaptive`, Web Component `adaptive`, debug mode attributes, docs, eval coverage, and updated showcases.
 
 ## 0.1.0 - 2026-07-08
 

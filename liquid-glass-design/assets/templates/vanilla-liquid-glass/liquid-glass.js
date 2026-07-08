@@ -1,8 +1,10 @@
 import {
   DEFAULT_SUPERSAMPLE,
   clamp,
+  clearAdaptiveLiquidGlass,
   createLiquidGlassDisplacementPixels,
   numberOption,
+  syncAdaptiveLiquidGlass,
   supportsLiquidGlassSvgFilter
 } from "../../core/liquid-glass-core.js";
 
@@ -237,11 +239,49 @@ function initPointerLighting(surfaces) {
   });
 }
 
+function isAdaptiveEnabled(element) {
+  const value = element.dataset.lgAdaptive;
+  return value !== undefined && value !== "false";
+}
+
+function initAdaptiveGlass(surfaces) {
+  const adaptiveSurfaces = surfaces.filter(isAdaptiveEnabled);
+  surfaces.filter((element) => !isAdaptiveEnabled(element)).forEach(clearAdaptiveLiquidGlass);
+  if (!adaptiveSurfaces.length) return () => {};
+
+  let frame = 0;
+  const sync = () => {
+    frame = 0;
+    adaptiveSurfaces.forEach((element) => {
+      syncAdaptiveLiquidGlass(element, {
+        sampleInset: numberOption(element.dataset.lgAdaptiveInset, 0.18, 0.05, 0.45)
+      });
+    });
+  };
+  const schedule = () => {
+    if (frame) return;
+    frame = requestAnimationFrame(sync);
+  };
+
+  sync();
+  window.addEventListener("resize", schedule, { passive: true });
+  window.addEventListener("scroll", schedule, { passive: true, capture: true });
+  document.addEventListener("liquidglass:adaptive-sync", schedule);
+
+  if ("ResizeObserver" in window) {
+    const observer = new ResizeObserver(schedule);
+    adaptiveSurfaces.forEach((element) => observer.observe(element));
+  }
+
+  return schedule;
+}
+
 function initLiquidGlass() {
   const surfaces = Array.from(document.querySelectorAll("[data-lg-refraction]"));
   if (!surfaces.length) return;
 
   initPointerLighting(surfaces);
+  initAdaptiveGlass(surfaces);
   if (!supportsLiquidGlassSvgFilter()) return;
 
   const defs = document.querySelector("#lg-filter-bank defs");
@@ -285,6 +325,7 @@ function initSceneControls() {
       const scene = button.getAttribute("data-scene-button") || "prism";
       stage.setAttribute("data-scene", scene);
       buttons.forEach((item) => item.classList.toggle("is-active", item === button));
+      document.dispatchEvent(new CustomEvent("liquidglass:adaptive-sync"));
     });
   });
 }

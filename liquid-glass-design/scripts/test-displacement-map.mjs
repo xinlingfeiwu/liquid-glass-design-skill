@@ -7,7 +7,12 @@ import {
   createLiquidGlassDisplacementPixels,
   createLiquidGlassDisplacementPng
 } from "./generate-displacement-map.mjs";
-import { isKnownBackdropSvgFilterUnsupported } from "../assets/core/liquid-glass-core.js";
+import {
+  computeAdaptiveLiquidGlassVars,
+  isKnownBackdropSvgFilterUnsupported,
+  parseCssColor,
+  relativeLuminance
+} from "../assets/core/liquid-glass-core.js";
 
 function hash(buffer) {
   return createHash("sha256").update(buffer).digest("hex");
@@ -34,6 +39,11 @@ assert.equal(pixels.data[2], 0, "blue channel should stay neutral because the fi
 assert.ok(dataUri.url.startsWith("data:image/png;base64,"), "data URI should be a PNG");
 assert.notEqual(hash(standard), hash(thin), "different profiles should produce different maps");
 assert.equal(hash(standard), "7bb5faadfc35ebe6ce9f6cdaa95d45ce405d9e8dfdb910958431e50508d79c22", "core map output should stay deterministic");
+assert.ok(relativeLuminance(parseCssColor("rgb(255, 255, 255)")) > relativeLuminance(parseCssColor("rgb(0, 0, 0)")), "white should measure brighter than black");
+assert.equal(parseCssColor("rgb(255 255 255 / 50%)").a, 0.5, "modern CSS alpha percentages should parse");
+assert.equal(computeAdaptiveLiquidGlassVars(0.82).mode, "bright", "bright backdrops should use bright mode");
+assert.equal(computeAdaptiveLiquidGlassVars(0.12).mode, "dark", "dark backdrops should use dark mode");
+assert.notEqual(computeAdaptiveLiquidGlassVars(0.82).variables["--lg-adaptive-tint"], computeAdaptiveLiquidGlassVars(0.12).variables["--lg-adaptive-tint"], "adaptive tint should change with luminance");
 assert.equal(isKnownBackdropSvgFilterUnsupported("Mozilla/5.0 AppleWebKit/605.1.15 Version/17.4 Safari/605.1.15"), true, "Safari must use fallback until SVG backdrop filters render correctly");
 assert.equal(isKnownBackdropSvgFilterUnsupported("Mozilla/5.0 Firefox/128.0"), true, "Firefox must use fallback until SVG backdrop filters render correctly");
 assert.equal(isKnownBackdropSvgFilterUnsupported("Mozilla/5.0 Chrome/126.0.0.0 Safari/537.36"), false, "Chromium should use SVG refraction when syntax support is present");

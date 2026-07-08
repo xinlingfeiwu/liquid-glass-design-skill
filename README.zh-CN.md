@@ -92,10 +92,33 @@ npm run dev:web-component
 ```html
 <script type="module" src="./liquid-glass-element.js"></script>
 
-<liquid-glass radius="34" profile="prominent" strength="142" dispersion="0.035" interactive>
+<liquid-glass radius="34" profile="prominent" strength="142" dispersion="0.035" adaptive interactive>
   Controls
 </liquid-glass>
 ```
+
+## 自适应玻璃
+
+当控件会跨越亮色媒体、暗色面板、饱和渐变或复杂产品内容时，开启自适应玻璃。运行时会低频采样表面背后的亮度，并自动写入 tint、border、saturate、brightness、contrast 相关 CSS 变量：
+
+```html
+<button
+  class="lg-surface lg-button"
+  data-lg-refraction
+  data-lg-adaptive
+  data-lg-adaptive-inset="0.18"
+>
+  Play
+</button>
+```
+
+```jsx
+<LiquidGlass adaptive={{ sampleInset: 0.18 }} interactive>
+  Play
+</LiquidGlass>
+```
+
+调试时可查看 `data-lg-adaptive-mode="bright|balanced|dark"` 和 `data-lg-adaptive-luminance`。它只在挂载、resize、scroll 和主动切换背景时更新，不会每帧采样。
 
 ## 视觉 QA
 
@@ -109,6 +132,8 @@ node liquid-glass-design/scripts/check-visual-geometry.mjs \
 ```
 
 像素回归默认对比仓库内提交的 baseline：
+
+QA 脚本会检查重叠、居中、viewport containment、SVG/filter fallback、自适应 tint 是否同步、对比度和像素 baseline。
 
 ```bash
 node liquid-glass-design/scripts/check-visual-geometry.mjs \

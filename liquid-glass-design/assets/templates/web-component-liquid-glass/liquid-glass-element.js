@@ -1,8 +1,10 @@
 import {
   DEFAULT_SUPERSAMPLE,
   clamp,
+  clearAdaptiveLiquidGlass,
   createLiquidGlassDisplacementPixels,
   numberOption,
+  syncAdaptiveLiquidGlass,
   supportsLiquidGlassSvgFilter
 } from "../../core/liquid-glass-core.js";
 
@@ -79,20 +81,20 @@ liquid-glass {
   display: block;
   isolation: isolate;
   overflow: hidden;
-  color: white;
-  border: 1px solid var(--lg-border);
+  color: var(--lg-adaptive-foreground, white);
+  border: 1px solid var(--lg-adaptive-border, var(--lg-border));
   border-radius: var(--lg-radius);
-  background: var(--lg-highlight), var(--lg-tint);
+  background: var(--lg-highlight), var(--lg-adaptive-tint, var(--lg-tint));
   background-clip: padding-box;
   box-shadow: var(--lg-shadow);
   clip-path: inset(0 round var(--lg-radius));
   transform: translate3d(var(--lg-elastic-x), var(--lg-elastic-y), 0);
-  backdrop-filter: blur(var(--lg-fallback-blur)) saturate(var(--lg-saturate)) brightness(var(--lg-brightness)) contrast(var(--lg-contrast));
-  -webkit-backdrop-filter: blur(var(--lg-fallback-blur)) saturate(var(--lg-saturate)) brightness(var(--lg-brightness)) contrast(var(--lg-contrast));
+  backdrop-filter: blur(var(--lg-fallback-blur)) saturate(var(--lg-adaptive-saturate, var(--lg-saturate))) brightness(var(--lg-adaptive-brightness, var(--lg-brightness))) contrast(var(--lg-adaptive-contrast, var(--lg-contrast)));
+  -webkit-backdrop-filter: blur(var(--lg-fallback-blur)) saturate(var(--lg-adaptive-saturate, var(--lg-saturate))) brightness(var(--lg-adaptive-brightness, var(--lg-brightness))) contrast(var(--lg-adaptive-contrast, var(--lg-contrast)));
 }
 liquid-glass.lg-svg-ok.lg-map-ready {
-  backdrop-filter: var(--lg-filter-url) blur(var(--lg-blur)) saturate(var(--lg-saturate)) brightness(var(--lg-brightness)) contrast(var(--lg-contrast));
-  -webkit-backdrop-filter: var(--lg-filter-url) blur(var(--lg-blur)) saturate(var(--lg-saturate)) brightness(var(--lg-brightness)) contrast(var(--lg-contrast));
+  backdrop-filter: var(--lg-filter-url) blur(var(--lg-blur)) saturate(var(--lg-adaptive-saturate, var(--lg-saturate))) brightness(var(--lg-adaptive-brightness, var(--lg-brightness))) contrast(var(--lg-adaptive-contrast, var(--lg-contrast)));
+  -webkit-backdrop-filter: var(--lg-filter-url) blur(var(--lg-blur)) saturate(var(--lg-adaptive-saturate, var(--lg-saturate))) brightness(var(--lg-adaptive-brightness, var(--lg-brightness))) contrast(var(--lg-adaptive-contrast, var(--lg-contrast)));
 }
 liquid-glass::before,
 liquid-glass::after {
@@ -121,7 +123,9 @@ liquid-glass::after {
 @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
   liquid-glass {
     --lg-tint: rgba(16, 24, 34, .72);
+    --lg-adaptive-tint: rgba(16, 24, 34, .78);
     --lg-border: rgba(255,255,255,.72);
+    --lg-adaptive-border: rgba(255,255,255,.78);
     --lg-filter-url: none;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
@@ -218,6 +222,8 @@ export class LiquidGlassElement extends HTMLElement {
     "dispersion",
     "blur",
     "tint",
+    "adaptive",
+    "adaptive-inset",
     "interactive"
   ];
 
@@ -228,14 +234,19 @@ export class LiquidGlassElement extends HTMLElement {
     this.mapKey = "";
     this.scale = 0;
     this.resizeObserver = null;
+    this.adaptiveResizeObserver = null;
+    this.adaptiveFrame = 0;
+    this.adaptiveListenersActive = false;
     this.pointerRect = null;
     this.svgFilterOk = false;
+    this.scheduleAdaptive = this.scheduleAdaptive.bind(this);
   }
 
   connectedCallback() {
     ensureBaseStyles();
     this.svgFilterOk = supportsLiquidGlassSvgFilter();
     this.applyAttributes();
+    this.initAdaptiveGlass();
 
     if (this.svgFilterOk) {
       const dispersion = numberOption(this.getAttribute("dispersion"), 0.035, 0, 0.3);
@@ -251,12 +262,18 @@ export class LiquidGlassElement extends HTMLElement {
 
   disconnectedCallback() {
     this.resizeObserver?.disconnect();
+    this.disconnectAdaptiveGlass();
     this.filterRefs?.svg?.remove();
   }
 
-  attributeChangedCallback() {
+  attributeChangedCallback(name) {
     if (!this.isConnected) return;
     this.applyAttributes();
+    if (name === "adaptive" || name === "adaptive-inset") {
+      this.initAdaptiveGlass();
+    } else {
+      this.scheduleAdaptive();
+    }
     requestAnimationFrame(() => this.updateMap());
   }
 
@@ -267,6 +284,61 @@ export class LiquidGlassElement extends HTMLElement {
     this.style.setProperty("--lg-radius", Number.isFinite(Number(radius)) ? `${radius}px` : radius);
     this.style.setProperty("--lg-blur", Number.isFinite(Number(blur)) ? `${blur}px` : blur);
     if (tint) this.style.setProperty("--lg-tint", tint);
+  }
+
+  isAdaptiveEnabled() {
+    const value = this.getAttribute("adaptive");
+    return value !== null && value !== "false";
+  }
+
+  adaptiveOptions() {
+    return {
+      sampleInset: numberOption(this.getAttribute("adaptive-inset"), 0.18, 0.05, 0.45)
+    };
+  }
+
+  syncAdaptiveGlass() {
+    this.adaptiveFrame = 0;
+    if (!this.isAdaptiveEnabled()) {
+      clearAdaptiveLiquidGlass(this);
+      return;
+    }
+    syncAdaptiveLiquidGlass(this, this.adaptiveOptions());
+  }
+
+  scheduleAdaptive() {
+    if (!this.isConnected || !this.isAdaptiveEnabled() || this.adaptiveFrame) return;
+    this.adaptiveFrame = requestAnimationFrame(() => this.syncAdaptiveGlass());
+  }
+
+  initAdaptiveGlass() {
+    this.disconnectAdaptiveGlass();
+    if (!this.isAdaptiveEnabled()) {
+      clearAdaptiveLiquidGlass(this);
+      return;
+    }
+    this.syncAdaptiveGlass();
+    window.addEventListener("resize", this.scheduleAdaptive, { passive: true });
+    window.addEventListener("scroll", this.scheduleAdaptive, { passive: true, capture: true });
+    this.adaptiveListenersActive = true;
+    if ("ResizeObserver" in window) {
+      this.adaptiveResizeObserver = new ResizeObserver(this.scheduleAdaptive);
+      this.adaptiveResizeObserver.observe(this);
+    }
+  }
+
+  disconnectAdaptiveGlass() {
+    if (this.adaptiveFrame) {
+      cancelAnimationFrame(this.adaptiveFrame);
+      this.adaptiveFrame = 0;
+    }
+    this.adaptiveResizeObserver?.disconnect();
+    this.adaptiveResizeObserver = null;
+    if (this.adaptiveListenersActive) {
+      window.removeEventListener("resize", this.scheduleAdaptive);
+      window.removeEventListener("scroll", this.scheduleAdaptive, { capture: true });
+      this.adaptiveListenersActive = false;
+    }
   }
 
   updateMap() {

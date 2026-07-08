@@ -2,6 +2,12 @@ import type { ComponentPropsWithoutRef, ElementType, ForwardedRef, ReactNode } f
 
 export type LiquidGlassVariant = "regular" | "clear" | "tinted";
 export type LiquidGlassProfile = "standard" | "soft" | "prominent" | "thin";
+export type LiquidGlassAdaptiveOptions = {
+  sampleInset?: number;
+  fallbackLuminance?: number;
+  brightTintAlpha?: number;
+  darkTintAlpha?: number;
+};
 
 export type LiquidGlassProps<T extends ElementType = "div"> = {
   as?: T;
@@ -21,6 +27,7 @@ export type LiquidGlassProps<T extends ElementType = "div"> = {
   glare?: number;
   elasticity?: number;
   tint?: string;
+  adaptive?: boolean | LiquidGlassAdaptiveOptions;
   interactive?: boolean;
 } & Omit<ComponentPropsWithoutRef<T>, "as" | "children" | "className">;
 

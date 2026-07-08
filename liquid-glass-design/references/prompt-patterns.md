@@ -37,7 +37,7 @@ Report the top issues in this order: composition, geometry, optical material, fo
 ```text
 Use $liquid-glass-design to build a reusable React LiquidGlass component for [project].
 
-Expose variant, radius, profile, strength, magnify, dispersion, blur, tint, glare, and interactive props. Keep children sharp, filters out of layout flow, map generation cached by shape/tuning, and fallback SSR-safe. Include a showcase page that exercises small pills, circular controls, text panels, and a long dock.
+Expose variant, radius, profile, strength, magnify, dispersion, blur, tint, adaptive, glare, and interactive props. Keep children sharp, filters out of layout flow, map generation cached by shape/tuning, adaptive tint sampled at low frequency, and fallback SSR-safe. Include a showcase page that exercises small pills, circular controls, text panels, and a long dock.
 ```
 
 ## Run Visual QA

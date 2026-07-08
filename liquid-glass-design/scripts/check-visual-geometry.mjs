@@ -419,6 +419,7 @@ async function main() {
           };
         }
         const surfaces = Array.from(document.querySelectorAll("[data-lg-refraction]"));
+        const adaptiveSurfaces = Array.from(document.querySelectorAll("[data-lg-adaptive], liquid-glass[adaptive]"));
         return {
           rects: {
             stage: rect(query.stage),
@@ -431,6 +432,15 @@ async function main() {
             surfaceCount: surfaces.length,
             mapReadyCount: surfaces.filter((element) => element.classList.contains("lg-map-ready")).length,
             firstBackdropFilter: surfaces[0] ? (getComputedStyle(surfaces[0]).backdropFilter || getComputedStyle(surfaces[0]).webkitBackdropFilter || "") : ""
+          },
+          adaptive: {
+            surfaceCount: adaptiveSurfaces.length,
+            syncedCount: adaptiveSurfaces.filter((element) => element.dataset.lgAdaptiveMode && element.dataset.lgAdaptiveLuminance).length,
+            modes: adaptiveSurfaces.map((element) => ({
+              tag: element.tagName.toLowerCase(),
+              mode: element.dataset.lgAdaptiveMode || "",
+              luminance: element.dataset.lgAdaptiveLuminance || ""
+            }))
           },
           motion: {
             reducedMotionMatches: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
@@ -548,6 +558,14 @@ async function main() {
       } else if (expectSvgFilter === "disabled") {
         checks.push({ name: "svg-filter-disabled", pass: !pageState.filter.htmlHasSvgOk, value: pageState.filter.htmlHasSvgOk, limit: false });
       }
+      if (pageState.adaptive.surfaceCount > 0) {
+        checks.push({
+          name: "adaptive-synced",
+          pass: pageState.adaptive.syncedCount === pageState.adaptive.surfaceCount,
+          value: pageState.adaptive.syncedCount,
+          limit: pageState.adaptive.surfaceCount
+        });
+      }
       if (reducedMotion) {
         checks.push(
           { name: "reduced-motion-media", pass: pageState.motion.reducedMotionMatches, value: pageState.motion.reducedMotionMatches, limit: true },
@@ -555,7 +573,7 @@ async function main() {
         );
       }
 
-      results.push({ viewport: viewport.label, browser: browserName, selectors, rects, filter: pageState.filter, motion: pageState.motion, checks });
+      results.push({ viewport: viewport.label, browser: browserName, selectors, rects, filter: pageState.filter, adaptive: pageState.adaptive, motion: pageState.motion, checks });
       await page.close();
     }
   } finally {

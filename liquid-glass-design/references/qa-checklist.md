@@ -17,6 +17,7 @@ Run this checklist before finalizing Liquid Glass UI.
 - Compare against a high-frequency procedural or photographic background even if the final product background is dark; weak glass often hides on simple gradients.
 - Confirm high-frequency detail is local and purposeful; reject previews that read as noisy wallpaper or a raw filter test.
 - Confirm rims, glare, tint, and refraction read as one material, not as a cloudy card overlay.
+- For adaptive surfaces, inspect `data-lg-adaptive-mode` and `data-lg-adaptive-luminance`; verify bright backgrounds gain enough tint and dark backgrounds remain transparent enough.
 - Confirm shape-specific profiles are intentional: small pills stay crisp, text panels stay readable, showcase bars carry stronger lensing.
 - Confirm the first viewport has a clear product/UI composition and focal point before judging the optical material.
 - Confirm the README/screenshot preview is generated from the current runnable demo and uses a cache-busting filename when pushed to GitHub.

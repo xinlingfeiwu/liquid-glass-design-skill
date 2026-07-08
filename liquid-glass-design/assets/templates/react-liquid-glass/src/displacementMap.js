@@ -1,8 +1,10 @@
 import {
   DEFAULT_SUPERSAMPLE,
   clamp,
+  clearAdaptiveLiquidGlass,
   createLiquidGlassDisplacementPixels,
   numberOption,
+  syncAdaptiveLiquidGlass,
   supportsLiquidGlassSvgFilter
 } from "../../../core/liquid-glass-core.js";
 
@@ -52,4 +54,4 @@ export function createLiquidGlassDisplacementMap(options = {}) {
   };
 }
 
-export { supportsLiquidGlassSvgFilter };
+export { clearAdaptiveLiquidGlass, syncAdaptiveLiquidGlass, supportsLiquidGlassSvgFilter };

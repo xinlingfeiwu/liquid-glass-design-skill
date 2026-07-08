@@ -10,8 +10,10 @@ Build in layers:
 4. Optional map-on-content strategy when Safari/Firefox parity is more important than live backdrop refraction.
 5. Optional React abstraction or WebGL/WebGPU renderer when the product needs shader-grade Fresnel, glare, merged shapes, or dynamic video scenes.
 
-Gate SVG backdrop filters with feature detection (UA gate for Safari/Firefox
-plus a `backdrop-filter: url(...)` probe). Always retain the fallback.
+Gate SVG backdrop filters with feature detection: keep a deny-list for engines
+known to parse but not render `backdrop-filter: url(...)`, then run a CSS
+syntax probe for the remaining engines. Always retain the fallback and a
+force-fallback hook for QA.
 
 For demos and screenshots, build a high-information content layer first. Include dark, bright, image-like, and high-frequency scenes so the material cannot hide behind a flattering background.
 
@@ -42,12 +44,18 @@ from the fill gradient, the border, box-shadows, and two pseudo-elements.
   --lg-light-x: <pointer-or-static-x>;
   --lg-light-y: <pointer-or-static-y>;
   --lg-glare: <surface-glare>;
+  --lg-adaptive-tint: <optional-runtime-tint>;
+  --lg-adaptive-border: <optional-runtime-border>;
+  --lg-adaptive-saturate: <optional-runtime-saturate>;
+  --lg-adaptive-brightness: <optional-runtime-brightness>;
+  --lg-adaptive-contrast: <optional-runtime-contrast>;
 }
 ```
 
 Key rules:
 
-- `background: <white highlight gradient>, var(--lg-tint);`
+- `background: <white highlight gradient>, var(--lg-adaptive-tint, var(--lg-tint));`
+- `border`, `saturate`, `brightness`, and `contrast` may use `--lg-adaptive-*` variables when adaptive glass is enabled. Without those variables, the surface falls back to the selected production/showcase defaults.
 - `::before` holds corner glints and top sheen; `::after` holds the fine inner rim. Both `z-index: -1` inside an isolated stacking context so content stays plain DOM above them.
 - If pseudo-elements are painted above the fill for stronger highlights, explicitly keep direct children at a higher z-index so foreground text/icons remain sharp.
 - On interactive controls, pointer movement may update `--lg-light-x`, `--lg-light-y`, `--lg-glare`, and small elastic offsets. Do not update the displacement map on pointer movement.
@@ -95,7 +103,8 @@ Implement:
 
 - `createLiquidGlassDisplacementMap(options) -> { url, scale, key }` — inverse lens mapping on canvas; `scale` is measured from the generated field (see `golden-glass-style.md`). Options should include `profile`, `magnify`, `bend`, `spread`, `bezelRatio`, and optional `supersample`.
 - `syncLiquidGlassMap(element, filterRefs, cacheKey)` — regenerates the map only when size/radius/map tuning changed and applies `scale * strength * channelMultiplier` to every displacement node. `filterRefs = { image, displacements: [{ node, mul }] }`.
-- `supportsLiquidGlassSvgFilter()` — decides whether to enable the refraction path with feature detection (`CSS.supports` plus style assignment), not permanent Safari/Firefox UA blocks. Keep a force-fallback hook for QA.
+- `supportsLiquidGlassSvgFilter()` — decides whether to enable the refraction path with a known-engine fallback gate plus feature detection (`CSS.supports` plus style assignment). Keep a force-fallback hook for QA.
+- `syncAdaptiveLiquidGlass(element, options)` — optional low-frequency backdrop sampling that estimates luminance around a surface and writes `--lg-adaptive-tint`, `--lg-adaptive-border`, `--lg-adaptive-saturate`, `--lg-adaptive-brightness`, and `--lg-adaptive-contrast`. Use it for controls that cross bright/dark content; do not run it every animation frame.
 - Pointer-light handling — updates only CSS variables for glint and elastic drift; never regenerates maps.
 
 Use `ResizeObserver` for shape changes. Use `requestAnimationFrame` to batch
@@ -121,6 +130,7 @@ Expose:
   glare={surfaceGlare}
   elasticity={controlElasticity}
   tint={activeDefaultTint}
+  adaptive={false}       // true or { sampleInset, fallbackLuminance, brightTintAlpha, darkTintAlpha }
   interactive
   ref={surfaceRef}
 />
@@ -134,6 +144,7 @@ The component should:
 - Apply the measured map scale to its displacement nodes after each regen, and update strength/dispersion as scale-only changes without regenerating the PNG map.
 - Add a ready class only after the `<feImage>` map href is written; support detection alone is not map readiness.
 - Expose profile/tuning props instead of hardcoding one visual for every shape.
+- Expose `adaptive` for surfaces that move across mixed backdrops. When enabled, sample at low frequency and tune CSS variables; keep it disabled by default so existing design systems remain deterministic.
 - Include a showcase page that actually exercises those props across small pills, circular controls, bars, and text panels. A component file alone is not a sufficient template.
 - Use lower `dispersion` and softer profiles for long docks/bars over detailed backdrops; reserve stronger chromatic detail for compact surfaces where only the rim shows it.
 - Keep component-owned filter SVGs out of layout flow. If a component emits an inline `<svg><filter>...</filter></svg>` next to the rendered surface, force the SVG to `position: absolute !important; width: 0; height: 0; overflow: hidden; pointer-events: none;` and exclude it from broad child rules such as `.glass > *`. Otherwise nested glass controls inside grid/flex bars can silently become extra layout items.

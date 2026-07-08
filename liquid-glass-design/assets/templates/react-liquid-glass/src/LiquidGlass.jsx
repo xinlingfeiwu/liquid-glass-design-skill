@@ -1,5 +1,10 @@
 import { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useRef, useState } from "react";
-import { createLiquidGlassDisplacementMap, supportsLiquidGlassSvgFilter } from "./displacementMap.js";
+import {
+  clearAdaptiveLiquidGlass,
+  createLiquidGlassDisplacementMap,
+  supportsLiquidGlassSvgFilter,
+  syncAdaptiveLiquidGlass
+} from "./displacementMap.js";
 import "./liquidGlass.css";
 
 const XLINK_NS = "http://www.w3.org/1999/xlink";
@@ -15,6 +20,7 @@ const XLINK_NS = "http://www.w3.org/1999/xlink";
  * blur:                blur that runs *with* refraction; keep tiny or lensing turns to mush
  * glare/elasticity:    pointer-aware light and micro motion for controls
  * tint:                surface fill behind the highlight gradient
+ * adaptive:            sample backdrop brightness and auto tune tint/contrast
  * interactive:         hover/press/focus states
  */
 export const LiquidGlass = forwardRef(function LiquidGlass({
@@ -35,6 +41,7 @@ export const LiquidGlass = forwardRef(function LiquidGlass({
   glare = 0.56,
   elasticity = 0.12,
   tint,
+  adaptive = false,
   interactive = false,
   style,
   onPointerEnter,
@@ -59,6 +66,43 @@ export const LiquidGlass = forwardRef(function LiquidGlass({
   useEffect(() => {
     setSvgFilterOk(supportsLiquidGlassSvgFilter(filterId));
   }, [filterId]);
+
+  useEffect(() => {
+    const element = surfaceRef.current;
+    if (!element || !adaptive) {
+      clearAdaptiveLiquidGlass(element);
+      return undefined;
+    }
+
+    const options = typeof adaptive === "object" ? adaptive : {};
+    let frame = 0;
+    const sync = () => {
+      frame = 0;
+      if (surfaceRef.current) syncAdaptiveLiquidGlass(surfaceRef.current, options);
+    };
+    const schedule = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(sync);
+    };
+
+    sync();
+    window.addEventListener("resize", schedule, { passive: true });
+    window.addEventListener("scroll", schedule, { passive: true, capture: true });
+
+    let observer;
+    if ("ResizeObserver" in window) {
+      observer = new ResizeObserver(schedule);
+      observer.observe(element);
+    }
+
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      observer?.disconnect();
+      window.removeEventListener("resize", schedule);
+      window.removeEventListener("scroll", schedule, { capture: true });
+      clearAdaptiveLiquidGlass(element);
+    };
+  }, [adaptive]);
 
   useEffect(() => {
     if (!svgFilterOk || !surfaceRef.current || !mapRef.current) {
