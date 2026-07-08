@@ -1,19 +1,20 @@
 .lg-filter-root {
-  position: absolute;
+  position: absolute !important;
   width: 0;
   height: 0;
   overflow: hidden;
+  pointer-events: none;
 }
 
 .lg-surface {
   --lg-radius: 26px;
   --lg-blur: 0.2px;
   --lg-fallback-blur: 6px;
-  --lg-tint: rgba(32, 42, 56, 0.20);
-  --lg-border: rgba(255, 255, 255, 0.52);
-  --lg-saturate: 1.55;
-  --lg-brightness: 1.1;
-  --lg-contrast: 1.14;
+  --lg-tint: rgba(24, 32, 44, 0.16);
+  --lg-border: rgba(255, 255, 255, 0.62);
+  --lg-saturate: 1.72;
+  --lg-brightness: 1.12;
+  --lg-contrast: 1.18;
   --lg-filter-url: none;
   --lg-light-x: 84%;
   --lg-light-y: 12%;
@@ -22,20 +23,21 @@
   --lg-elastic-y: 0px;
   --lg-press-scale: 1;
   --lg-highlight:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.48), rgba(255, 255, 255, 0.16) 38%, rgba(255, 255, 255, 0.035) 58%, rgba(255, 255, 255, 0.22));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.17) 34%, rgba(255, 255, 255, 0.035) 56%, rgba(255, 255, 255, 0.24));
   --lg-shadow:
-    0 18px 42px rgba(31, 38, 50, 0.34),
-    inset 0 1px 0 rgba(255, 255, 255, 0.76),
-    inset 0 -1px 1px rgba(255, 255, 255, 0.24),
-    inset 0 0 22px rgba(255, 255, 255, 0.18),
-    inset 0 0 38px rgba(126, 226, 255, 0.08);
+    0 18px 48px rgba(10, 16, 26, 0.36),
+    0 1px 1px rgba(255, 255, 255, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.86),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.28),
+    inset 0 0 26px rgba(255, 255, 255, 0.22),
+    inset 0 0 48px rgba(118, 221, 255, 0.12);
   --lg-shadow-active:
-    0 22px 54px rgba(31, 38, 50, 0.42),
+    0 24px 64px rgba(10, 16, 26, 0.48),
     inset 0 1px 0 rgba(255, 255, 255, 0.9),
     inset 0 -1px 1px rgba(255, 255, 255, 0.30),
     inset 0 0 28px rgba(255, 255, 255, 0.26),
     inset 0 0 44px rgba(126, 226, 255, 0.12),
-    0 0 34px rgba(255, 255, 255, 0.18);
+    0 0 42px rgba(255, 255, 255, 0.24);
   position: relative;
   isolation: isolate;
   overflow: hidden;
@@ -43,11 +45,17 @@
   border: 1px solid var(--lg-border);
   border-radius: var(--lg-radius);
   background: var(--lg-highlight), var(--lg-tint);
+  background-clip: padding-box;
   box-shadow: var(--lg-shadow);
   transform: translate3d(0, 0, 0);
   /* Cross-browser baseline: believable frosted glass everywhere. */
   backdrop-filter: blur(var(--lg-fallback-blur)) saturate(var(--lg-saturate)) brightness(var(--lg-brightness)) contrast(var(--lg-contrast));
   -webkit-backdrop-filter: blur(var(--lg-fallback-blur)) saturate(var(--lg-saturate)) brightness(var(--lg-brightness)) contrast(var(--lg-contrast));
+}
+
+.lg-surface > :not(.lg-filter-root) {
+  position: relative;
+  z-index: 2;
 }
 
 /* Chromium path: true refraction with near-zero blur so lensing stays crisp. */
@@ -61,14 +69,14 @@
   content: "";
   position: absolute;
   inset: 0;
-  z-index: -1;
+  z-index: 1;
   border-radius: inherit;
   pointer-events: none;
   background:
     radial-gradient(circle at var(--lg-light-x) var(--lg-light-y), rgb(255 255 255 / calc(var(--lg-glare) * 0.82)), transparent 22%),
     radial-gradient(circle at calc(100% - var(--lg-light-x)) calc(100% - var(--lg-light-y)), rgb(126 226 255 / calc(var(--lg-glare) * 0.32)), transparent 30%),
     radial-gradient(circle at 12% 6%, rgba(255, 255, 255, 0.36), transparent 28%),
-    linear-gradient(115deg, transparent 0 36%, rgba(255, 255, 255, 0.22) 48%, transparent 62%),
+    linear-gradient(118deg, transparent 0 34%, rgba(255, 255, 255, 0.26) 48%, transparent 63%),
     radial-gradient(120% 70% at 50% -20%, rgba(255, 255, 255, 0.34), transparent 56%);
   opacity: 0.98;
   transition: opacity 0.22s ease, background 0.22s ease;
@@ -79,27 +87,28 @@
   content: "";
   position: absolute;
   inset: 0;
-  z-index: -1;
+  z-index: 1;
   border-radius: inherit;
   pointer-events: none;
   box-shadow:
     inset 0 0 0 1px rgba(255, 255, 255, 0.34),
-    inset 0 1px 0 rgba(255, 255, 255, 0.62),
+    inset 0 1px 0 rgba(255, 255, 255, 0.78),
     inset 0 -1px 0 rgba(255, 255, 255, 0.18),
-    inset 0 0 18px rgba(255, 255, 255, 0.10);
+    inset 0 0 18px rgba(255, 255, 255, 0.14),
+    inset 0 0 42px rgba(126, 226, 255, 0.08);
 }
 
 .lg-regular {
-  --lg-tint: rgba(32, 42, 56, 0.20);
+  --lg-tint: rgba(24, 32, 44, 0.16);
 }
 
 .lg-clear {
-  --lg-tint: rgba(255, 255, 255, 0.24);
-  --lg-border: rgba(255, 255, 255, 0.62);
+  --lg-tint: rgba(255, 255, 255, 0.18);
+  --lg-border: rgba(255, 255, 255, 0.72);
 }
 
 .lg-tinted {
-  --lg-tint: rgba(18, 27, 42, 0.34);
+  --lg-tint: rgba(13, 21, 32, 0.30);
 }
 
 .lg-panel {
@@ -119,8 +128,8 @@
 .lg-interactive:hover,
 .lg-interactive:focus-visible,
 .lg-interactive.is-active {
-  --lg-tint: rgba(255, 255, 255, 0.26);
-  --lg-glare: 0.72;
+  --lg-tint: rgba(255, 255, 255, 0.22);
+  --lg-glare: 0.82;
   box-shadow: var(--lg-shadow-active);
   transform: translate3d(var(--lg-elastic-x), calc(var(--lg-elastic-y) - 1px), 0) scale(var(--lg-press-scale));
   outline: none;

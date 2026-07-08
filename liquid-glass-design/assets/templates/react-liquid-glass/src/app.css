@@ -2,7 +2,8 @@
   color-scheme: dark;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: #fff;
-  background: #10131a;
+  background:
+    linear-gradient(135deg, #070b12, #14171f 54%, #070b12);
 }
 
 * {
@@ -17,6 +18,7 @@ body {
 
 button {
   font: inherit;
+  border: 0;
 }
 
 .app-shell {
@@ -32,14 +34,28 @@ button {
   overflow: hidden;
   border-radius: 42px;
   background:
-    radial-gradient(120% 90% at 12% 4%, rgba(255, 205, 160, 0.92), transparent 52%),
-    radial-gradient(110% 100% at 88% 12%, rgba(122, 194, 255, 0.9), transparent 58%),
-    radial-gradient(120% 110% at 78% 96%, rgba(255, 158, 180, 0.72), transparent 56%),
-    radial-gradient(100% 90% at 18% 92%, rgba(126, 232, 202, 0.66), transparent 54%),
+    linear-gradient(126deg, rgba(255, 224, 172, 0.82), transparent 34%),
+    linear-gradient(242deg, rgba(93, 180, 255, 0.82), transparent 38%),
+    linear-gradient(18deg, rgba(255, 118, 155, 0.72), transparent 42%),
     linear-gradient(168deg, #8ec9f2 0%, #b5a8e8 48%, #f2b9c4 100%);
   box-shadow:
     inset 0 0 0 1px rgba(255, 255, 255, 0.22),
     0 36px 120px rgba(16, 19, 26, 0.5);
+  transition: background 0.35s ease;
+}
+
+.visual-stage[data-scene="noir"] {
+  background:
+    linear-gradient(128deg, rgba(23, 32, 48, 0.98), rgba(8, 11, 17, 0.84) 42%, rgba(17, 37, 40, 0.9)),
+    linear-gradient(180deg, #0b1018, #111821);
+}
+
+.visual-stage[data-scene="signal"] {
+  background:
+    linear-gradient(120deg, rgba(78, 238, 201, 0.68), transparent 38%),
+    linear-gradient(236deg, rgba(255, 208, 80, 0.72), transparent 34%),
+    linear-gradient(18deg, rgba(67, 150, 255, 0.86), rgba(233, 116, 190, 0.72) 58%, rgba(17, 21, 30, 0.74)),
+    #10151f;
 }
 
 .scene-layers,
@@ -49,22 +65,24 @@ button {
 }
 
 .sun-disc {
-  top: 9%;
-  left: 61%;
-  width: 220px;
-  height: 220px;
+  top: -10%;
+  left: 47%;
+  width: 54%;
+  height: 46%;
   inset: auto;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 244, 214, 0.98) 0 32%, rgba(255, 214, 150, 0.55) 58%, transparent 72%);
-  filter: blur(2px);
+  background:
+    linear-gradient(108deg, transparent 0 28%, rgba(255, 246, 209, 0.54) 45%, transparent 66%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), transparent 72%);
+  filter: blur(10px);
+  transform: skewX(-14deg);
 }
 
 .detail-rings {
   background:
-    repeating-radial-gradient(circle at 12% 8%, transparent 0 34px, rgba(255, 255, 255, 0.6) 34px 36px),
-    repeating-radial-gradient(circle at 24% 68%, transparent 0 42px, rgba(255, 255, 255, 0.55) 42px 44px),
-    repeating-radial-gradient(circle at 82% 22%, transparent 0 56px, rgba(255, 255, 255, 0.45) 56px 58px);
-  opacity: 0.65;
+    repeating-radial-gradient(ellipse at 12% 8%, transparent 0 34px, rgba(255, 255, 255, 0.62) 34px 36px),
+    repeating-radial-gradient(ellipse at 24% 68%, transparent 0 42px, rgba(255, 255, 255, 0.55) 42px 44px),
+    repeating-radial-gradient(ellipse at 82% 22%, transparent 0 56px, rgba(255, 255, 255, 0.48) 56px 58px);
+  opacity: 0.74;
 }
 
 .detail-dots {
@@ -73,11 +91,32 @@ button {
   opacity: 0.55;
 }
 
+.photo-field {
+  inset: 8% 5% 21% 49%;
+  border-radius: 30px;
+  background:
+    linear-gradient(100deg, rgba(255, 255, 255, 0.12), transparent 30%),
+    repeating-linear-gradient(102deg, rgba(255, 255, 255, 0.12) 0 1px, transparent 1px 22px),
+    linear-gradient(155deg, rgba(11, 19, 28, 0.74), rgba(27, 40, 50, 0.34) 46%, rgba(3, 8, 13, 0.66)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+  opacity: 0.7;
+  transform: perspective(900px) rotateX(5deg) rotateY(-7deg);
+}
+
+.signal-grid {
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.16) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+  background-size: 96px 96px;
+  opacity: 0.3;
+}
+
 .blob {
   inset: auto;
-  border-radius: 50%;
+  border-radius: 38% 62% 54% 46%;
   mix-blend-mode: soft-light;
-  filter: blur(6px);
+  filter: blur(18px);
 }
 
 .blob-a {
@@ -85,7 +124,7 @@ button {
   left: -6%;
   width: 42%;
   height: 46%;
-  background: radial-gradient(circle at 40% 36%, rgba(255, 255, 255, 0.85), transparent 66%);
+  background: linear-gradient(118deg, rgba(255, 255, 255, 0.62), transparent 66%);
 }
 
 .blob-b {
@@ -93,7 +132,7 @@ button {
   left: 30%;
   width: 30%;
   height: 34%;
-  background: radial-gradient(circle at 60% 50%, rgba(255, 255, 255, 0.7), transparent 68%);
+  background: linear-gradient(75deg, rgba(255, 255, 255, 0.5), transparent 68%);
 }
 
 /* Crisp line band behind the transport bar — this is what the lens bends */
@@ -108,7 +147,28 @@ button {
     linear-gradient(180deg, transparent 0 64%, rgba(140, 220, 255, 0.7) 65%, transparent 67%),
     linear-gradient(180deg, transparent 0 80%, rgba(255, 255, 255, 0.55) 81%, transparent 83%),
     repeating-linear-gradient(90deg, transparent 0 58px, rgba(255, 255, 255, 0.24) 58px 60px);
-  opacity: 0.85;
+  opacity: 0.92;
+}
+
+.visual-stage[data-scene="noir"] .detail-rings,
+.visual-stage[data-scene="noir"] .detail-dots {
+  opacity: 0.28;
+}
+
+.visual-stage[data-scene="noir"] .photo-field {
+  opacity: 0.88;
+  background:
+    repeating-linear-gradient(92deg, rgba(255, 255, 255, 0.13) 0 1px, transparent 1px 18px),
+    linear-gradient(150deg, rgba(19, 31, 48, 0.92), rgba(7, 10, 16, 0.74) 45%, rgba(6, 28, 24, 0.78));
+}
+
+.visual-stage[data-scene="signal"] .signal-grid {
+  opacity: 0.52;
+  background-size: 54px 54px;
+}
+
+.visual-stage[data-scene="signal"] .detail-dots {
+  opacity: 0.76;
 }
 
 .top-strip {
@@ -136,7 +196,7 @@ button {
   z-index: 2;
   left: 8%;
   right: 8%;
-  top: 24%;
+  top: 21%;
   display: grid;
   justify-items: center;
   gap: 12px;
@@ -147,13 +207,15 @@ button {
 .lyric-stack p {
   margin: 0;
   color: rgba(255, 255, 255, 0.78);
-  font-size: 1.35rem;
+  font-size: 1.2rem;
+  font-weight: 650;
 }
 
 .lyric-stack h1 {
   margin: 0;
-  font-size: 5.75rem;
+  font-size: clamp(4.8rem, 8vw, 8.2rem);
   line-height: 0.92;
+  letter-spacing: 0;
 }
 
 .label {
@@ -167,8 +229,8 @@ button {
 .status-panel {
   position: absolute;
   z-index: 3;
-  top: 22%;
-  right: 9%;
+  top: 19%;
+  right: 8%;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: end;
@@ -176,6 +238,55 @@ button {
   width: 260px;
   padding: 22px 24px;
 }
+
+.visual-stage > .optics-stack {
+  position: absolute !important;
+  z-index: 4;
+  top: auto;
+  left: auto;
+  right: 8%;
+  bottom: 20%;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  width: 290px;
+}
+
+.metric-card {
+  display: grid;
+  gap: 10px;
+  padding: 18px 20px;
+}
+
+.metric-card strong {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.compact-card {
+  width: 78%;
+  justify-self: end;
+}
+
+.sparkline {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  align-items: end;
+  gap: 8px;
+  height: 46px;
+}
+
+.sparkline i {
+  display: block;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.42);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.sparkline i:nth-child(1) { height: 42%; }
+.sparkline i:nth-child(2) { height: 62%; }
+.sparkline i:nth-child(3) { height: 82%; }
+.sparkline i:nth-child(4) { height: 58%; }
 
 .status-panel .label {
   grid-column: 1 / -1;
@@ -200,7 +311,7 @@ button {
   grid-template-columns: minmax(180px, 0.85fr) auto minmax(160px, 1fr) auto;
   align-items: center;
   gap: 18px;
-  width: min(1120px, calc(100vw - 88px));
+  width: min(1180px, calc(100vw - 88px));
   min-height: 90px;
   padding: 12px 20px;
   transform: translateX(-50%);
@@ -299,31 +410,64 @@ button {
   }
 
   .visual-stage {
-    min-height: 820px;
+    display: grid;
+    align-content: start;
+    gap: 14px;
+    min-height: auto;
+    padding: 16px;
     border-radius: 30px;
   }
 
   .top-strip {
-    top: 16px;
-    left: 16px;
+    position: relative;
+    top: auto;
+    left: auto;
+    flex-wrap: wrap;
+  }
+
+  .lyric-stack {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    margin: 34px 0 16px;
   }
 
   .lyric-stack h1 {
-    font-size: 4rem;
+    font-size: 4.2rem;
   }
 
   .status-panel {
-    top: 43%;
-    left: 50%;
+    position: relative;
+    top: auto;
+    left: auto;
     right: auto;
-    width: min(360px, calc(100vw - 48px));
-    transform: translateX(-50%);
+    width: 100%;
+    transform: none;
+  }
+
+  .visual-stage > .optics-stack {
+    position: relative !important;
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    width: 100%;
+    transform: none;
+  }
+
+  .compact-card {
+    width: 100%;
   }
 
   .transport-bar {
+    position: relative;
+    left: auto;
+    bottom: auto;
     grid-template-columns: 1fr;
-    width: calc(100vw - 36px);
+    width: 100%;
     padding: 16px;
+    transform: none;
   }
 
   .transport-actions {

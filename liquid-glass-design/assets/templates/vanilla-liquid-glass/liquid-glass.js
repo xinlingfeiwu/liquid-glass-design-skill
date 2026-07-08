@@ -359,4 +359,19 @@ function initLiquidGlass() {
   }
 }
 
+function initSceneControls() {
+  const stage = document.querySelector(".visual-stage");
+  const buttons = Array.from(document.querySelectorAll("[data-scene-button]"));
+  if (!stage || !buttons.length) return;
+
+  buttons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const scene = button.getAttribute("data-scene-button") || "prism";
+      stage.setAttribute("data-scene", scene);
+      buttons.forEach((item) => item.classList.toggle("is-active", item === button));
+    });
+  });
+}
+
 initLiquidGlass();
+initSceneControls();

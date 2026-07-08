@@ -5,6 +5,7 @@ Run this checklist before finalizing Liquid Glass UI.
 ## Visual
 
 - Test black, bright, saturated, patterned, photo, and video backgrounds.
+- Test at least four built-in showcase scenes: dark, bright, image-like, and high-frequency line/grid.
 - Confirm edges are complete on all sides with no clipping or offset gaps.
 - Confirm the center stays readable and is not over-warped.
 - Confirm chromatic aberration is visible only as restrained edge detail.
@@ -13,6 +14,8 @@ Run this checklist before finalizing Liquid Glass UI.
 - Compare against a high-frequency procedural or photographic background even if the final product background is dark; weak glass often hides on simple gradients.
 - Confirm rims, glare, tint, and refraction read as one material, not as a cloudy card overlay.
 - Confirm shape-specific profiles are intentional: small pills stay crisp, text panels stay readable, showcase bars carry stronger lensing.
+- Confirm the README/screenshot preview is generated from the current runnable demo and uses a cache-busting filename when pushed to GitHub.
+- Confirm the user can open a real demo URL or HTML file; a directory listing of template folders is not a valid visual deliverable.
 
 ## Layout
 
@@ -20,6 +23,7 @@ Run this checklist before finalizing Liquid Glass UI.
 - Check long labels, icon-only controls, dense toolbars, and compact pills.
 - Ensure hover/active/focus states do not change element dimensions.
 - Confirm popovers and menus do not stack glass inside glass.
+- In React/grid/flex demos, confirm component-owned filter SVG nodes stay out of layout and do not become extra items that push controls into another row.
 
 ## Accessibility
 
@@ -38,6 +42,7 @@ Run this checklist before finalizing Liquid Glass UI.
 - Confirm large hidden surfaces do not keep expensive filters active.
 - Watch for stutter during hover, menu open, scroll, resize, and route transitions.
 - Prefer caching, throttling, and shape grouping before reducing material quality.
+- In browser verification, confirm the Chromium path adds the expected SVG support class/state and no JavaScript error prevents filter initialization.
 
 ## Browser Fallback
 

@@ -58,6 +58,8 @@ One SVG filter per distinct surface shape:
 - Hover/active states energize the material with light and depth.
 - Pointer light moves the glint without resizing the layout.
 - The effect adapts to black, bright, saturated, and photographic backgrounds.
+- A showcase screenshot proves the material on detailed content, not only on a flattering gradient.
+- Small pills, circular controls, text panels, and large bars each feel tuned rather than sharing one weak map.
 
 ## Rejection Criteria
 
@@ -74,6 +76,8 @@ Reject an implementation if it:
 - Recomputes maps continuously during simple movement.
 - Animates geometry or regenerates maps in response to pointer movement.
 - Demonstrates the material on a dark, flat background where refraction cannot be seen. Judge glass over bright, detailed, colorful backdrops.
+- Ships only component folders or API docs without a rendered visual proof.
+- Uses production-safe weak defaults in a showcase where the viewer cannot see real edge bending.
 
 ## Tuning Order
 
@@ -85,3 +89,15 @@ Reject an implementation if it:
 6. Tune `dispersion` (default 0.07, 0 disables the extra passes).
 7. Tune hover/press/focus light and pointer glare.
 8. Only then tune motion timing.
+
+## Showcase Defaults
+
+For README previews and first-run demos, bias slightly stronger than production:
+
+- `strength`: 130-180% of measured scale.
+- `magnify`: 1.15-1.4.
+- `dispersion`: 0.08-0.13.
+- `saturate`: 1.65-1.75.
+- `contrast`: 1.14-1.2.
+
+Reduce after visual proof is established. If you start too subtle, the result often reads as generic blur and hides the core Liquid Glass behavior.

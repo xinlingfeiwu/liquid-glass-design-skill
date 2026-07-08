@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Liquid Glass Template</title>
-    <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="./styles.css?v=20260708">
   </head>
   <body>
     <svg id="lg-filter-bank" class="lg-filter-root" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
@@ -12,56 +12,70 @@
     </svg>
 
     <main class="app-shell">
-      <section class="visual-stage" aria-label="Liquid Glass control demo">
+      <section class="visual-stage" data-scene="prism" aria-label="Liquid Glass control demo">
         <div class="scene-layers" aria-hidden="true">
           <span class="sun-disc"></span>
           <div class="detail-rings"></div>
           <div class="detail-dots"></div>
+          <div class="photo-field"></div>
+          <div class="signal-grid"></div>
           <span class="blob blob-a"></span>
           <span class="blob blob-b"></span>
           <div class="horizon-lines"></div>
         </div>
 
         <header class="top-strip" aria-label="Primary controls">
-          <button class="lg-surface lg-button" data-lg-refraction data-lg-profile="thin" data-lg-strength="118" data-lg-magnify="1.08">Library</button>
-          <button class="lg-surface lg-button is-active" data-lg-refraction data-lg-profile="thin" data-lg-strength="124" data-lg-magnify="1.1">Now</button>
-          <button class="lg-surface lg-button" data-lg-refraction data-lg-profile="thin" data-lg-strength="118" data-lg-magnify="1.08">Scene</button>
+          <button class="lg-surface lg-button is-active" data-scene-button="prism" data-lg-refraction data-lg-profile="thin" data-lg-strength="132" data-lg-magnify="1.16"><span>Prism</span></button>
+          <button class="lg-surface lg-button" data-scene-button="noir" data-lg-refraction data-lg-profile="thin" data-lg-strength="132" data-lg-magnify="1.16"><span>Noir</span></button>
+          <button class="lg-surface lg-button" data-scene-button="signal" data-lg-refraction data-lg-profile="thin" data-lg-strength="132" data-lg-magnify="1.16"><span>Signal</span></button>
         </header>
 
         <section class="lyric-stack" aria-hidden="true">
-          <p>warm light across the valley</p>
-          <h1>Day Trip</h1>
-          <p>colors folding into motion</p>
+          <p>midnight signal over the valley</p>
+          <h1>Liquid</h1>
+          <p>glass channel in motion</p>
         </section>
 
-        <aside class="lg-surface lg-panel lg-tinted status-panel" data-lg-refraction data-lg-profile="soft" data-lg-strength="128" data-lg-magnify="1.12" data-lg-glare="0.60">
+        <aside class="lg-surface lg-panel lg-tinted status-panel" data-lg-refraction data-lg-profile="soft" data-lg-strength="150" data-lg-magnify="1.22" data-lg-glare="0.64" data-lg-dispersion="0.08">
           <p class="label">Current Layer</p>
-          <strong>Atmosphere</strong>
-          <span>82%</span>
+          <strong>Refraction</strong>
+          <span>92%</span>
         </aside>
 
-        <nav class="lg-surface lg-panel transport-bar" data-lg-refraction data-lg-profile="prominent" data-lg-strength="148" data-lg-magnify="1.24" data-lg-glare="0.64" data-lg-dispersion="0.10" aria-label="Playback controls">
+        <section class="optics-stack" aria-label="Glass samples">
+          <article class="lg-surface lg-panel metric-card" data-lg-refraction data-lg-profile="prominent" data-lg-strength="162" data-lg-magnify="1.32" data-lg-glare="0.68" data-lg-dispersion="0.11">
+            <p class="label">Rim Index</p>
+            <strong>1.46</strong>
+            <span class="sparkline" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+          </article>
+          <article class="lg-surface lg-panel metric-card compact-card" data-lg-refraction data-lg-profile="thin" data-lg-strength="150" data-lg-magnify="1.24" data-lg-glare="0.7" data-lg-dispersion="0.1">
+            <p class="label">Light Angle</p>
+            <strong>38deg</strong>
+          </article>
+        </section>
+
+        <nav class="lg-surface lg-panel transport-bar" data-lg-refraction data-lg-profile="prominent" data-lg-strength="176" data-lg-magnify="1.38" data-lg-glare="0.72" data-lg-dispersion="0.13" aria-label="Playback controls">
           <div class="track-meta">
             <div class="mini-cover" aria-hidden="true"></div>
             <div>
-              <strong>Day Trip</strong>
-              <span>Studio channel</span>
+              <strong>Glass Channel</strong>
+              <span>Live optical pass</span>
             </div>
           </div>
 
           <div class="transport-actions">
-            <button class="lg-surface lg-button icon-button" data-lg-refraction data-lg-profile="thin" data-lg-strength="120" data-lg-magnify="1.1" aria-label="Previous"><span aria-hidden="true">Prev</span></button>
-            <button class="lg-surface lg-button play-button" data-lg-refraction data-lg-profile="prominent" data-lg-strength="140" data-lg-magnify="1.2" data-lg-glare="0.74" data-lg-dispersion="0.11" aria-label="Play"><span aria-hidden="true">Play</span></button>
-            <button class="lg-surface lg-button icon-button" data-lg-refraction data-lg-profile="thin" data-lg-strength="120" data-lg-magnify="1.1" aria-label="Next"><span aria-hidden="true">Next</span></button>
+            <button class="lg-surface lg-button icon-button" data-lg-refraction data-lg-profile="thin" data-lg-strength="138" data-lg-magnify="1.2" aria-label="Previous"><span aria-hidden="true">Prev</span></button>
+            <button class="lg-surface lg-button play-button" data-lg-refraction data-lg-profile="prominent" data-lg-strength="168" data-lg-magnify="1.36" data-lg-glare="0.82" data-lg-dispersion="0.13" aria-label="Play"><span aria-hidden="true">Play</span></button>
+            <button class="lg-surface lg-button icon-button" data-lg-refraction data-lg-profile="thin" data-lg-strength="138" data-lg-magnify="1.2" aria-label="Next"><span aria-hidden="true">Next</span></button>
           </div>
 
           <div class="progress" aria-hidden="true"><i></i></div>
 
-          <button class="lg-surface lg-button mode-button lg-clear is-active" data-lg-refraction data-lg-profile="thin" data-lg-strength="124" data-lg-magnify="1.1">Clear</button>
+          <button class="lg-surface lg-button mode-button lg-clear is-active" data-lg-refraction data-lg-profile="thin" data-lg-strength="142" data-lg-magnify="1.2"><span>Clear</span></button>
         </nav>
       </section>
     </main>
 
-    <script type="module" src="./liquid-glass.js"></script>
+    <script type="module" src="./liquid-glass.js?v=20260708"></script>
   </body>
 </html>

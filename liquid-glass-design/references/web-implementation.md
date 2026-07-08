@@ -13,6 +13,8 @@ Build in layers:
 Gate SVG backdrop filters with feature detection (UA gate for Safari/Firefox
 plus a `backdrop-filter: url(...)` probe). Always retain the fallback.
 
+For demos and screenshots, build a high-information content layer first. Include dark, bright, image-like, and high-frequency scenes so the material cannot hide behind a flattering background.
+
 ## CSS Surface Contract
 
 One class carries the whole material; no injected layer stack. Lighting comes
@@ -46,8 +48,10 @@ Key rules:
 
 - `background: <white highlight gradient>, var(--lg-tint);`
 - `::before` holds corner glints and top sheen; `::after` holds the fine inner rim. Both `z-index: -1` inside an isolated stacking context so content stays plain DOM above them.
+- If pseudo-elements are painted above the fill for stronger highlights, explicitly keep direct children at a higher z-index so foreground text/icons remain sharp.
 - On interactive controls, pointer movement may update `--lg-light-x`, `--lg-light-y`, `--lg-glare`, and small elastic offsets. Do not update the displacement map on pointer movement.
 - The refractive `backdrop-filter` is applied **directly to the surface element** — no background clones, no `background-attachment: fixed` hacks, which break in scroll containers and on mobile.
+- When a project needs a dedicated warped material layer, keep that layer behind a separate sharp content layer; do not rasterize or displace live foreground DOM.
 
 ## SVG Filter Contract
 
@@ -69,6 +73,8 @@ point; reduce only after visual QA shows no clipped edges.
 
 Optional specular maps can be generated for experimental surfaces, but CSS
 pseudo-element glints are usually cheaper and easier to theme for app controls.
+
+Use the same mental model as shader-grade renderers when reviewing CSS/SVG output: shape/SDF, edge factor, refraction, dispersion, Fresnel-like rim, glare, tint, and fallback are separate concerns even if implemented with CSS variables and SVG primitives.
 
 ## JavaScript Contract
 
@@ -111,6 +117,8 @@ The component should:
 - Use a stable internal filter id and per-instance filter.
 - Apply the measured map scale to its displacement nodes after each regen.
 - Expose profile/tuning props instead of hardcoding one visual for every shape.
+- Include a showcase page that actually exercises those props across small pills, circular controls, bars, and text panels. A component file alone is not a sufficient template.
+- Keep component-owned filter SVGs out of layout flow. If a component emits an inline `<svg><filter>...</filter></svg>` next to the rendered surface, force the SVG to `position: absolute !important; width: 0; height: 0; overflow: hidden; pointer-events: none;` and exclude it from broad child rules such as `.glass > *`. Otherwise nested glass controls inside grid/flex bars can silently become extra layout items.
 - Keep pointer glare as CSS variable updates, not React state churn.
 - Fall back to CSS blur when SVG filter support is absent (SSR-safe).
 - Avoid layout shifts on hover/press.
