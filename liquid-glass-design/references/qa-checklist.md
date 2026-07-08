@@ -12,8 +12,10 @@ Run this checklist before finalizing Liquid Glass UI.
 - Confirm hover, active, selected, disabled, and focus states all read clearly.
 - Confirm the UI does not look like ordinary blur-only glass.
 - Compare against a high-frequency procedural or photographic background even if the final product background is dark; weak glass often hides on simple gradients.
+- Confirm high-frequency detail is local and purposeful; reject previews that read as noisy wallpaper or a raw filter test.
 - Confirm rims, glare, tint, and refraction read as one material, not as a cloudy card overlay.
 - Confirm shape-specific profiles are intentional: small pills stay crisp, text panels stay readable, showcase bars carry stronger lensing.
+- Confirm the first viewport has a clear product/UI composition and focal point before judging the optical material.
 - Confirm the README/screenshot preview is generated from the current runnable demo and uses a cache-busting filename when pushed to GitHub.
 - Confirm the user can open a real demo URL or HTML file; a directory listing of template folders is not a valid visual deliverable.
 

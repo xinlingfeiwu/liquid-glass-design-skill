@@ -13,6 +13,8 @@ A Liquid Glass example is incomplete until it proves the material against these 
 
 Do not ship a demo that only looks good on a flat gradient. Weak glass hides on simple backgrounds.
 
+High-information does not mean visual clutter. Treat crisp lines, dots, grids, waveforms, and chart marks as optical test details placed near glass edges, not as a full-screen decorative texture. The showcase must still look like a designed product surface.
+
 ## Required Surface Set
 
 Every showcase should include:
@@ -28,6 +30,7 @@ Every showcase should include:
 Good examples separate responsibilities:
 
 - Content/backdrop layer: detailed enough to reveal bending.
+- Composition layer: clear hierarchy, intentional whitespace, and a believable app context before any material tuning.
 - Material layer: tint, refraction, saturation, brightness, contrast, rim, and glints.
 - Foreground layer: live DOM text/icons that remain sharp and are never warped.
 - Interaction layer: pointer glare and tiny elastic drift; no map regeneration during pointer movement.
@@ -56,6 +59,7 @@ The preview image should make these facts visible without zooming:
 - The edge has a fine bright rim and restrained color separation.
 - Multiple surface sizes share a family resemblance but do not use identical tuning.
 - The scene includes enough dark and bright areas to prove contrast.
+- The first impression is a refined interface, not an engineering filter test or wallpaper sample.
 
 If the screenshot could be mistaken for a generic blur card, reject it and retune the backdrop, lens strength, rim, and tint.
 
@@ -68,3 +72,5 @@ If the screenshot could be mistaken for a generic blur card, reject it and retun
 - The surface tint is too opaque, hiding refraction.
 - The blur is too high, turning lensing into fog.
 - The material looks good only on one background scene.
+- High-frequency lines cover the whole screen and make the composition feel noisy or cheap.
+- The glass is strong but the UI has no believable product context, hierarchy, or focal point.

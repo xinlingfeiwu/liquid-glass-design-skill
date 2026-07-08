@@ -60,6 +60,7 @@ One SVG filter per distinct surface shape:
 - The effect adapts to black, bright, saturated, and photographic backgrounds.
 - A showcase screenshot proves the material on detailed content, not only on a flattering gradient.
 - Small pills, circular controls, text panels, and large bars each feel tuned rather than sharing one weak map.
+- The scene has a clear product composition first; optical probes such as grids, dots, and waveforms support the glass instead of taking over the entire viewport.
 
 ## Rejection Criteria
 
@@ -78,6 +79,7 @@ Reject an implementation if it:
 - Demonstrates the material on a dark, flat background where refraction cannot be seen. Judge glass over bright, detailed, colorful backdrops.
 - Ships only component folders or API docs without a rendered visual proof.
 - Uses production-safe weak defaults in a showcase where the viewer cannot see real edge bending.
+- Uses full-screen high-frequency patterns as decoration, making the preview feel like a filter lab instead of a premium interface.
 
 ## Tuning Order
 
@@ -101,3 +103,4 @@ For README previews and first-run demos, bias slightly stronger than production:
 - `contrast`: 1.14-1.2.
 
 Reduce after visual proof is established. If you start too subtle, the result often reads as generic blur and hides the core Liquid Glass behavior.
+Reduce dispersion before it becomes a visible rainbow stripe across whole surfaces; premium glass shows color separation at the rim, not across every line behind the card.

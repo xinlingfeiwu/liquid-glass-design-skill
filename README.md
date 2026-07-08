@@ -4,7 +4,7 @@ An AI-agent skill and template kit for building high-end Liquid Glass interfaces
 
 The refraction core uses inverse lens mapping: a canvas-generated displacement map whose interior is identity and whose edges magnify the backdrop, driven through a per-surface SVG `feDisplacementMap` at a measured — never guessed — scale.
 
-![Liquid Glass preview](docs/preview-20260708-v2.png)
+![Liquid Glass preview](docs/preview-20260708-v3.png)
 
 ## Join The QQ Group
 
@@ -17,8 +17,8 @@ Scan the QR code to join the `liquid-glass-skill` group chat.
 - `liquid-glass-design/SKILL.md` - the skill entrypoint (workflow, rules, defaults, acceptance criteria).
 - `liquid-glass-design/references/` - design principles, showcase quality gates, the golden-glass quality bar, web implementation contracts, GitHub research, and QA checklists.
 - `liquid-glass-design/scripts/generate-displacement-map.mjs` - a zero-dependency PNG displacement map generator that prints the exact `feDisplacementMap` scale.
-- `liquid-glass-design/assets/templates/vanilla-liquid-glass/` - a no-build HTML/CSS/JS showcase with per-surface filters, lens profiles, pointer glare, multi-background optical QA, and lens maps.
-- `liquid-glass-design/assets/templates/react-liquid-glass/` - a React/Vite `<LiquidGlass>` component template with profile/tuning props and the same showcase-grade demo scene.
+- `liquid-glass-design/assets/templates/vanilla-liquid-glass/` - a no-build HTML/CSS/JS Optic Deck showcase with per-surface filters, lens profiles, pointer glare, multi-background optical QA, and lens maps.
+- `liquid-glass-design/assets/templates/react-liquid-glass/` - a React/Vite `<LiquidGlass>` component template with profile/tuning props and the same redesigned showcase-grade demo scene.
 
 ## Install The Skill
 

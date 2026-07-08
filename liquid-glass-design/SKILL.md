@@ -12,7 +12,7 @@ Use this skill to design, implement, or review high-quality Liquid Glass UI. Tre
 ## Workflow
 
 1. Inspect the target UI first: identify the content layer, control/navigation layer, background complexity, motion density, and accessibility constraints.
-2. Build or locate a **high-information backdrop** before tuning glass. Use at least one dark field, one bright field, one photographic/media-like field, and one high-frequency line/grid field. Never judge Liquid Glass on a flat gradient alone.
+2. Build or locate a **designed, high-information backdrop** before tuning glass. Use dark, bright, photographic/media-like, and high-frequency line/grid details, but compose them as a real product scene. Never judge Liquid Glass on a flat gradient alone, and never turn the whole screen into noisy test pattern wallpaper.
 3. Choose the material variant:
    - **Regular** for most controls, panels, bars, and menus.
    - **Clear** only above visually rich media when a dimming layer and bold foreground content preserve legibility.
@@ -36,11 +36,13 @@ Use this skill to design, implement, or review high-quality Liquid Glass UI. Tre
 - Keep blur near zero on the refractive path; the punch comes from `contrast`, the optics from displacement.
 - Chromatic dispersion belongs on the rim only, via per-channel scale differences. Never `feOffset` whole channels.
 - Use shadows, inner rims, pointer-aware glare, Fresnel-like edge light, and small specular glints as a system. Avoid large white sweeps, muddy blur, or one-note transparency.
+- Keep high-frequency detail local and purposeful: behind docks, cards, media panels, or test strips where rim bending is visible. If line fields dominate the composition, redesign the scene before tuning glass.
 - Apply `backdrop-filter` directly to the surface element. No background-clone layers or `background-attachment: fixed` hacks.
 - Cache generated displacement maps by size/radius/tuning and update them only on shape changes, not on every animation frame.
 - Respect `prefers-reduced-motion`, increased contrast, and reduced transparency by reducing morphing and increasing tint/opacity.
 - Keep foreground content sharp. If the implementation uses extra optical layers, separate the warped backdrop/material layer from the content layer so text and icons are never rasterized or distorted.
 - Reject outputs that only look acceptable in one curated screenshot. A good material survives dark, bright, image-like, and high-frequency backgrounds.
+- Reject demos that feel like technical filter tests rather than a designed interface. The first screen should communicate an app surface, control deck, editor, dashboard, media view, or other believable UI context.
 
 ## Resource Guide
 
@@ -75,6 +77,7 @@ Complete Liquid Glass work only when:
 - Text and icons are readable on dark, bright, saturated, and image/video backgrounds.
 - Edges show restrained lensing — the backdrop visibly magnifies and bends at the rim — with chromatic detail only at the rim, no fringing across the surface.
 - The demo/verification backdrop includes dark, bright, image-like, and high-frequency detail backgrounds so refraction cannot hide.
+- High-frequency detail proves refraction without overwhelming the visual direction; the showcase still reads as a designed interface.
 - The delivered example is a rendered, runnable showcase, not merely a folder or code snippet.
 - Hover, press, focus, and selected states feel alive but do not flicker or resize layout.
 - Reduced motion/transparency/contrast preferences have explicit fallbacks.
