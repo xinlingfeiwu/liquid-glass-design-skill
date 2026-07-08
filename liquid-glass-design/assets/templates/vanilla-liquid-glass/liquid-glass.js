@@ -114,7 +114,7 @@ export function createLiquidGlassDisplacementMap(options = {}) {
   const range = Math.max(1, maxDisplacement * spread);
   const image = context.createImageData(w, h);
   const data = image.data;
-  rawIndex = 0;
+  let rawIndex = 0;
 
   for (let y = 0; y < h; y += 1) {
     for (let x = 0; x < w; x += 1) {
