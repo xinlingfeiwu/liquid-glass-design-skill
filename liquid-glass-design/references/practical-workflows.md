@@ -50,10 +50,11 @@ Reject the result if the answer to composition, optics, clarity, or geometry is 
 
 **Task type:** `component-template`.
 
-1. Copy the vanilla or React template only as a starting point. Replace the scene and labels with the target product context.
+1. Copy the vanilla, Web Component, or React template only as a starting point. Replace the scene and labels with the target product context.
 2. Keep the public contracts stable:
    - CSS: `.lg-surface`, `.lg-panel`, `.lg-button`, `.lg-clear`, `.lg-tinted`;
    - JS: `createLiquidGlassDisplacementMap(options)` and `syncLiquidGlassMap(...)`;
+   - Web Component: `<liquid-glass radius profile strength magnify dispersion blur tint interactive>`;
    - React: `<LiquidGlass variant radius profile strength magnify dispersion blur tint supersample interactive ref>`.
 3. Keep the filter root hidden and out of layout. In React, component-owned SVG filter nodes must not become flex/grid children.
 4. Retune surface profiles after resizing. Reusing one map/strength across buttons, cards, and docks is a common reason the effect feels weak or jagged.

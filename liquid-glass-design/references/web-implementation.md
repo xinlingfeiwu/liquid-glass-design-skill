@@ -95,7 +95,7 @@ Implement:
 
 - `createLiquidGlassDisplacementMap(options) -> { url, scale, key }` — inverse lens mapping on canvas; `scale` is measured from the generated field (see `golden-glass-style.md`). Options should include `profile`, `magnify`, `bend`, `spread`, `bezelRatio`, and optional `supersample`.
 - `syncLiquidGlassMap(element, filterRefs, cacheKey)` — regenerates the map only when size/radius/map tuning changed and applies `scale * strength * channelMultiplier` to every displacement node. `filterRefs = { image, displacements: [{ node, mul }] }`.
-- `supportsLiquidGlassSvgFilter()` — decides whether to enable the refraction path.
+- `supportsLiquidGlassSvgFilter()` — decides whether to enable the refraction path with feature detection (`CSS.supports` plus style assignment), not permanent Safari/Firefox UA blocks. Keep a force-fallback hook for QA.
 - Pointer-light handling — updates only CSS variables for glint and elastic drift; never regenerates maps.
 
 Use `ResizeObserver` for shape changes. Use `requestAnimationFrame` to batch
@@ -139,6 +139,7 @@ The component should:
 - Keep component-owned filter SVGs out of layout flow. If a component emits an inline `<svg><filter>...</filter></svg>` next to the rendered surface, force the SVG to `position: absolute !important; width: 0; height: 0; overflow: hidden; pointer-events: none;` and exclude it from broad child rules such as `.glass > *`. Otherwise nested glass controls inside grid/flex bars can silently become extra layout items.
 - Keep pointer glare as CSS variable updates, not React state churn.
 - Fall back to CSS blur when SVG filter support is absent (SSR-safe).
+- Support forced fallback in tests so WebKit/unsupported-path QA is measurable even on engines that later add URL-filter support.
 - Avoid layout shifts on hover/press.
 - Respect reduced motion and reduced transparency through CSS.
 

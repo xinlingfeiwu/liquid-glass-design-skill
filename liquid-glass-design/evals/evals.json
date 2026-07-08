@@ -100,12 +100,28 @@
     {
       "id": "qa-script-supports-data-role-and-baseline",
       "paths": ["scripts/check-visual-geometry.mjs"],
-      "must_include_any": ["data-lg-role", "baseline-dir", "pixel-threshold"]
+      "must_include_all": ["data-lg-role", "baseline-dir", "pixel-threshold"]
+    },
+    {
+      "id": "qa-script-supports-fallback-contrast-and-core",
+      "paths": ["scripts/check-visual-geometry.mjs"],
+      "must_include_all": ["playwright-core", "force-fallback", "expect-svg-filter", "contrast", "min-contrast"]
+    },
+    {
+      "id": "templates-use-feature-detection-not-ua-blocks",
+      "paths": ["assets/templates/vanilla-liquid-glass/liquid-glass.js", "assets/templates/react-liquid-glass/src/displacementMap.js", "assets/templates/web-component-liquid-glass/liquid-glass-element.js"],
+      "must_include_all": ["CSS\\?\\.supports", "__LG_FORCE_FALLBACK__"],
+      "must_not_include": ["navigator\\.userAgent", "Firefox", "Safari"]
+    },
+    {
+      "id": "web-component-template-is-portable",
+      "paths": ["assets/templates/web-component-liquid-glass"],
+      "must_include_all": ["customElements\\.define", "<liquid-glass", "feDisplacementMap", "createLiquidGlassDisplacementMap"]
     },
     {
       "id": "package-script-excludes-heavy-directories",
       "paths": ["scripts/package-skill.mjs"],
-      "must_include_any": ["node_modules", "dist", "dry-run", "lean"]
+      "must_include_all": ["node_modules", "dist", "dry-run", "lean"]
     }
   ]
 }

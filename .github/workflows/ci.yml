@@ -33,26 +33,16 @@ jobs:
           PY
 
       - name: Node syntax checks
-        run: |
-          node --check liquid-glass-design/scripts/generate-displacement-map.mjs
-          node --check liquid-glass-design/scripts/check-visual-geometry.mjs
-          node --check liquid-glass-design/scripts/package-skill.mjs
-          node --check liquid-glass-design/scripts/run-evals.mjs
-          node --check liquid-glass-design/scripts/test-displacement-map.mjs
-          node --check liquid-glass-design/assets/templates/vanilla-liquid-glass/liquid-glass.js
-          node --check liquid-glass-design/assets/templates/react-liquid-glass/src/displacementMap.js
+        run: npm run check
 
       - name: Displacement map tests
-        run: node liquid-glass-design/scripts/test-displacement-map.mjs
+        run: npm run test:maps
 
       - name: Eval smoke
-        run: node liquid-glass-design/scripts/run-evals.mjs
+        run: npm run eval
 
       - name: Package dry run
-        run: node liquid-glass-design/scripts/package-skill.mjs --dry-run
-
-      - name: Lean package dry run
-        run: node liquid-glass-design/scripts/package-skill.mjs --dry-run --lean
+        run: npm run package:dry
 
       - name: React template build
         working-directory: liquid-glass-design/assets/templates/react-liquid-glass
@@ -63,12 +53,12 @@ jobs:
       - name: Install Playwright for visual QA
         run: |
           npm install --no-save playwright@^1.53.0
-          npx playwright install --with-deps chromium
+          npx playwright install --with-deps chromium webkit
 
       - name: Vanilla template visual QA
         run: |
           set -euo pipefail
-          mkdir -p artifacts/screenshots artifacts/baselines
+          mkdir -p artifacts/screenshots
           python3 -m http.server 4173 --directory liquid-glass-design/assets/templates/vanilla-liquid-glass > /tmp/liquid-glass-http.log 2>&1 &
           server_pid=$!
           trap 'kill "$server_pid" 2>/dev/null || true' EXIT
@@ -80,13 +70,23 @@ jobs:
           done
           node liquid-glass-design/scripts/check-visual-geometry.mjs \
             --url http://127.0.0.1:4173 \
+            --browser chromium \
+            --expect-svg-filter enabled \
             --screenshot-dir artifacts/screenshots \
-            --baseline-dir artifacts/baselines \
-            --update-baseline
+            --baseline-dir liquid-glass-design/evals/baselines \
+            --pixel-threshold 0.05 \
+            --pixel-channel-threshold 24 \
+            --contrast \
+            --min-contrast 3
           node liquid-glass-design/scripts/check-visual-geometry.mjs \
             --url http://127.0.0.1:4173 \
-            --baseline-dir artifacts/baselines \
-            --pixel-threshold 0.01
+            --browser webkit \
+            --force-fallback \
+            --expect-svg-filter disabled \
+            --viewport 1440x900 \
+            --screenshot-dir artifacts/screenshots \
+            --contrast \
+            --min-contrast 3
 
       - name: Upload visual QA screenshots
         if: always()

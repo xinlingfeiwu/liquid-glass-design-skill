@@ -92,8 +92,9 @@ async function main() {
   for (const assertion of evals.static_assertions || []) {
     const text = await readCombined(assertion.paths || ["."]);
     const includePass = assertion.must_include_any ? regexAny(assertion.must_include_any, text) : true;
+    const includeAllPass = assertion.must_include_all ? assertion.must_include_all.every((pattern) => new RegExp(pattern, "i").test(text)) : true;
     const forbidden = (assertion.must_not_include || []).filter((pattern) => new RegExp(pattern, "i").test(text));
-    staticResults.push({ id: assertion.id, pass: includePass && forbidden.length === 0, includePass, forbidden });
+    staticResults.push({ id: assertion.id, pass: includePass && includeAllPass && forbidden.length === 0, includePass, includeAllPass, forbidden });
   }
 
   const pluginEval = spawnSync("plugin-eval", ["--version"], { encoding: "utf8" });

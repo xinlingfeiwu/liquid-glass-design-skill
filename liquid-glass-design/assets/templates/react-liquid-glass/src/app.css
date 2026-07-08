@@ -246,10 +246,9 @@ button {
   align-items: end;
   justify-content: space-between;
   gap: 18px;
-  color: rgba(255, 255, 255, 0.78);
+  color: rgba(25, 36, 50, 0.82);
 }
 
-.media-topline span,
 .label {
   margin: 0;
   color: rgba(216, 239, 255, 0.72);
@@ -259,7 +258,17 @@ button {
   text-transform: uppercase;
 }
 
+.media-topline span {
+  margin: 0;
+  color: rgba(31, 45, 62, 0.74);
+  font-size: 0.76rem;
+  font-weight: 820;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
 .media-topline strong {
+  color: rgba(16, 26, 39, 0.88);
   font-size: 1.08rem;
 }
 
@@ -520,6 +529,11 @@ button {
 
 .mode-button {
   min-width: 82px;
+}
+
+.mode-button.lg-clear {
+  color: rgba(17, 26, 36, 0.9);
+  text-shadow: 0 1px 10px rgba(255, 255, 255, 0.22);
 }
 
 @media (max-width: 1100px) {

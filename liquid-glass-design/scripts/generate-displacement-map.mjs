@@ -125,7 +125,8 @@ export function createLiquidGlassDisplacementPixels(options = {}) {
       const pixel = (y * width + x) * 4;
       data[pixel] = Math.round(clamp((dx * edgeFactor) / range * 0.5 + 0.5, 0, 1) * 255);
       data[pixel + 1] = Math.round(clamp((dy * edgeFactor) / range * 0.5 + 0.5, 0, 1) * 255);
-      data[pixel + 2] = data[pixel + 1];
+      // The filter reads only R/G; keep B neutral to avoid implying a third vector channel.
+      data[pixel + 2] = 0;
       data[pixel + 3] = 255;
     }
   }

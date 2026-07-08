@@ -24,6 +24,7 @@ Use this skill to design, implement, or review high-quality Liquid Glass UI. Tre
 6. Choose the implementation path:
    - Use CSS + a per-surface SVG filter fed by a canvas-generated inverse-lens displacement map for production web/Electron surfaces. This is the default quality path.
    - Use React components from `assets/templates/react-liquid-glass/` when a component API is useful.
+   - Use the Web Component template in `assets/templates/web-component-liquid-glass/` when Vue, Svelte, Angular, plain HTML, or mixed stacks need one portable `<liquid-glass>` element.
    - Use a map-on-content strategy when Safari/Firefox parity matters more than true live backdrop refraction.
    - Use the vanilla template in `assets/templates/vanilla-liquid-glass/` for plain HTML/CSS/JS or for extracting patterns into another framework.
    - Consider WebGL/WebGPU only for large dynamic scenes, shader-grade Fresnel/glare/blur, merged blob shapes, or when CSS/SVG cannot maintain quality or browser support.
@@ -51,6 +52,8 @@ Use this skill to design, implement, or review high-quality Liquid Glass UI. Tre
 | New UI/showcase | `references/design-recipes.md`, `references/golden-glass-style.md` | `scripts/generate-displacement-map.mjs` |
 | Existing UI upgrade | `references/practical-workflows.md`, `references/golden-glass-style.md` | `scripts/check-visual-geometry.mjs` when runnable |
 | React/component template | `references/web-implementation.md`, `references/golden-glass-style.md` | `assets/templates/react-liquid-glass/` |
+| Cross-framework component | `references/web-implementation.md`, `references/golden-glass-style.md` | `assets/templates/web-component-liquid-glass/` |
+| Electron app integration | `references/electron.md`, `references/web-implementation.md` | `scripts/check-visual-geometry.mjs` against the packaged renderer |
 | Visual QA/review | `references/qa-checklist.md`, `references/golden-glass-style.md` | `scripts/check-visual-geometry.mjs` |
 | README prompts/distribution | `references/prompt-patterns.md`, repository `README.md` | `scripts/package-skill.mjs` |
 | Research/engine choice | `references/github-research.md` | Use only when selecting CSS/SVG vs React vs WebGL |

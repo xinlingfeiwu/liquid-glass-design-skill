@@ -29,6 +29,7 @@ function usage() {
 node scripts/check-visual-geometry.mjs --url http://127.0.0.1:4173 [options]
 
 Options:
+  --browser chromium|webkit|firefox    Browser engine. Default: chromium
   --stage ".app"                  Stage/root selector. Default: [data-lg-role="stage"], .visual-stage
   --dock ".dock"                  Dock selector. Default: [data-lg-role="dock"], .transport-bar
   --focus ".card"                 Focal selector. Default: [data-lg-role="focus"], .media-card
@@ -41,6 +42,11 @@ Options:
   --update-baseline               Write/update baseline PNGs instead of comparing
   --pixel-threshold 0.01          Max changed-pixel ratio allowed
   --pixel-channel-threshold 16    Per-pixel channel delta threshold
+  --expect-svg-filter enabled|disabled|auto
+  --force-fallback                Force template fallback path before page scripts run
+  --contrast                      Estimate text/background contrast from screenshots
+  --contrast-selector ".label"    Text selector for contrast checks
+  --min-contrast 4.5              Minimum estimated contrast ratio
   --wait-ms 300                   Extra settle wait after network idle`;
 }
 
@@ -52,6 +58,30 @@ function parseViewport(value) {
 
 function round(value) {
   return Number.isFinite(value) ? Math.round(value * 10000) / 10000 : value;
+}
+
+function parseCssColor(value) {
+  const match = /rgba?\(([^)]+)\)/i.exec(String(value || ""));
+  if (!match) return null;
+  const parts = match[1].split(",").map((part) => Number.parseFloat(part.trim()));
+  if (parts.length < 3 || parts.some((part, index) => index < 3 && !Number.isFinite(part))) return null;
+  return { r: parts[0], g: parts[1], b: parts[2], a: Number.isFinite(parts[3]) ? parts[3] : 1 };
+}
+
+function luminance({ r, g, b }) {
+  const convert = (channel) => {
+    const value = channel / 255;
+    return value <= 0.03928 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+  };
+  return 0.2126 * convert(r) + 0.7152 * convert(g) + 0.0722 * convert(b);
+}
+
+function contrastRatio(a, b) {
+  const l1 = luminance(a);
+  const l2 = luminance(b);
+  const light = Math.max(l1, l2);
+  const dark = Math.min(l1, l2);
+  return (light + 0.05) / (dark + 0.05);
 }
 
 function overlapArea(a, b) {
@@ -184,19 +214,70 @@ function comparePngBuffers(actualBuffer, baselineBuffer, channelThreshold) {
 }
 
 async function loadPlaywright() {
+  const errors = [];
   try {
     return await import("playwright");
   } catch (error) {
-    console.error("Playwright is required for visual geometry checks.");
-    console.error("Install it in the project that runs this script:");
-    console.error("  npm i -D playwright && npx playwright install chromium");
-    console.error(error.message);
-    process.exit(2);
+    errors.push(error);
   }
+  try {
+    return await import("playwright-core");
+  } catch (error) {
+    errors.push(error);
+  }
+  console.error("Playwright is required for visual geometry checks.");
+  console.error("Install it in the project that runs this script:");
+  console.error("  npm i -D playwright && npx playwright install chromium");
+  console.error("If your project already provides browsers, playwright-core is also accepted.");
+  console.error(errors.map((error) => error.message).join("\n"));
+  process.exit(2);
 }
 
 async function ensureDir(path) {
   if (path) await mkdir(path, { recursive: true });
+}
+
+function sampleAverage(png, points) {
+  const pixels = [];
+  for (const point of points) {
+    const x = Math.max(0, Math.min(png.width - 1, Math.round(point.x)));
+    const y = Math.max(0, Math.min(png.height - 1, Math.round(point.y)));
+    const index = (y * png.width + x) * 4;
+    pixels.push({ r: png.rgba[index], g: png.rgba[index + 1], b: png.rgba[index + 2], a: png.rgba[index + 3] / 255 });
+  }
+  if (!pixels.length) return null;
+  return pixels.reduce((acc, pixel) => ({
+    r: acc.r + pixel.r / pixels.length,
+    g: acc.g + pixel.g / pixels.length,
+    b: acc.b + pixel.b / pixels.length,
+    a: acc.a + pixel.a / pixels.length
+  }), { r: 0, g: 0, b: 0, a: 0 });
+}
+
+function estimateContrasts(screenshot, items, minContrast) {
+  const png = decodePng(screenshot);
+  return items.map((item) => {
+    const foreground = parseCssColor(item.color);
+    const rect = item.rect;
+    const inset = Math.min(8, Math.max(3, Math.min(rect.width, rect.height) * 0.18));
+    const background = sampleAverage(png, [
+      { x: rect.left - inset, y: rect.top + rect.height / 2 },
+      { x: rect.right + inset, y: rect.top + rect.height / 2 },
+      { x: rect.left + rect.width / 2, y: rect.top - inset },
+      { x: rect.left + rect.width / 2, y: rect.bottom + inset },
+      { x: rect.left + inset, y: rect.top + inset },
+      { x: rect.right - inset, y: rect.bottom - inset }
+    ]);
+    const ratio = foreground && background ? contrastRatio(foreground, background) : 0;
+    return {
+      selector: item.selector,
+      text: item.text,
+      ratio: round(ratio),
+      pass: ratio >= minContrast,
+      foreground,
+      background: background ? { r: round(background.r), g: round(background.g), b: round(background.b) } : null
+    };
+  });
 }
 
 async function main() {
@@ -212,6 +293,7 @@ async function main() {
     focus: args.focus || '[data-lg-role="focus"], .media-card',
     rail: args.rail || '[data-lg-role="rail"], .insight-rail'
   };
+  const browserName = String(args.browser || "chromium");
   const viewports = String(args.viewport || DEFAULT_VIEWPORTS).split(",").map(parseViewport);
   const minGap = Number(args["min-gap"] ?? 16);
   const maxCenterDelta = Number(args["max-center-delta"] ?? 1);
@@ -221,23 +303,53 @@ async function main() {
   const updateBaseline = Boolean(args["update-baseline"]);
   const pixelThreshold = Number(args["pixel-threshold"] ?? 0.01);
   const pixelChannelThreshold = Number(args["pixel-channel-threshold"] ?? 16);
+  const expectSvgFilter = String(args["expect-svg-filter"] || "auto");
+  const runContrast = Boolean(args.contrast);
+  const contrastSelector = String(args["contrast-selector"] || '[data-lg-contrast], .hero-copy h1, .hero-copy span, .lg-surface strong, .lg-surface .label, .lg-button span, .track-meta span');
+  const minContrast = Number(args["min-contrast"] ?? 4.5);
 
   await ensureDir(screenshotDir);
   await ensureDir(baselineDir);
 
-  const { chromium } = await loadPlaywright();
-  const browser = await chromium.launch();
+  const playwright = await loadPlaywright();
+  const browserType = playwright[browserName];
+  if (!browserType) {
+    console.error(`Unknown Playwright browser "${browserName}". Use chromium, webkit, or firefox.`);
+    process.exit(2);
+  }
+  let browser;
+  try {
+    browser = await browserType.launch();
+  } catch (error) {
+    console.error(`Could not launch Playwright ${browserName}.`);
+    console.error("Install browser binaries with:");
+    console.error(`  npx playwright install ${browserName}`);
+    console.error(error.message);
+    process.exit(2);
+  }
   const results = [];
   const screenshots = [];
   const diffs = [];
+  const contrasts = [];
 
   try {
     for (const viewport of viewports) {
       const page = await browser.newPage({ viewport: { width: viewport.width, height: viewport.height }, deviceScaleFactor: 1 });
+      if (args["force-fallback"]) {
+        await page.addInitScript(() => {
+          window.__LG_FORCE_FALLBACK__ = true;
+        });
+      }
+      const pageErrors = [];
+      const consoleErrors = [];
+      page.on("pageerror", (error) => pageErrors.push(error.message));
+      page.on("console", (message) => {
+        if (message.type() === "error") consoleErrors.push(message.text());
+      });
       await page.goto(String(args.url), { waitUntil: "networkidle", timeout: 30000 });
       if (waitMs > 0) await page.waitForTimeout(waitMs);
 
-      const rects = await page.evaluate((query) => {
+      const pageState = await page.evaluate((query) => {
         function rect(selector) {
           const element = document.querySelector(selector);
           if (!element) return null;
@@ -252,13 +364,45 @@ async function main() {
             height: box.height
           };
         }
+        const surfaces = Array.from(document.querySelectorAll("[data-lg-refraction]"));
         return {
-          stage: rect(query.stage),
-          dock: rect(query.dock),
-          focus: rect(query.focus),
-          rail: rect(query.rail)
+          rects: {
+            stage: rect(query.stage),
+            dock: rect(query.dock),
+            focus: rect(query.focus),
+            rail: rect(query.rail)
+          },
+          filter: {
+            htmlHasSvgOk: document.documentElement.classList.contains("lg-svg-ok"),
+            surfaceCount: surfaces.length,
+            mapReadyCount: surfaces.filter((element) => element.classList.contains("lg-map-ready")).length,
+            firstBackdropFilter: surfaces[0] ? (getComputedStyle(surfaces[0]).backdropFilter || getComputedStyle(surfaces[0]).webkitBackdropFilter || "") : ""
+          }
         };
       }, selectors);
+      const rects = pageState.rects;
+
+      const contrastItems = runContrast ? await page.evaluate((selector) => {
+        return Array.from(document.querySelectorAll(selector))
+          .map((element) => {
+            const box = element.getBoundingClientRect();
+            const style = getComputedStyle(element);
+            return {
+              selector,
+              text: (element.textContent || "").trim().replace(/\s+/g, " ").slice(0, 80),
+              color: style.color,
+              rect: {
+                left: box.left,
+                top: box.top,
+                right: box.right,
+                bottom: box.bottom,
+                width: box.width,
+                height: box.height
+              }
+            };
+          })
+          .filter((item) => item.text && item.rect.width > 2 && item.rect.height > 2);
+      }, contrastSelector) : [];
 
       const screenshot = await page.screenshot({ fullPage: true });
       const fileName = `liquid-glass-${viewport.label}.png`;
@@ -282,6 +426,11 @@ async function main() {
         }
       }
 
+      const viewportContrasts = runContrast
+        ? estimateContrasts(screenshot, contrastItems, minContrast).map((item) => ({ viewport: viewport.label, ...item }))
+        : [];
+      contrasts.push(...viewportContrasts);
+
       const dockCenterDelta = rects.stage && rects.dock
         ? Math.abs((rects.dock.left + rects.dock.width / 2) - (rects.stage.left + rects.stage.width / 2))
         : null;
@@ -292,6 +441,8 @@ async function main() {
       const focusInsideStage = isInside(rects.stage, rects.focus);
 
       const checks = [
+        { name: "no-page-errors", pass: pageErrors.length === 0 && consoleErrors.length === 0, value: { pageErrors, consoleErrors }, limit: "none" },
+        { name: "surfaces-present", pass: pageState.filter.surfaceCount > 0, value: pageState.filter.surfaceCount, limit: ">0" },
         { name: "dock-centered", pass: dockCenterDelta !== null && dockCenterDelta <= maxCenterDelta, value: round(dockCenterDelta), limit: maxCenterDelta },
         { name: "focus-dock-gap", pass: focusDockGap !== null && focusDockGap >= minGap, value: round(focusDockGap), limit: minGap },
         { name: "focus-dock-overlap", pass: focusDockOverlap === 0, value: round(focusDockOverlap), limit: 0 },
@@ -299,8 +450,16 @@ async function main() {
         { name: "dock-inside-stage", pass: dockInsideStage, value: dockInsideStage, limit: true },
         { name: "focus-inside-stage", pass: focusInsideStage, value: focusInsideStage, limit: true }
       ];
+      if (expectSvgFilter === "enabled") {
+        checks.push(
+          { name: "svg-filter-enabled", pass: pageState.filter.htmlHasSvgOk, value: pageState.filter.htmlHasSvgOk, limit: true },
+          { name: "maps-ready", pass: pageState.filter.mapReadyCount === pageState.filter.surfaceCount, value: pageState.filter.mapReadyCount, limit: pageState.filter.surfaceCount }
+        );
+      } else if (expectSvgFilter === "disabled") {
+        checks.push({ name: "svg-filter-disabled", pass: !pageState.filter.htmlHasSvgOk, value: pageState.filter.htmlHasSvgOk, limit: false });
+      }
 
-      results.push({ viewport: viewport.label, selectors, rects, checks });
+      results.push({ viewport: viewport.label, browser: browserName, selectors, rects, filter: pageState.filter, checks });
       await page.close();
     }
   } finally {
@@ -309,10 +468,11 @@ async function main() {
 
   const failed = [
     ...results.flatMap((result) => result.checks.filter((check) => !check.pass).map((check) => ({ type: "geometry", viewport: result.viewport, ...check }))),
-    ...diffs.filter((diff) => !diff.pass).map((diff) => ({ type: "pixel", ...diff }))
+    ...diffs.filter((diff) => !diff.pass).map((diff) => ({ type: "pixel", ...diff })),
+    ...contrasts.filter((contrast) => !contrast.pass).map((contrast) => ({ type: "contrast", ...contrast, limit: minContrast }))
   ];
 
-  console.log(JSON.stringify({ url: args.url, results, failed, screenshots, diffs }, null, 2));
+  console.log(JSON.stringify({ url: args.url, browser: browserName, results, failed, screenshots, diffs, contrasts }, null, 2));
   if (failed.length > 0) process.exit(1);
 }
 

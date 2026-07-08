@@ -123,7 +123,8 @@ export function createLiquidGlassDisplacementMap(options = {}) {
       const pixel = (y * w + x) * 4;
       data[pixel] = clamp((dx * edgeFactor) / range * 0.5 + 0.5, 0, 1) * 255;
       data[pixel + 1] = clamp((dy * edgeFactor) / range * 0.5 + 0.5, 0, 1) * 255;
-      data[pixel + 2] = data[pixel + 1];
+      // The filter reads only R/G; keep B neutral to avoid implying a third vector channel.
+      data[pixel + 2] = 0;
       data[pixel + 3] = 255;
     }
   }
@@ -138,15 +139,16 @@ export function createLiquidGlassDisplacementMap(options = {}) {
 }
 
 export function supportsLiquidGlassSvgFilter(filterId = "lg-probe-filter") {
-  if (typeof document === "undefined" || typeof navigator === "undefined") return false;
+  if (typeof document === "undefined") return false;
   try {
-    const userAgent = navigator.userAgent || "";
-    if (/Firefox/.test(userAgent) || (/Safari/.test(userAgent) && !/Chrome|Chromium|Edg/.test(userAgent))) {
-      return false;
-    }
+    if (globalThis.__LG_FORCE_FALLBACK__) return false;
+    const supports = globalThis.CSS?.supports?.bind(globalThis.CSS);
+    const filterValue = `url("#${filterId}")`;
+    if (supports && !supports("backdrop-filter", filterValue) && !supports("-webkit-backdrop-filter", filterValue)) return false;
     const probe = document.createElement("div");
-    probe.style.backdropFilter = `url("#${filterId}")`;
-    return probe.style.backdropFilter !== "";
+    probe.style.backdropFilter = filterValue;
+    probe.style.webkitBackdropFilter = filterValue;
+    return probe.style.backdropFilter !== "" || probe.style.webkitBackdropFilter !== "";
   } catch {
     return false;
   }

@@ -56,8 +56,10 @@ node liquid-glass-design/scripts/package-skill.mjs --lean
 
 - 新建高品质界面：先选 `design-recipes.md` 中的构图配方，再按 `golden-glass-style.md` 选择 production 或 showcase 默认值。
 - 升级现有产品：先修层级、重叠、裁切、Dock 居中，再调折射、边缘光、色差和 glare。
-- 做 React 组件：使用 `assets/templates/react-liquid-glass/`，保持 props 和 SSR fallback。
-- 做视觉验收：使用 `check-visual-geometry.mjs` 检查重叠、居中、viewport containment 和像素回归。
+- 做 React 组件：使用 `assets/templates/react-liquid-glass/`，保持 props、类型声明和 SSR fallback。
+- 做跨框架组件：使用 `assets/templates/web-component-liquid-glass/`，直接提供可移植的 `<liquid-glass>` custom element。
+- 做 Electron 集成：读取 `references/electron.md`，先处理窗口、拖拽区、renderer 缓存和平台 fallback。
+- 做视觉验收：使用 `check-visual-geometry.mjs` 检查重叠、居中、viewport containment、fallback、contrast 和 committed baseline 像素回归。
 
 ## 运行 Demo
 
@@ -76,37 +78,60 @@ npm install
 npm run dev
 ```
 
+Web Component：
+
+```bash
+npm run dev:web-component
+```
+
+任意 HTML/框架里可直接使用：
+
+```html
+<script type="module" src="./liquid-glass-element.js"></script>
+
+<liquid-glass radius="34" profile="prominent" strength="142" dispersion="0.035" interactive>
+  Controls
+</liquid-glass>
+```
+
 ## 视觉 QA
 
 ```bash
 npm i -D playwright && npx playwright install chromium
 node liquid-glass-design/scripts/check-visual-geometry.mjs \
   --url http://127.0.0.1:4173 \
-  --screenshot-dir ./shots
+  --screenshot-dir ./shots \
+  --contrast \
+  --min-contrast 3
 ```
 
-像素回归：
+像素回归默认对比仓库内提交的 baseline：
 
 ```bash
 node liquid-glass-design/scripts/check-visual-geometry.mjs \
   --url http://127.0.0.1:4173 \
-  --baseline-dir ./baselines \
-  --update-baseline
+  --baseline-dir liquid-glass-design/evals/baselines \
+  --pixel-threshold 0.05 \
+  --pixel-channel-threshold 24
+```
 
-node liquid-glass-design/scripts/check-visual-geometry.mjs \
-  --url http://127.0.0.1:4173 \
-  --baseline-dir ./baselines \
-  --pixel-threshold 0.01
+只有视觉变化是有意的，才更新 baseline：
+
+```bash
+npm run qa:vanilla:update-baseline
+git diff -- liquid-glass-design/evals/baselines
+```
+
+验证 fallback：
+
+```bash
+npm run qa:vanilla:fallback
 ```
 
 ## 校验
 
 ```bash
-node --check liquid-glass-design/scripts/*.mjs
-node liquid-glass-design/scripts/test-displacement-map.mjs
-node liquid-glass-design/scripts/run-evals.mjs
-node liquid-glass-design/scripts/package-skill.mjs --dry-run
-node liquid-glass-design/scripts/package-skill.mjs --dry-run --lean
+npm test
 ```
 
 React 模板：

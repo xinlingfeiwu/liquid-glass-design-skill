@@ -61,34 +61,60 @@
       "id": "implementation-has-displacement-api",
       "pass": true,
       "includePass": true,
+      "includeAllPass": true,
       "forbidden": []
     },
     {
       "id": "implementation-does-not-use-background-fixed",
       "pass": true,
       "includePass": true,
+      "includeAllPass": true,
       "forbidden": []
     },
     {
       "id": "implementation-does-not-use-feoffset-channel-shift",
       "pass": true,
       "includePass": true,
+      "includeAllPass": true,
       "forbidden": []
     },
     {
       "id": "qa-script-supports-data-role-and-baseline",
       "pass": true,
       "includePass": true,
+      "includeAllPass": true,
+      "forbidden": []
+    },
+    {
+      "id": "qa-script-supports-fallback-contrast-and-core",
+      "pass": true,
+      "includePass": true,
+      "includeAllPass": true,
+      "forbidden": []
+    },
+    {
+      "id": "templates-use-feature-detection-not-ua-blocks",
+      "pass": true,
+      "includePass": true,
+      "includeAllPass": true,
+      "forbidden": []
+    },
+    {
+      "id": "web-component-template-is-portable",
+      "pass": true,
+      "includePass": true,
+      "includeAllPass": true,
       "forbidden": []
     },
     {
       "id": "package-script-excludes-heavy-directories",
       "pass": true,
       "includePass": true,
+      "includeAllPass": true,
       "forbidden": []
     }
   ],
-  "passed": 11,
-  "total": 11,
+  "passed": 14,
+  "total": 14,
   "failed": []
 }

@@ -50,7 +50,7 @@ console.table({
 Bundled script check when the page is runnable and Playwright is installed:
 
 ```bash
-node liquid-glass-design/scripts/check-visual-geometry.mjs --url http://127.0.0.1:4173 --screenshot-dir ./shots
+node liquid-glass-design/scripts/check-visual-geometry.mjs --url http://127.0.0.1:4173 --screenshot-dir ./shots --contrast --min-contrast 3
 ```
 
 Prefer adding semantic hooks in product code so the script can auto-discover surfaces:
@@ -62,11 +62,12 @@ Prefer adding semantic hooks in product code so the script can auto-discover sur
 <nav data-lg-role="dock">...</nav>
 ```
 
-For pixel regression, first update baselines, then compare:
+For pixel regression, compare against committed baselines. Update them only when the visual change is intentional and the PNG diff is reviewed:
 
 ```bash
-node liquid-glass-design/scripts/check-visual-geometry.mjs --url http://127.0.0.1:4173 --baseline-dir ./baselines --update-baseline
-node liquid-glass-design/scripts/check-visual-geometry.mjs --url http://127.0.0.1:4173 --baseline-dir ./baselines --pixel-threshold 0.01
+node liquid-glass-design/scripts/check-visual-geometry.mjs --url http://127.0.0.1:4173 --baseline-dir liquid-glass-design/evals/baselines --pixel-threshold 0.05 --pixel-channel-threshold 24
+npm run qa:vanilla:update-baseline
+git diff -- liquid-glass-design/evals/baselines
 ```
 
 ## Accessibility
@@ -74,6 +75,7 @@ node liquid-glass-design/scripts/check-visual-geometry.mjs --url http://127.0.0.
 - Test `prefers-reduced-motion`.
 - Test reduced transparency by switching to a more solid fill.
 - Test increased contrast by strengthening text, icons, rims, and tint.
+- Use `--contrast` for smoke-level text/background contrast estimates on rendered screenshots. Treat failures as review prompts; glass can hide weak text until measured.
 - Verify keyboard focus is visible without relying only on glow or color.
 - Ensure icons and labels remain readable against rich backgrounds.
 
@@ -92,5 +94,6 @@ node liquid-glass-design/scripts/check-visual-geometry.mjs --url http://127.0.0.
 ## Browser Fallback
 
 - Chromium/Electron: expect full SVG backdrop-filter path where supported.
-- Safari/Firefox: expect graceful blur/tint/shadow fallback unless the implementation uses a cross-browser map-on-content strategy.
+- Safari/Firefox: expect graceful blur/tint/shadow fallback unless the implementation uses a cross-browser map-on-content strategy or the engine proves URL-filter support via feature detection.
+- Run `npm run qa:vanilla:fallback` to force the fallback path and prove panels remain nonblank, legible, and error-free.
 - Verify unsupported browsers do not show broken filters, blank panels, or unreadable transparent controls.

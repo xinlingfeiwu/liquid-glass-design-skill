@@ -1,0 +1,460 @@
+const SVG_NS = "http://www.w3.org/2000/svg";
+const XLINK_NS = "http://www.w3.org/1999/xlink";
+const STYLE_ID = "lg-web-component-style";
+const DEFAULT_SUPERSAMPLE = 2;
+let nextId = 0;
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function numberOption(value, fallback, min, max) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return fallback;
+  return clamp(numeric, min, max);
+}
+
+function smoothStep(edge0, edge1, value) {
+  const t = clamp((value - edge0) / (edge1 - edge0 || 1), 0, 1);
+  return t * t * (3 - 2 * t);
+}
+
+function roundedRectSdf(px, py, width, height, radius) {
+  const cx = px - width / 2;
+  const cy = py - height / 2;
+  const hx = Math.max(0, width / 2 - radius);
+  const hy = Math.max(0, height / 2 - radius);
+  const qx = Math.abs(cx) - hx;
+  const qy = Math.abs(cy) - hy;
+  const inner = Math.min(Math.max(qx, qy), 0);
+  const outer = Math.hypot(Math.max(qx, 0), Math.max(qy, 0));
+  return inner + outer - radius;
+}
+
+function profileCurve(value, profile = "standard") {
+  const eased = smoothStep(0, 1, value);
+  switch (profile) {
+    case "soft":
+      return eased * 0.78;
+    case "prominent":
+      return Math.pow(eased, 0.72);
+    case "thin":
+      return Math.pow(eased, 1.45);
+    default:
+      return eased;
+  }
+}
+
+export function createLiquidGlassDisplacementMap(options = {}) {
+  if (typeof document === "undefined") return { url: "", scale: 0, key: "" };
+
+  const width = Math.max(24, Math.round(numberOption(options.width, 400, 24, 4096)));
+  const height = Math.max(24, Math.round(numberOption(options.height, 96, 24, 4096)));
+  const radius = clamp(Math.round(numberOption(options.radius, Math.min(width, height) / 2, 0, 2048)), 0, Math.min(width, height) / 2);
+  const magnify = numberOption(options.magnify, 1, 0.2, 2);
+  const bend = numberOption(options.bend, 0.06, 0, 0.3);
+  const spread = numberOption(options.spread, 0.58, 0.4, 1);
+  const bezelRatio = numberOption(options.bezelRatio, 0.62, 0.2, 1);
+  const profile = String(options.profile || "standard");
+  const supersample = numberOption(options.supersample, DEFAULT_SUPERSAMPLE, 1, 3);
+
+  const w = Math.max(160, Math.round(width * supersample));
+  const h = Math.max(96, Math.round(height * supersample));
+  const r = Math.max(4, Math.round(radius * supersample));
+  const shortSide = Math.min(w, h);
+  const bezel = clamp(shortSide * 0.5 * bezelRatio, 10, 220);
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const context = canvas.getContext("2d", { willReadFrequently: false });
+  if (!context) return { url: "", scale: 0, key: "" };
+
+  const raw = new Float32Array(w * h * 2);
+  let maxDisplacement = 0;
+  const cx = w / 2;
+  const cy = h / 2;
+
+  for (let y = 0; y < h; y += 1) {
+    for (let x = 0; x < w; x += 1) {
+      const px = x + 0.5;
+      const py = y + 0.5;
+      const d = roundedRectSdf(px, py, w, h, r);
+      let dx = 0;
+      let dy = 0;
+
+      if (d > -bezel) {
+        const pull = smoothStep(-bezel, 0, Math.min(d, 0));
+        const shaped = profileCurve(pull, profile);
+        const ox = (px - cx) / (w / 2);
+        const oy = (py - cy) / (h / 2);
+        dx = -ox * shaped * magnify * bezel;
+        dy = -oy * shaped * magnify * bezel;
+        dx += Math.sin((px / w - 0.5) * Math.PI) * bend * bezel * shaped;
+        dy += Math.sin((py / h - 0.5) * Math.PI) * bend * bezel * shaped;
+      }
+
+      const rawIndex = (y * w + x) * 2;
+      raw[rawIndex] = dx;
+      raw[rawIndex + 1] = dy;
+      maxDisplacement = Math.max(maxDisplacement, Math.abs(dx), Math.abs(dy));
+    }
+  }
+
+  const range = Math.max(1, maxDisplacement * spread);
+  const image = context.createImageData(w, h);
+  const data = image.data;
+  let rawIndex = 0;
+
+  for (let y = 0; y < h; y += 1) {
+    for (let x = 0; x < w; x += 1) {
+      const dx = raw[rawIndex];
+      const dy = raw[rawIndex + 1];
+      rawIndex += 2;
+      const edgeDistance = Math.min(x, y, w - x - 1, h - y - 1);
+      const edgeFactor = smoothStep(0, 3, edgeDistance);
+      const pixel = (y * w + x) * 4;
+      data[pixel] = clamp((dx * edgeFactor) / range * 0.5 + 0.5, 0, 1) * 255;
+      data[pixel + 1] = clamp((dy * edgeFactor) / range * 0.5 + 0.5, 0, 1) * 255;
+      // The filter reads only R/G; keep B neutral to avoid implying a third vector channel.
+      data[pixel + 2] = 0;
+      data[pixel + 3] = 255;
+    }
+  }
+
+  context.putImageData(image, 0, 0);
+  return {
+    url: canvas.toDataURL("image/png"),
+    scale: (range * 2) / supersample,
+    key: `${w}x${h}:${r}:${magnify}:${bend}:${spread}:${bezelRatio}:${profile}:${supersample}`
+  };
+}
+
+export function supportsLiquidGlassSvgFilter() {
+  try {
+    if (globalThis.__LG_FORCE_FALLBACK__) return false;
+    const supports = globalThis.CSS?.supports?.bind(globalThis.CSS);
+    const filterValue = 'url("#lg-probe-filter")';
+    if (supports && !supports("backdrop-filter", filterValue) && !supports("-webkit-backdrop-filter", filterValue)) return false;
+    const probe = document.createElement("div");
+    probe.style.backdropFilter = filterValue;
+    probe.style.webkitBackdropFilter = filterValue;
+    return probe.style.backdropFilter !== "" || probe.style.webkitBackdropFilter !== "";
+  } catch {
+    return false;
+  }
+}
+
+function appendNode(parent, name, attributes = {}) {
+  const node = document.createElementNS(SVG_NS, name);
+  Object.entries(attributes).forEach(([key, value]) => node.setAttribute(key, String(value)));
+  parent.appendChild(node);
+  return node;
+}
+
+function ensureBaseStyles() {
+  if (document.getElementById(STYLE_ID)) return;
+  const style = document.createElement("style");
+  style.id = STYLE_ID;
+  style.textContent = `
+liquid-glass {
+  --lg-tint: rgba(18, 25, 34, 0.18);
+  --lg-highlight: linear-gradient(180deg, rgba(255,255,255,.54), rgba(255,255,255,.14) 34%, rgba(255,255,255,.035) 58%, rgba(255,255,255,.18));
+  --lg-border: rgba(255,255,255,.56);
+  --lg-radius: 26px;
+  --lg-filter-url: none;
+  --lg-blur: .2px;
+  --lg-fallback-blur: 7px;
+  --lg-saturate: 1.58;
+  --lg-brightness: 1.12;
+  --lg-contrast: 1.14;
+  --lg-light-x: 84%;
+  --lg-light-y: 12%;
+  --lg-glare: .56;
+  --lg-elastic-x: 0px;
+  --lg-elastic-y: 0px;
+  --lg-shadow: 0 22px 60px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.72), inset 0 -1px 1px rgba(255,255,255,.2), inset 0 0 24px rgba(255,255,255,.18);
+  position: relative;
+  display: block;
+  isolation: isolate;
+  overflow: hidden;
+  color: white;
+  border: 1px solid var(--lg-border);
+  border-radius: var(--lg-radius);
+  background: var(--lg-highlight), var(--lg-tint);
+  background-clip: padding-box;
+  box-shadow: var(--lg-shadow);
+  clip-path: inset(0 round var(--lg-radius));
+  transform: translate3d(var(--lg-elastic-x), var(--lg-elastic-y), 0);
+  backdrop-filter: blur(var(--lg-fallback-blur)) saturate(var(--lg-saturate)) brightness(var(--lg-brightness)) contrast(var(--lg-contrast));
+  -webkit-backdrop-filter: blur(var(--lg-fallback-blur)) saturate(var(--lg-saturate)) brightness(var(--lg-brightness)) contrast(var(--lg-contrast));
+}
+liquid-glass.lg-svg-ok.lg-map-ready {
+  backdrop-filter: var(--lg-filter-url) blur(var(--lg-blur)) saturate(var(--lg-saturate)) brightness(var(--lg-brightness)) contrast(var(--lg-contrast));
+  -webkit-backdrop-filter: var(--lg-filter-url) blur(var(--lg-blur)) saturate(var(--lg-saturate)) brightness(var(--lg-brightness)) contrast(var(--lg-contrast));
+}
+liquid-glass::before,
+liquid-glass::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+liquid-glass::before {
+  background:
+    radial-gradient(circle at var(--lg-light-x) var(--lg-light-y), rgba(255,255,255,calc(var(--lg-glare) * .92)), transparent 16%),
+    linear-gradient(135deg, rgba(255,255,255,.28), transparent 34%, rgba(255,255,255,.12) 68%, transparent);
+  mix-blend-mode: screen;
+  opacity: .76;
+}
+liquid-glass::after {
+  box-shadow: inset 0 1px 1px rgba(255,255,255,.9), inset 0 -1px 1px rgba(255,255,255,.24), inset 0 0 0 1px rgba(255,255,255,.18);
+}
+.lg-filter-root {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  liquid-glass {
+    --lg-tint: rgba(16, 24, 34, .72);
+    --lg-border: rgba(255,255,255,.72);
+    --lg-filter-url: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+`;
+  document.head.appendChild(style);
+}
+
+function createFilter(filterId, dispersion) {
+  const svg = appendNode(document.body, "svg", {
+    class: "lg-filter-root",
+    "aria-hidden": "true",
+    focusable: "false"
+  });
+  const defs = appendNode(svg, "defs");
+  const filter = appendNode(defs, "filter", {
+    id: filterId,
+    "color-interpolation-filters": "sRGB",
+    x: "-35%",
+    y: "-35%",
+    width: "170%",
+    height: "170%"
+  });
+  const image = appendNode(filter, "feImage", {
+    x: "0",
+    y: "0",
+    width: "100%",
+    height: "100%",
+    preserveAspectRatio: "none",
+    result: "map"
+  });
+
+  const displacements = [];
+  if (dispersion > 0) {
+    [
+      { mul: 1 + dispersion, matrix: "1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0", result: "red" },
+      { mul: 1, matrix: "0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0", result: "green" },
+      { mul: 1 - dispersion, matrix: "0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0", result: "blue" }
+    ].forEach((pass) => {
+      const node = appendNode(filter, "feDisplacementMap", {
+        in: "SourceGraphic",
+        in2: "map",
+        scale: 0,
+        xChannelSelector: "R",
+        yChannelSelector: "G",
+        result: `${pass.result}Disp`
+      });
+      appendNode(filter, "feColorMatrix", {
+        in: `${pass.result}Disp`,
+        type: "matrix",
+        values: pass.matrix,
+        result: pass.result
+      });
+      displacements.push({ node, mul: pass.mul });
+    });
+    appendNode(filter, "feBlend", { in: "red", in2: "green", mode: "screen", result: "rg" });
+    appendNode(filter, "feBlend", { in: "rg", in2: "blue", mode: "screen", result: "rgb" });
+    appendNode(filter, "feColorMatrix", {
+      in: "rgb",
+      type: "matrix",
+      values: "1.05 0 0 0 0  0 1.02 0 0 0  0 0 1.06 0 0  0 0 0 1 0"
+    });
+  } else {
+    const node = appendNode(filter, "feDisplacementMap", {
+      in: "SourceGraphic",
+      in2: "map",
+      scale: 0,
+      xChannelSelector: "R",
+      yChannelSelector: "G",
+      result: "displaced"
+    });
+    displacements.push({ node, mul: 1 });
+    appendNode(filter, "feColorMatrix", {
+      in: "displaced",
+      type: "matrix",
+      values: "1.05 0 0 0 0  0 1.02 0 0 0  0 0 1.06 0 0  0 0 0 1 0"
+    });
+  }
+
+  return { svg, image, displacements };
+}
+
+export class LiquidGlassElement extends HTMLElement {
+  static observedAttributes = [
+    "radius",
+    "strength",
+    "profile",
+    "magnify",
+    "bend",
+    "spread",
+    "bezel-ratio",
+    "supersample",
+    "dispersion",
+    "blur",
+    "tint",
+    "interactive"
+  ];
+
+  constructor() {
+    super();
+    this.filterId = `lg-web-component-${nextId++}`;
+    this.filterRefs = null;
+    this.mapKey = "";
+    this.scale = 0;
+    this.resizeObserver = null;
+    this.pointerRect = null;
+    this.svgFilterOk = false;
+  }
+
+  connectedCallback() {
+    ensureBaseStyles();
+    this.svgFilterOk = supportsLiquidGlassSvgFilter();
+    this.applyAttributes();
+
+    if (this.svgFilterOk) {
+      const dispersion = numberOption(this.getAttribute("dispersion"), 0.035, 0, 0.3);
+      this.filterRefs = createFilter(this.filterId, dispersion);
+      this.style.setProperty("--lg-filter-url", `url("#${this.filterId}")`);
+      this.classList.add("lg-svg-ok");
+      requestAnimationFrame(() => this.updateMap());
+    }
+
+    this.initResizeObserver();
+    this.initPointerLighting();
+  }
+
+  disconnectedCallback() {
+    this.resizeObserver?.disconnect();
+    this.filterRefs?.svg?.remove();
+  }
+
+  attributeChangedCallback() {
+    if (!this.isConnected) return;
+    this.applyAttributes();
+    requestAnimationFrame(() => this.updateMap());
+  }
+
+  applyAttributes() {
+    const radius = this.getAttribute("radius") || "26";
+    const blur = this.getAttribute("blur") || "0.2";
+    const tint = this.getAttribute("tint");
+    this.style.setProperty("--lg-radius", Number.isFinite(Number(radius)) ? `${radius}px` : radius);
+    this.style.setProperty("--lg-blur", Number.isFinite(Number(blur)) ? `${blur}px` : blur);
+    if (tint) this.style.setProperty("--lg-tint", tint);
+  }
+
+  updateMap() {
+    if (!this.svgFilterOk || !this.filterRefs) return;
+    const rect = this.getBoundingClientRect();
+    if (rect.width < 2 || rect.height < 2) return;
+
+    const radius = Number.parseFloat(getComputedStyle(this).borderRadius) || 26;
+    const profile = this.getAttribute("profile") || "standard";
+    const magnify = numberOption(this.getAttribute("magnify"), 1, 0.2, 2);
+    const bend = numberOption(this.getAttribute("bend"), 0.06, 0, 0.3);
+    const spread = numberOption(this.getAttribute("spread"), 0.58, 0.4, 1);
+    const bezelRatio = numberOption(this.getAttribute("bezel-ratio"), 0.62, 0.2, 1);
+    const supersample = numberOption(this.getAttribute("supersample"), 2, 1, 3);
+    const strength = numberOption(this.getAttribute("strength"), 100, 10, 250) / 100;
+    const key = [
+      Math.round(rect.width),
+      Math.round(rect.height),
+      Math.round(radius),
+      profile,
+      magnify,
+      bend,
+      spread,
+      bezelRatio,
+      supersample
+    ].join(":");
+
+    if (this.mapKey !== key) {
+      const map = createLiquidGlassDisplacementMap({
+        width: rect.width,
+        height: rect.height,
+        radius,
+        profile,
+        magnify,
+        bend,
+        spread,
+        bezelRatio,
+        supersample
+      });
+      if (!map.url) return;
+      this.mapKey = key;
+      this.scale = map.scale;
+      this.filterRefs.image.setAttribute("href", map.url);
+      this.filterRefs.image.setAttributeNS(XLINK_NS, "href", map.url);
+    }
+
+    this.filterRefs.displacements.forEach(({ node, mul }) => {
+      node.setAttribute("scale", (this.scale * strength * mul).toFixed(2));
+    });
+    this.classList.add("lg-map-ready");
+  }
+
+  initResizeObserver() {
+    if ("ResizeObserver" in window) {
+      this.resizeObserver = new ResizeObserver(() => requestAnimationFrame(() => this.updateMap()));
+      this.resizeObserver.observe(this);
+    } else {
+      window.addEventListener("resize", () => requestAnimationFrame(() => this.updateMap()), { passive: true });
+    }
+  }
+
+  initPointerLighting() {
+    if (!this.hasAttribute("interactive")) return;
+    const baseGlare = numberOption(this.getAttribute("glare"), 0.56, 0, 1);
+    this.style.setProperty("--lg-glare", String(baseGlare));
+    this.addEventListener("pointerenter", () => {
+      this.pointerRect = this.getBoundingClientRect();
+    });
+    this.addEventListener("pointermove", (event) => {
+      const rect = this.pointerRect || this.getBoundingClientRect();
+      if (rect.width < 2 || rect.height < 2) return;
+      const x = clamp((event.clientX - rect.left) / rect.width, 0, 1);
+      const y = clamp((event.clientY - rect.top) / rect.height, 0, 1);
+      this.style.setProperty("--lg-light-x", `${(x * 100).toFixed(1)}%`);
+      this.style.setProperty("--lg-light-y", `${(y * 100).toFixed(1)}%`);
+      this.style.setProperty("--lg-glare", String(clamp(baseGlare + 0.18, 0, 1)));
+      this.style.setProperty("--lg-elastic-x", `${((x - 0.5) * 3).toFixed(2)}px`);
+      this.style.setProperty("--lg-elastic-y", `${((y - 0.5) * 2).toFixed(2)}px`);
+    });
+    this.addEventListener("pointerleave", () => {
+      this.pointerRect = null;
+      this.style.setProperty("--lg-light-x", "84%");
+      this.style.setProperty("--lg-light-y", "12%");
+      this.style.setProperty("--lg-glare", String(baseGlare));
+      this.style.setProperty("--lg-elastic-x", "0px");
+      this.style.setProperty("--lg-elastic-y", "0px");
+    });
+  }
+}
+
+if (!customElements.get("liquid-glass")) {
+  customElements.define("liquid-glass", LiquidGlassElement);
+}

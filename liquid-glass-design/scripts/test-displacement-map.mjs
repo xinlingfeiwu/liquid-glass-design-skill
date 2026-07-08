@@ -29,6 +29,7 @@ assert.deepEqual(readPngSize(standard), { width: 96, height: 48 }, "IHDR should 
 assert.ok(Number.isFinite(standard.liquidGlassScale) && standard.liquidGlassScale > 0, "PNG scale should be positive");
 assert.ok(Number.isFinite(pixels.scale) && pixels.scale > 0, "pixel map scale should be positive");
 assert.equal(pixels.data.length, 64 * 32 * 4, "pixel map should be RGBA");
+assert.equal(pixels.data[2], 0, "blue channel should stay neutral because the filter reads R/G only");
 assert.ok(dataUri.url.startsWith("data:image/png;base64,"), "data URI should be a PNG");
 assert.notEqual(hash(standard), hash(thin), "different profiles should produce different maps");
 

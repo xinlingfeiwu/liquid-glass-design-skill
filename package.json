@@ -1,0 +1,19 @@
+{
+  "name": "liquid-glass-design-skill",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check liquid-glass-design/scripts/generate-displacement-map.mjs && node --check liquid-glass-design/scripts/check-visual-geometry.mjs && node --check liquid-glass-design/scripts/package-skill.mjs && node --check liquid-glass-design/scripts/run-evals.mjs && node --check liquid-glass-design/scripts/test-displacement-map.mjs && node --check liquid-glass-design/assets/templates/vanilla-liquid-glass/liquid-glass.js && node --check liquid-glass-design/assets/templates/react-liquid-glass/src/displacementMap.js && node --check liquid-glass-design/assets/templates/web-component-liquid-glass/liquid-glass-element.js",
+    "test:maps": "node liquid-glass-design/scripts/test-displacement-map.mjs",
+    "eval": "node liquid-glass-design/scripts/run-evals.mjs",
+    "package:dry": "node liquid-glass-design/scripts/package-skill.mjs --dry-run && node liquid-glass-design/scripts/package-skill.mjs --dry-run --lean",
+    "package:skill": "node liquid-glass-design/scripts/package-skill.mjs && node liquid-glass-design/scripts/package-skill.mjs --lean",
+    "test": "npm run check && npm run test:maps && npm run eval && npm run package:dry",
+    "dev:vanilla": "python3 -m http.server 4173 --directory liquid-glass-design/assets/templates/vanilla-liquid-glass",
+    "dev:web-component": "python3 -m http.server 4174 --directory liquid-glass-design/assets/templates/web-component-liquid-glass",
+    "qa:vanilla": "node liquid-glass-design/scripts/check-visual-geometry.mjs --url http://127.0.0.1:4173 --browser chromium --expect-svg-filter enabled --baseline-dir liquid-glass-design/evals/baselines --pixel-threshold 0.05 --pixel-channel-threshold 24 --contrast --min-contrast 3",
+    "qa:vanilla:update-baseline": "node liquid-glass-design/scripts/check-visual-geometry.mjs --url http://127.0.0.1:4173 --browser chromium --expect-svg-filter enabled --baseline-dir liquid-glass-design/evals/baselines --update-baseline --contrast --min-contrast 3",
+    "qa:vanilla:fallback": "node liquid-glass-design/scripts/check-visual-geometry.mjs --url http://127.0.0.1:4173 --browser webkit --force-fallback --expect-svg-filter disabled --viewport 1440x900 --contrast --min-contrast 3"
+  }
+}

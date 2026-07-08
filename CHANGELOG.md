@@ -9,6 +9,7 @@
 - Hardened trigger evals so query terms and skill-description terms are checked separately instead of self-matching.
 - Added lean `.skill` packaging, visual self-QA in CI, and tag-based GitHub Release asset publishing.
 - Improved React/vanilla templates with explicit supersampling, scale-only strength updates, ready classes, forwarded refs, and lower pointer-move layout cost.
+- Added committed visual baselines, WebKit fallback QA, contrast checks, Electron integration guidance, and a portable `<liquid-glass>` Web Component template.
 
 ## 0.1.0 - 2026-07-08
 

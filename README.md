@@ -17,14 +17,15 @@ Scan the QR code to join the `liquid-glass-skill` group chat.
 ## What Is Included
 
 - `liquid-glass-design/SKILL.md` - the skill entrypoint (workflow, rules, defaults, acceptance criteria).
-- `liquid-glass-design/references/` - practical workflows, design recipes, prompt patterns, showcase quality gates, the golden-glass single source of truth, web implementation contracts, GitHub research, and QA checklists.
+- `liquid-glass-design/references/` - practical workflows, design recipes, prompt patterns, showcase quality gates, the golden-glass single source of truth, web/Electron implementation contracts, GitHub research, and QA checklists.
 - `liquid-glass-design/scripts/generate-displacement-map.mjs` - a zero-dependency PNG displacement map generator that prints the exact `feDisplacementMap` scale.
-- `liquid-glass-design/scripts/check-visual-geometry.mjs` - a Playwright-based QA helper for overlap, dock centering, viewport containment, and screenshots.
+- `liquid-glass-design/scripts/check-visual-geometry.mjs` - a Playwright-based QA helper for overlap, dock centering, viewport containment, fallback behavior, contrast estimates, screenshots, and committed PNG baselines.
 - `liquid-glass-design/scripts/package-skill.mjs` - creates full or lean `.skill` packages while excluding `node_modules`, `dist`, caches, logs, and other heavy local artifacts.
 - `liquid-glass-design/scripts/run-evals.mjs` - executable smoke evals for trigger coverage and forbidden implementation patterns.
 - `liquid-glass-design/evals/evals.json` - trigger cases and static assertions for checking practical, premium Liquid Glass outcomes.
 - `liquid-glass-design/assets/templates/vanilla-liquid-glass/` - a no-build HTML/CSS/JS Optic Deck showcase with per-surface filters, lens profiles, pointer glare, multi-background optical QA, and lens maps.
-- `liquid-glass-design/assets/templates/react-liquid-glass/` - a React/Vite `<LiquidGlass>` component template with profile/tuning props and the same redesigned showcase-grade demo scene.
+- `liquid-glass-design/assets/templates/web-component-liquid-glass/` - a portable `<liquid-glass>` custom element for Vue, Svelte, Angular, plain HTML, and mixed stacks.
+- `liquid-glass-design/assets/templates/react-liquid-glass/` - a React/Vite `<LiquidGlass>` component template with profile/tuning props, `.d.ts` types, and the same redesigned showcase-grade demo scene.
 
 ## Install The Skill
 
@@ -108,6 +109,24 @@ npm install   # or pnpm install
 npm run dev
 ```
 
+## Try The Web Component Demo
+
+No framework required:
+
+```bash
+npm run dev:web-component
+```
+
+Use it in any HTML-rendering stack:
+
+```html
+<script type="module" src="./liquid-glass-element.js"></script>
+
+<liquid-glass radius="34" profile="prominent" strength="142" dispersion="0.035" interactive>
+  Controls
+</liquid-glass>
+```
+
 The component API:
 
 ```jsx
@@ -154,23 +173,34 @@ When a demo page is running and the project has Playwright installed:
 npm i -D playwright && npx playwright install chromium
 node liquid-glass-design/scripts/check-visual-geometry.mjs \
   --url http://127.0.0.1:4173 \
-  --screenshot-dir ./shots
+  --screenshot-dir ./shots \
+  --contrast \
+  --min-contrast 3
 ```
 
-The script checks dock centering, focus/dock overlap, rail/focus overlap, viewport containment, and can save screenshots for desktop and mobile viewports.
+The script checks dock centering, focus/dock overlap, rail/focus overlap, viewport containment, JS console errors, SVG-filter readiness/fallback, estimated text contrast, and can save screenshots for desktop and mobile viewports. It accepts either `playwright` or `playwright-core`.
 
-For visual regression:
+For visual regression, compare against the committed baseline PNGs in `liquid-glass-design/evals/baselines/`:
 
 ```bash
 node liquid-glass-design/scripts/check-visual-geometry.mjs \
   --url http://127.0.0.1:4173 \
-  --baseline-dir ./baselines \
-  --update-baseline
+  --baseline-dir liquid-glass-design/evals/baselines \
+  --pixel-threshold 0.05 \
+  --pixel-channel-threshold 24
+```
 
-node liquid-glass-design/scripts/check-visual-geometry.mjs \
-  --url http://127.0.0.1:4173 \
-  --baseline-dir ./baselines \
-  --pixel-threshold 0.01
+Only update baselines when the visual change is intentional:
+
+```bash
+npm run qa:vanilla:update-baseline
+git diff -- liquid-glass-design/evals/baselines
+```
+
+To verify the fallback path:
+
+```bash
+npm run qa:vanilla:fallback
 ```
 
 ## Design Rules
@@ -192,17 +222,7 @@ node liquid-glass-design/scripts/check-visual-geometry.mjs \
 ## Validate
 
 ```bash
-node --check liquid-glass-design/scripts/generate-displacement-map.mjs
-node --check liquid-glass-design/scripts/check-visual-geometry.mjs
-node --check liquid-glass-design/scripts/package-skill.mjs
-node --check liquid-glass-design/scripts/run-evals.mjs
-node --check liquid-glass-design/scripts/test-displacement-map.mjs
-node --check liquid-glass-design/assets/templates/vanilla-liquid-glass/liquid-glass.js
-node --check liquid-glass-design/assets/templates/react-liquid-glass/src/displacementMap.js
-node liquid-glass-design/scripts/test-displacement-map.mjs
-node liquid-glass-design/scripts/run-evals.mjs
-node liquid-glass-design/scripts/package-skill.mjs --dry-run
-node liquid-glass-design/scripts/package-skill.mjs --dry-run --lean
+npm test
 ```
 
 For the React template:
