@@ -53,6 +53,22 @@ Bundled script check when the page is runnable and Playwright is installed:
 node liquid-glass-design/scripts/check-visual-geometry.mjs --url http://127.0.0.1:4173 --screenshot-dir ./shots
 ```
 
+Prefer adding semantic hooks in product code so the script can auto-discover surfaces:
+
+```html
+<section data-lg-role="stage">...</section>
+<article data-lg-role="focus">...</article>
+<aside data-lg-role="rail">...</aside>
+<nav data-lg-role="dock">...</nav>
+```
+
+For pixel regression, first update baselines, then compare:
+
+```bash
+node liquid-glass-design/scripts/check-visual-geometry.mjs --url http://127.0.0.1:4173 --baseline-dir ./baselines --update-baseline
+node liquid-glass-design/scripts/check-visual-geometry.mjs --url http://127.0.0.1:4173 --baseline-dir ./baselines --pixel-threshold 0.01
+```
+
 ## Accessibility
 
 - Test `prefers-reduced-motion`.

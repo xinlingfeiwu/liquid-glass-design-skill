@@ -1,5 +1,7 @@
 # Liquid Glass Design Skill
 
+[中文文档](README.zh-CN.md)
+
 An AI-agent skill and template kit for building high-end Liquid Glass interfaces with CSS, SVG refraction filters, JavaScript, and React. Works out of the box with Codex, Claude Code, and any agent that reads `SKILL.md`-style skills.
 
 The refraction core uses inverse lens mapping: a canvas-generated displacement map whose interior is identity and whose edges magnify the backdrop, driven through a per-surface SVG `feDisplacementMap` at a measured — never guessed — scale.
@@ -15,10 +17,12 @@ Scan the QR code to join the `liquid-glass-skill` group chat.
 ## What Is Included
 
 - `liquid-glass-design/SKILL.md` - the skill entrypoint (workflow, rules, defaults, acceptance criteria).
-- `liquid-glass-design/references/` - practical workflows, design recipes, prompt patterns, showcase quality gates, the golden-glass quality bar, web implementation contracts, GitHub research, and QA checklists.
+- `liquid-glass-design/references/` - practical workflows, design recipes, prompt patterns, showcase quality gates, the golden-glass single source of truth, web implementation contracts, GitHub research, and QA checklists.
 - `liquid-glass-design/scripts/generate-displacement-map.mjs` - a zero-dependency PNG displacement map generator that prints the exact `feDisplacementMap` scale.
 - `liquid-glass-design/scripts/check-visual-geometry.mjs` - a Playwright-based QA helper for overlap, dock centering, viewport containment, and screenshots.
-- `liquid-glass-design/evals/evals.json` - regression prompts for checking whether the skill produces practical, premium Liquid Glass outcomes.
+- `liquid-glass-design/scripts/package-skill.mjs` - creates a `.skill` package while excluding `node_modules`, `dist`, caches, logs, and other heavy local artifacts.
+- `liquid-glass-design/scripts/run-evals.mjs` - executable smoke evals for trigger coverage and forbidden implementation patterns.
+- `liquid-glass-design/evals/evals.json` - trigger cases and static assertions for checking practical, premium Liquid Glass outcomes.
 - `liquid-glass-design/assets/templates/vanilla-liquid-glass/` - a no-build HTML/CSS/JS Optic Deck showcase with per-surface filters, lens profiles, pointer glare, multi-background optical QA, and lens maps.
 - `liquid-glass-design/assets/templates/react-liquid-glass/` - a React/Vite `<LiquidGlass>` component template with profile/tuning props and the same redesigned showcase-grade demo scene.
 
@@ -58,6 +62,20 @@ ln -sf "$(pwd)/liquid-glass-design" ~/.claude/skills/liquid-glass-design
 ```
 
 Then ask Claude Code to build or review Liquid Glass UI — the skill triggers on Liquid Glass / glassmorphism / refraction requests, or invoke it explicitly with `/liquid-glass-design`.
+
+### Cowork / `.skill` Upload
+
+Create a portable package:
+
+```bash
+node liquid-glass-design/scripts/package-skill.mjs
+```
+
+Upload `dist/liquid-glass-design.skill` in Cowork settings. The package excludes local `node_modules/`, template `dist/`, caches, and logs so it stays small enough for upload.
+
+### Claude Code Plugin / Marketplace
+
+Use the same packaged `.skill` file for Claude-compatible plugin or marketplace submission flows. Keep `liquid-glass-design/LICENSE` inside the skill folder so the license travels with the standalone package.
 
 ### Other agents
 
@@ -125,6 +143,7 @@ Options: `--width`, `--height`, `--radius`, `--profile`, `--magnify`, `--bend`, 
 When a demo page is running and the project has Playwright installed:
 
 ```bash
+npm i -D playwright && npx playwright install chromium
 node liquid-glass-design/scripts/check-visual-geometry.mjs \
   --url http://127.0.0.1:4173 \
   --screenshot-dir ./shots
@@ -132,12 +151,26 @@ node liquid-glass-design/scripts/check-visual-geometry.mjs \
 
 The script checks dock centering, focus/dock overlap, rail/focus overlap, viewport containment, and can save screenshots for desktop and mobile viewports.
 
+For visual regression:
+
+```bash
+node liquid-glass-design/scripts/check-visual-geometry.mjs \
+  --url http://127.0.0.1:4173 \
+  --baseline-dir ./baselines \
+  --update-baseline
+
+node liquid-glass-design/scripts/check-visual-geometry.mjs \
+  --url http://127.0.0.1:4173 \
+  --baseline-dir ./baselines \
+  --pixel-threshold 0.01
+```
+
 ## Design Rules
 
 - Use glass on controls and navigation, not as a blanket content layer.
 - Start with composition: one focal surface, one command surface, one grouped secondary information area.
 - Choose a design recipe before coding: Command Deck, Lens Inspector, Media Glass Stage, Instrument Bay, Mobile Focus Sheet, or a custom equivalent.
-- One filter and one map per distinct surface shape.
+- Use `liquid-glass-design/references/golden-glass-style.md` as the only numeric defaults source; choose production or showcase mode first.
 - Inverse lens mapping: identity center, edge magnification, measured scale, shape-specific profile.
 - Keep blur near zero on the refractive path; punch comes from `contrast`.
 - Chromatic dispersion only at the rim, via per-channel scale differences.
@@ -153,8 +186,14 @@ The script checks dock centering, focus/dock overlap, rail/focus overlap, viewpo
 ```bash
 node --check liquid-glass-design/scripts/generate-displacement-map.mjs
 node --check liquid-glass-design/scripts/check-visual-geometry.mjs
+node --check liquid-glass-design/scripts/package-skill.mjs
+node --check liquid-glass-design/scripts/run-evals.mjs
+node --check liquid-glass-design/scripts/test-displacement-map.mjs
 node --check liquid-glass-design/assets/templates/vanilla-liquid-glass/liquid-glass.js
 node --check liquid-glass-design/assets/templates/react-liquid-glass/src/displacementMap.js
+node liquid-glass-design/scripts/test-displacement-map.mjs
+node liquid-glass-design/scripts/run-evals.mjs
+node liquid-glass-design/scripts/package-skill.mjs --dry-run
 ```
 
 For the React template:
@@ -164,6 +203,14 @@ cd liquid-glass-design/assets/templates/react-liquid-glass
 npm install
 npm run build
 ```
+
+If `plugin-eval` is installed locally, run it in addition to the fallback smoke eval:
+
+```bash
+plugin-eval analyze liquid-glass-design --format markdown
+```
+
+When `plugin-eval` is not available, use `run-evals.mjs` plus `quick_validate.py`/CI as the baseline.
 
 ## Browser Support
 

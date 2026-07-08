@@ -2,6 +2,8 @@
 
 This reference records public projects worth studying for Liquid Glass implementation decisions. Use links for research and attribution. Do not copy third-party code unless the target project explicitly accepts the license and attribution requirements.
 
+Last verified: 2026-07-08
+
 ## CSS And SVG
 
 - `nikdelvin/liquid-glass`: CSS and SVG filter approach with refraction, chromatic aberration, auto-sizing components, and Safari fallback. Useful when building a dependency-light web implementation.

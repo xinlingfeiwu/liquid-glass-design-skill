@@ -8,7 +8,7 @@ export default function App() {
 
   return (
     <main className="app-shell">
-      <section className="visual-stage" data-scene={scene} aria-label="Liquid Glass control demo">
+      <section className="visual-stage" data-lg-role="stage" data-scene={scene} aria-label="Liquid Glass control demo">
         <div className="scene-layers" aria-hidden="true">
           <span className="aurora-glow glow-a" />
           <span className="aurora-glow glow-b" />
@@ -44,7 +44,7 @@ export default function App() {
           <span>precision controls with calibrated edge refraction</span>
         </section>
 
-        <LiquidGlass as="article" className="lg-panel media-card" radius={38} profile="prominent" strength={164} magnify={1.28} dispersion={0.052} glare={0.72}>
+        <LiquidGlass as="article" className="lg-panel media-card" data-lg-role="focus" radius={38} profile="prominent" strength={164} magnify={1.28} dispersion={0.052} glare={0.72}>
           <div className="media-topline">
             <span>Now Rendering</span>
             <strong>Liquid Pass 04</strong>
@@ -58,7 +58,7 @@ export default function App() {
           </div>
         </LiquidGlass>
 
-        <section className="insight-rail" aria-label="Glass samples">
+        <section className="insight-rail" data-lg-role="rail" aria-label="Glass samples">
           <LiquidGlass as="aside" className="lg-panel status-panel" variant="tinted" radius={30} profile="soft" strength={136} magnify={1.12} dispersion={0.024} glare={0.6}>
             <p className="label">Current Layer</p>
             <strong>Refraction</strong>
@@ -75,7 +75,7 @@ export default function App() {
           </LiquidGlass>
         </section>
 
-        <LiquidGlass as="nav" className="lg-panel transport-bar" radius={46} profile="soft" strength={144} magnify={1.12} dispersion={0.006} glare={0.72} aria-label="Playback controls">
+        <LiquidGlass as="nav" className="lg-panel transport-bar" data-lg-role="dock" radius={46} profile="soft" strength={144} magnify={1.12} dispersion={0.006} glare={0.72} aria-label="Playback controls">
           <div className="track-meta">
             <div className="mini-cover" aria-hidden="true" />
             <div>

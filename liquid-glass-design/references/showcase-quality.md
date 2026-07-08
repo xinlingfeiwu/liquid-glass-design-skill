@@ -51,16 +51,7 @@ It is acceptable to apply `backdrop-filter` directly to the surface when content
 
 ## Tuning Bias
 
-For showcase surfaces, start stronger than production defaults:
-
-- Strength: `130-180` percent of measured scale.
-- Magnify: `1.15-1.4`.
-- Dispersion: `0.006-0.06` by surface size. Long docks stay near the low end; compact rim-heavy controls can use more.
-- Refractive blur: `0.2-0.5px`.
-- Fallback blur: `5-8px`.
-- Tint: as low as legibility allows; increase only on bright or noisy backgrounds.
-
-Then reduce only when readability or performance fails. Starting too weak produces ordinary frosted acrylic.
+Use the `Showcase Defaults` table in `golden-glass-style.md`. Start with those values, then reduce only when readability or performance fails. Starting too weak produces ordinary frosted acrylic.
 
 ## What The Screenshot Must Show
 
@@ -78,18 +69,6 @@ The preview image should make these facts visible without zooming:
 
 If the screenshot could be mistaken for a generic blur card, reject it and retune the backdrop, lens strength, rim, and tint.
 
-## Common Failure Modes
+## Failure Criteria
 
-- A project page only shows template folders, not a rendered demo.
-- The README preview is stale or cached under the same image filename.
-- The demo uses a pretty gradient but has no high-frequency detail near glass edges.
-- The component API exists, but the example does not use enough props to show real optical range.
-- The surface tint is too opaque, hiding refraction.
-- The blur is too high, turning lensing into fog.
-- The material looks good only on one background scene.
-- High-frequency lines cover the whole screen and make the composition feel noisy or cheap.
-- The glass is strong but the UI has no believable product context, hierarchy, or focal point.
-- The demo looks like a collection of glass samples instead of one coherent interface.
-- A bottom dock collides with the main card, equalizer, chart, or other foreground artwork at common desktop sizes.
-- Wide cards stretch circular dials, avatars, records, or preview art into ovals.
-- Long docks use showcase-level dispersion and turn backdrop lines into colored vertical artifacts.
+Use the rejection criteria in `golden-glass-style.md` as the canonical failure list. For showcase-specific review, pay special attention to stale previews, missing rendered demos, full-screen test-pattern clutter, and bottom docks colliding with focal content.

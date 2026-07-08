@@ -1,39 +1,68 @@
 {
-  "schemaVersion": "1.0",
-  "description": "Manual and automated regression prompts for the liquid-glass-design skill.",
-  "cases": [
+  "schemaVersion": "2.0",
+  "description": "Executable smoke evals for liquid-glass-design. Run with scripts/run-evals.mjs.",
+  "trigger_cases": [
     {
-      "id": "upgrade-overlapping-demo",
-      "prompt": "Use $liquid-glass-design to upgrade an existing Liquid Glass demo. The screenshot shows the bottom dock overlapping the main card/equalizer, the dock is not visually centered, and the glass feels weak. Keep the existing product context and improve the implementation.",
-      "assertions": [
-        "The response fixes layout hierarchy before tuning optical parameters.",
-        "The response preserves the product context instead of replacing the scene with a generic background.",
-        "The response verifies dock centering and non-overlap using browser geometry or scripts/check-visual-geometry.mjs.",
-        "The response strengthens refraction with measured displacement maps and shape-specific profiles.",
-        "The response updates or regenerates any preview image after visual changes."
-      ]
+      "id": "trigger-glassmorphism-card",
+      "query": "Build a glassmorphism card with premium Liquid Glass refraction.",
+      "expected": true,
+      "match_any": ["liquid glass", "glassmorphism", "refraction", "backdrop-filter"],
+      "exclude_any": []
     },
     {
-      "id": "new-react-component",
-      "prompt": "Use $liquid-glass-design to create a reusable React LiquidGlass component and showcase page for a premium analytics dashboard.",
-      "assertions": [
-        "The component exposes variant, radius, profile, strength, magnify, dispersion, blur, tint, glare, and interactive props.",
-        "The showcase chooses a named composition recipe or equivalent design rationale.",
-        "The implementation keeps children sharp and filter SVG nodes out of layout flow.",
-        "The showcase exercises small pills, circular/square art, text panels, and a long dock or command rail.",
-        "The implementation includes reduced motion, reduced transparency, and fallback behavior."
-      ]
+      "id": "trigger-chinese-frosted-nav",
+      "query": "帮我做一个高级的毛玻璃导航栏，要有液态玻璃质感。",
+      "expected": true,
+      "match_any": ["毛玻璃", "液态玻璃", "glass", "translucent"],
+      "exclude_any": []
     },
     {
-      "id": "weak-output-review",
-      "prompt": "Use $liquid-glass-design to review a screenshot of a Liquid Glass interface that looks cluttered, blurry, and low-end. Identify what is wrong and patch the code.",
-      "assertions": [
-        "The review orders issues by composition, geometry, optical material, foreground clarity, accessibility, performance, and fallback.",
-        "The patch removes scattered or competing glass samples before adding stronger effects.",
-        "The optical changes avoid blur-only glass and use rim refraction plus restrained chromatic detail.",
-        "The final answer includes screenshot or runnable-demo verification.",
-        "The final answer does not claim success without measurable checks for overlap or clipping."
-      ]
+      "id": "trigger-svg-displacement",
+      "query": "Use SVG feDisplacementMap and chromatic aberration for a glass toolbar.",
+      "expected": true,
+      "match_any": ["feDisplacementMap", "chromatic", "glass toolbar"],
+      "exclude_any": []
+    },
+    {
+      "id": "no-trigger-water-physics",
+      "query": "Make a realistic glass water simulation with fluid physics.",
+      "expected": false,
+      "match_any": ["glass"],
+      "exclude_any": ["water simulation", "fluid physics"]
+    },
+    {
+      "id": "no-trigger-window-repair",
+      "query": "Help me replace a broken glass window at home.",
+      "expected": false,
+      "match_any": ["glass"],
+      "exclude_any": ["window at home", "broken glass"]
+    }
+  ],
+  "static_assertions": [
+    {
+      "id": "implementation-has-displacement-api",
+      "paths": ["assets/templates", "scripts/generate-displacement-map.mjs"],
+      "must_include_any": ["feDisplacementMap", "createLiquidGlassDisplacementMap", "generate-displacement-map"]
+    },
+    {
+      "id": "implementation-does-not-use-background-fixed",
+      "paths": ["assets/templates"],
+      "must_not_include": ["background-attachment\\s*:\\s*fixed"]
+    },
+    {
+      "id": "implementation-does-not-use-feoffset-channel-shift",
+      "paths": ["assets/templates"],
+      "must_not_include": ["<feOffset\\b", "feOffset\\("]
+    },
+    {
+      "id": "qa-script-supports-data-role-and-baseline",
+      "paths": ["scripts/check-visual-geometry.mjs"],
+      "must_include_any": ["data-lg-role", "baseline-dir", "pixel-threshold"]
+    },
+    {
+      "id": "package-script-excludes-heavy-directories",
+      "paths": ["scripts/package-skill.mjs"],
+      "must_include_any": ["node_modules", "dist", "dry-run"]
     }
   ]
 }

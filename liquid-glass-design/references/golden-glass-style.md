@@ -2,12 +2,52 @@
 
 Use this reference when judging whether an implementation feels premium enough.
 
+This file is the single source of truth for Liquid Glass numeric defaults. Other files should link here instead of restating default values.
+
+## Production Defaults
+
+Use these values for app/product integration unless the target design clearly needs stronger proof of refraction.
+
+| Token | Default |
+| --- | --- |
+| Border | `1px rgba(255,255,255,.38)` |
+| Tint | `rgba(30,36,46,.16)` |
+| Refractive blur | `0.3px` |
+| Fallback blur | `4-6px` |
+| Saturate | `1.55` |
+| Brightness | `1.10` |
+| Contrast | `1.12` |
+| Strength | `100-130%` of measured scale |
+| Magnify | `1.0-1.16` |
+| Dispersion | `0.006-0.035` by surface size |
+| Bezel ratio | `0.62` |
+| Spread | `0.58` |
+
+## Showcase Defaults
+
+Use these values for README previews, first-run demos, and optical proof screens.
+
+| Token | Default |
+| --- | --- |
+| Border | `1px rgba(255,255,255,.62)` |
+| Tint | `rgba(24,32,44,.16)` |
+| Refractive blur | `0.2px` |
+| Fallback blur | `5-8px` |
+| Saturate | `1.70` |
+| Brightness | `1.12` |
+| Contrast | `1.18` |
+| Strength | `130-180%` of measured scale |
+| Magnify | `1.15-1.4` |
+| Dispersion | `0.006-0.06` by surface size |
+| Bezel ratio | `0.62` |
+| Spread | `0.58` |
+
 ## Visual Recipe
 
-- Base fill: a glossy top-sheen gradient over a *barely-there* tint, e.g. `linear-gradient(180deg, rgba(255,255,255,.34), rgba(255,255,255,.08) 46%, rgba(255,255,255,.02) 58%, rgba(255,255,255,.16))` over `rgba(30,36,46,.16)`. Crystal clarity dies first from an over-dark, over-opaque tint.
-- Border: a real 1px border around `rgba(255,255,255,.38)`, plus a fine inner rim and a bright 1px top edge (`inset 0 1px 0 rgba(255,255,255,.55)`).
-- Blur: near zero on the refractive path (`0.3-1px`). Real refraction does the optical work; heavy blur destroys it. The blur-only fallback may use `4-6px`.
-- Color ops: `saturate(1.45-1.6)` makes the backdrop's color glow through the glass; keep `contrast` controlled (`1.08-1.16`) and brightness lift modest (`1.06-1.12`) or the material turns muddy.
+- Base fill: a glossy top-sheen gradient over a *barely-there* tint. Crystal clarity dies first from an over-dark, over-opaque tint.
+- Border: a real 1px border, plus a fine inner rim and a bright 1px top edge (`inset 0 1px 0 rgba(255,255,255,.55)`).
+- Blur: near zero on the refractive path. Real refraction does the optical work; heavy blur destroys it. The blur-only fallback may use the fallback blur from the active defaults table.
+- Color ops: saturation makes the backdrop's color glow through the glass; keep contrast controlled or the material turns muddy.
 - Specular light: two or three small radial glints near corners plus a quiet top sheen — never a full-card white sweep.
 - Directional light: pointer-aware controls should move the primary glint toward the pointer and add only 1-3px of elastic drift. Panels may keep static light.
 - Refraction: visible mostly near edges and curved corners; the center is identity.
@@ -37,9 +77,8 @@ Use profiles to make different shapes feel tuned instead of copied:
 
 - `thin`: tighter edge band and sharper rim for small pills and icon buttons.
 - `standard`: balanced controls, menus, and compact panels.
-- `soft`: lower mid-band force for text-heavy panels where readability matters.
+- `soft`: lower mid-band force for text-heavy panels, long docks, and transport bars over detailed backdrops; it preserves the optical edge without turning background lines into visible streaks.
 - `prominent`: stronger mid-band bend for showcase panels and compact hero surfaces where the material itself should be noticed.
-- `soft`: preferred for long docks and transport bars over detailed backdrops; it preserves the optical edge without turning background lines into visible streaks.
 
 The profile changes only the displacement falloff. Keep measured scale, caching,
 fallbacks, and dispersion structure identical across profiles.
@@ -95,16 +134,6 @@ Reject an implementation if it:
 6. Tune `dispersion` (default 0.035, 0 disables the extra passes). Use lower values for large bars and higher values only for small rim-heavy controls.
 7. Tune hover/press/focus light and pointer glare.
 8. Only then tune motion timing.
-
-## Showcase Defaults
-
-For README previews and first-run demos, bias slightly stronger than production:
-
-- `strength`: 130-180% of measured scale.
-- `magnify`: 1.15-1.4.
-- `dispersion`: 0.006-0.06 by surface size. Long docks stay near the low end; small rim-heavy controls can use the high end.
-- `saturate`: 1.65-1.75.
-- `contrast`: 1.14-1.2.
 
 Reduce after visual proof is established. If you start too subtle, the result often reads as generic blur and hides the core Liquid Glass behavior.
 Reduce dispersion before it becomes a visible rainbow stripe across whole surfaces; premium glass shows color separation at the rim, not across every line behind the card.

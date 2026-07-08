@@ -1,0 +1,71 @@
+{
+  "generatedAt": "2026-07-08T06:29:08.267Z",
+  "pluginEvalAvailable": false,
+  "triggerResults": [
+    {
+      "id": "trigger-glassmorphism-card",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    },
+    {
+      "id": "trigger-chinese-frosted-nav",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    },
+    {
+      "id": "trigger-svg-displacement",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    },
+    {
+      "id": "no-trigger-water-physics",
+      "expected": false,
+      "actual": false,
+      "pass": true
+    },
+    {
+      "id": "no-trigger-window-repair",
+      "expected": false,
+      "actual": false,
+      "pass": true
+    }
+  ],
+  "staticResults": [
+    {
+      "id": "implementation-has-displacement-api",
+      "pass": true,
+      "includePass": true,
+      "forbidden": []
+    },
+    {
+      "id": "implementation-does-not-use-background-fixed",
+      "pass": true,
+      "includePass": true,
+      "forbidden": []
+    },
+    {
+      "id": "implementation-does-not-use-feoffset-channel-shift",
+      "pass": true,
+      "includePass": true,
+      "forbidden": []
+    },
+    {
+      "id": "qa-script-supports-data-role-and-baseline",
+      "pass": true,
+      "includePass": true,
+      "forbidden": []
+    },
+    {
+      "id": "package-script-excludes-heavy-directories",
+      "pass": true,
+      "includePass": true,
+      "forbidden": []
+    }
+  ],
+  "passed": 10,
+  "total": 10,
+  "failed": []
+}

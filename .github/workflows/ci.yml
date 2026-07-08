@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Validate skill structure
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          skill = Path("liquid-glass-design/SKILL.md")
+          text = skill.read_text(encoding="utf-8")
+          assert text.startswith("---\n"), "SKILL.md must start with frontmatter"
+          end = text.find("\n---", 4)
+          assert end != -1, "SKILL.md frontmatter must close"
+          frontmatter = text[4:end]
+          assert "name: liquid-glass-design" in frontmatter
+          assert "description:" in frontmatter
+          assert (Path("liquid-glass-design/agents/openai.yaml")).exists()
+          assert (Path("liquid-glass-design/LICENSE")).exists()
+          PY
+
+      - name: Node syntax checks
+        run: |
+          node --check liquid-glass-design/scripts/generate-displacement-map.mjs
+          node --check liquid-glass-design/scripts/check-visual-geometry.mjs
+          node --check liquid-glass-design/scripts/package-skill.mjs
+          node --check liquid-glass-design/scripts/run-evals.mjs
+          node --check liquid-glass-design/scripts/test-displacement-map.mjs
+          node --check liquid-glass-design/assets/templates/vanilla-liquid-glass/liquid-glass.js
+          node --check liquid-glass-design/assets/templates/react-liquid-glass/src/displacementMap.js
+
+      - name: Displacement map tests
+        run: node liquid-glass-design/scripts/test-displacement-map.mjs
+
+      - name: Eval smoke
+        run: node liquid-glass-design/scripts/run-evals.mjs
+
+      - name: Package dry run
+        run: node liquid-glass-design/scripts/package-skill.mjs --dry-run
+
+      - name: React template build
+        working-directory: liquid-glass-design/assets/templates/react-liquid-glass
+        run: |
+          npm ci
+          npm run build

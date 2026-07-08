@@ -5,8 +5,8 @@
 Build in layers:
 
 1. Solid/tinted fallback (reduced transparency).
-2. `backdrop-filter: blur(4-6px) saturate(...) brightness(...) contrast(...)` — every engine gets believable frosted glass.
-3. Chromium/Electron: `backdrop-filter: url(#filter-id) blur(0.2-0.8px) saturate(...) brightness(...) contrast(...)` with a per-surface displacement map — true refraction.
+2. `backdrop-filter: blur(...) saturate(...) brightness(...) contrast(...)` using the active defaults from `golden-glass-style.md` — every engine gets believable frosted glass.
+3. Chromium/Electron: `backdrop-filter: url(#filter-id) blur(...) saturate(...) brightness(...) contrast(...)` with a per-surface displacement map and the active defaults from `golden-glass-style.md` — true refraction.
 4. Optional map-on-content strategy when Safari/Firefox parity is more important than live backdrop refraction.
 5. Optional React abstraction or WebGL/WebGPU renderer when the product needs shader-grade Fresnel, glare, merged shapes, or dynamic video scenes.
 
@@ -29,18 +29,19 @@ from the fill gradient, the border, box-shadows, and two pseudo-elements.
 .lg-interactive {} /* pointer-aware glare and micro elasticity */
 
 :root {
-  --lg-tint: rgba(32, 42, 56, .20);
-  --lg-border: rgba(255, 255, 255, .52);
-  --lg-blur: 0.2px;          /* refractive path */
-  --lg-fallback-blur: 6px;   /* blur-only path */
-  --lg-saturate: 1.55;
-  --lg-brightness: 1.1;
-  --lg-contrast: 1.14;
-  --lg-radius: 26px;
+  /* Populate these from Production Defaults or Showcase Defaults in golden-glass-style.md. */
+  --lg-tint: <active-default>;
+  --lg-border: <active-default>;
+  --lg-blur: <active-default>;
+  --lg-fallback-blur: <active-default>;
+  --lg-saturate: <active-default>;
+  --lg-brightness: <active-default>;
+  --lg-contrast: <active-default>;
+  --lg-radius: <surface-radius>;
   --lg-filter-url: none;     /* set per element by JS */
-  --lg-light-x: 84%;
-  --lg-light-y: 12%;
-  --lg-glare: .56;
+  --lg-light-x: <pointer-or-static-x>;
+  --lg-light-y: <pointer-or-static-y>;
+  --lg-glare: <surface-glare>;
 }
 ```
 
@@ -109,16 +110,16 @@ Expose:
   variant="regular"      // regular | clear | tinted
   radius={26}
   profile="standard"    // standard | soft | prominent | thin
-  strength={100}         // % of the measured lens scale
-  magnify={1}            // lens curvature 0.2-2
-  bend={0.06}
-  spread={0.58}
-  bezelRatio={0.62}
-  dispersion={0.035}     // rim RGB separation; 0 = single pass
-  blur={0.2}             // px, refractive path
-  glare={0.56}
-  elasticity={0.12}
-  tint="rgba(20,25,32,.32)"
+  strength={activeDefaultStrength}
+  magnify={activeDefaultMagnify}
+  bend={activeDefaultBend}
+  spread={activeDefaultSpread}
+  bezelRatio={activeDefaultBezelRatio}
+  dispersion={activeDefaultDispersion}
+  blur={activeDefaultBlur}
+  glare={surfaceGlare}
+  elasticity={controlElasticity}
+  tint={activeDefaultTint}
   interactive
 />
 ```
