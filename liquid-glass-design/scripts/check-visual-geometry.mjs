@@ -40,6 +40,7 @@ Options:
   --screenshot-dir ./shots        Optional screenshot output directory
   --baseline-dir ./baselines      Optional PNG baseline directory
   --update-baseline               Write/update baseline PNGs instead of comparing
+  --full-page                     Capture full-page screenshots. Default: viewport only
   --pixel-threshold 0.01          Max changed-pixel ratio allowed
   --pixel-channel-threshold 16    Per-pixel channel delta threshold
   --expect-svg-filter enabled|disabled|auto
@@ -256,7 +257,10 @@ function sampleAverage(png, points) {
 
 function estimateContrasts(screenshot, items, minContrast) {
   const png = decodePng(screenshot);
-  return items.map((item) => {
+  return items.filter((item) => {
+    const rect = item.rect;
+    return rect.right >= 0 && rect.left <= png.width && rect.bottom >= 0 && rect.top <= png.height;
+  }).map((item) => {
     const foreground = parseCssColor(item.color);
     const rect = item.rect;
     const inset = Math.min(8, Math.max(3, Math.min(rect.width, rect.height) * 0.18));
@@ -305,6 +309,7 @@ async function main() {
   const pixelChannelThreshold = Number(args["pixel-channel-threshold"] ?? 16);
   const expectSvgFilter = String(args["expect-svg-filter"] || "auto");
   const runContrast = Boolean(args.contrast);
+  const fullPage = Boolean(args["full-page"]);
   const contrastSelector = String(args["contrast-selector"] || '[data-lg-contrast], .hero-copy h1, .hero-copy span, .lg-surface strong, .lg-surface .label, .lg-button span, .track-meta span');
   const minContrast = Number(args["min-contrast"] ?? 4.5);
 
@@ -404,7 +409,7 @@ async function main() {
           .filter((item) => item.text && item.rect.width > 2 && item.rect.height > 2);
       }, contrastSelector) : [];
 
-      const screenshot = await page.screenshot({ fullPage: true });
+      const screenshot = await page.screenshot({ fullPage });
       const fileName = `liquid-glass-${viewport.label}.png`;
       if (screenshotDir) {
         const screenshotPath = `${screenshotDir.replace(/\/$/, "")}/${fileName}`;

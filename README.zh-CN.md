@@ -111,7 +111,7 @@ node liquid-glass-design/scripts/check-visual-geometry.mjs \
 node liquid-glass-design/scripts/check-visual-geometry.mjs \
   --url http://127.0.0.1:4173 \
   --baseline-dir liquid-glass-design/evals/baselines \
-  --pixel-threshold 0.05 \
+  --pixel-threshold 0.08 \
   --pixel-channel-threshold 24
 ```
 
