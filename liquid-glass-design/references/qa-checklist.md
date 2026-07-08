@@ -9,6 +9,9 @@ Run this checklist before finalizing Liquid Glass UI.
 - Confirm edges are complete on all sides with no clipping or offset gaps.
 - Confirm the center stays readable and is not over-warped.
 - Confirm chromatic aberration is visible only as restrained edge detail.
+- Confirm long bars and docks do not turn detailed backgrounds into rainbow stripes.
+- Confirm circular or square art inside glass keeps its aspect ratio and is not stretched by the card.
+- Confirm sliders, progress rails, and decorative meters do not accidentally cover the primary artwork.
 - Confirm hover, active, selected, disabled, and focus states all read clearly.
 - Confirm the UI does not look like ordinary blur-only glass.
 - Compare against a high-frequency procedural or photographic background even if the final product background is dark; weak glass often hides on simple gradients.

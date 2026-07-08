@@ -4,7 +4,7 @@ An AI-agent skill and template kit for building high-end Liquid Glass interfaces
 
 The refraction core uses inverse lens mapping: a canvas-generated displacement map whose interior is identity and whose edges magnify the backdrop, driven through a per-surface SVG `feDisplacementMap` at a measured — never guessed — scale.
 
-![Liquid Glass preview](docs/preview-20260708-v3.png)
+![Liquid Glass preview](docs/preview-20260708-v4.png)
 
 ## Join The QQ Group
 
@@ -25,7 +25,7 @@ Scan the QR code to join the `liquid-glass-skill` group chat.
 Clone the repository:
 
 ```bash
-git clone https://github.com/<your-name>/liquid-glass-design-skill.git
+git clone https://github.com/xinlingfeiwu/liquid-glass-design-skill.git
 cd liquid-glass-design-skill
 ```
 
@@ -87,7 +87,7 @@ The component API:
   bend={0.06}
   spread={0.58}
   bezelRatio={0.62}
-  dispersion={0.07}     // rim RGB separation; 0 = single pass
+  dispersion={0.035}    // rim RGB separation; 0 = single pass
   blur={0.2}            // px on the refractive path
   glare={0.56}
   elasticity={0.12}
@@ -119,6 +119,8 @@ Options: `--width`, `--height`, `--radius`, `--profile`, `--magnify`, `--bend`, 
 - Inverse lens mapping: identity center, edge magnification, measured scale, shape-specific profile.
 - Keep blur near zero on the refractive path; punch comes from `contrast`.
 - Chromatic dispersion only at the rim, via per-channel scale differences.
+- Keep large bars cleaner than small controls; reduce dispersion before detailed backdrops turn into rainbow stripes.
+- Lock decorative circular/ratio-sensitive art with `aspect-ratio`; do not let a wide glass card stretch circles, icons, records, meters, or previews into ovals.
 - Use pointer-aware glare and tiny elastic drift for interactive controls; never regenerate maps on pointer movement.
 - Keep hover and press states stable; do not resize layout on interaction.
 - Provide reduced motion, increased contrast, and reduced transparency fallbacks.

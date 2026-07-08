@@ -64,10 +64,10 @@ export function createLiquidGlassDisplacementMap(options = {}) {
   const spread = numberOption(options.spread, 0.58, 0.4, 1);
   const bezelRatio = numberOption(options.bezelRatio, 0.62, 0.2, 1);
   const profile = String(options.profile || "standard");
-  const dpr = clamp((typeof window !== "undefined" && window.devicePixelRatio) || 1, 1, 1.5);
+  const dpr = clamp((typeof window !== "undefined" && window.devicePixelRatio) || 1, 2, 2);
 
-  const w = Math.max(72, Math.round(width * dpr));
-  const h = Math.max(48, Math.round(height * dpr));
+  const w = Math.max(160, Math.round(width * dpr));
+  const h = Math.max(96, Math.round(height * dpr));
   const r = Math.max(4, Math.round(radius * dpr));
   const shortSide = Math.min(w, h);
   const bezel = clamp(shortSide * 0.5 * bezelRatio, 10, 220);
@@ -124,7 +124,7 @@ export function createLiquidGlassDisplacementMap(options = {}) {
       // Fade the outermost pixels to neutral so the filter region
       // never samples garbage outside the element.
       const edgeDistance = Math.min(x, y, w - x - 1, h - y - 1);
-      const edgeFactor = Math.min(1, edgeDistance / 2);
+      const edgeFactor = smoothStep(0, 3, edgeDistance);
       const pixel = (y * w + x) * 4;
       data[pixel] = clamp((dx * edgeFactor) / range * 0.5 + 0.5, 0, 1) * 255;
       data[pixel + 1] = clamp((dy * edgeFactor) / range * 0.5 + 0.5, 0, 1) * 255;
@@ -170,7 +170,7 @@ function appendNode(parent, name, attributes = {}) {
  */
 function createFilterDefinition(defs, index, options) {
   const filterId = `lg-refraction-${index}`;
-  const dispersion = numberOption(options.dispersion, 0.07, 0, 0.3);
+  const dispersion = numberOption(options.dispersion, 0.035, 0, 0.3);
   const filter = appendNode(defs, "filter", {
     id: filterId,
     "color-interpolation-filters": "sRGB",

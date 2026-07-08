@@ -46,6 +46,7 @@
   background: var(--lg-highlight), var(--lg-tint);
   background-clip: padding-box;
   box-shadow: var(--lg-shadow);
+  clip-path: inset(0 round var(--lg-radius));
   transform: translate3d(0, 0, 0);
   /* Cross-browser baseline: believable frosted glass everywhere. */
   backdrop-filter: blur(var(--lg-fallback-blur)) saturate(var(--lg-saturate)) brightness(var(--lg-brightness)) contrast(var(--lg-contrast));

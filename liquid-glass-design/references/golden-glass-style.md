@@ -12,6 +12,8 @@ Use this reference when judging whether an implementation feels premium enough.
 - Directional light: pointer-aware controls should move the primary glint toward the pointer and add only 1-3px of elastic drift. Panels may keep static light.
 - Refraction: visible mostly near edges and curved corners; the center is identity.
 - Chromatic detail: subtle RGB separation at the rim only, produced by per-channel scale differences, never by offsetting whole channels.
+- Large horizontal bars need much lower dispersion than compact pills. If a grid, image, or waveform behind the bar turns into rainbow stripes, keep the lens but reduce dispersion first.
+- Ratio-sensitive foreground art must keep its own geometry. Put circular records, gauges, meters, icons, and preview art in an `aspect-ratio` locked inner layer instead of letting a wide glass container stretch them.
 
 ## Displacement Pattern — Inverse Lens Mapping
 
@@ -36,7 +38,8 @@ Use profiles to make different shapes feel tuned instead of copied:
 - `thin`: tighter edge band and sharper rim for small pills and icon buttons.
 - `standard`: balanced controls, menus, and compact panels.
 - `soft`: lower mid-band force for text-heavy panels where readability matters.
-- `prominent`: stronger mid-band bend for transport bars, docks, showcase panels, and places where the material itself should be noticed.
+- `prominent`: stronger mid-band bend for showcase panels and compact hero surfaces where the material itself should be noticed.
+- `soft`: preferred for long docks and transport bars over detailed backdrops; it preserves the optical edge without turning background lines into visible streaks.
 
 The profile changes only the displacement falloff. Keep measured scale, caching,
 fallbacks, and dispersion structure identical across profiles.
@@ -69,7 +72,8 @@ Reject an implementation if it:
 - Looks like ordinary blurred acrylic with no lensing.
 - Uses a large white sheen that sweeps across the whole element.
 - Makes the center muddy or unreadable.
-- Shows color fringing across the whole surface (a sign of `feOffset` channel shifts).
+- Shows color fringing across the whole surface or rainbow striping through long bars.
+- Stretches circular or square foreground artwork into ovals/rectangles inside a glass card.
 - Shows missing edges, clipping, or obvious filter offset.
 - Uses a guessed `feDisplacementMap` scale instead of the measured one.
 - Uses high transparency on complex backgrounds without tint or dimming.
@@ -88,7 +92,7 @@ Reject an implementation if it:
 3. Tune `contrast`/`saturate`/`brightness` (keep blur near zero on the refractive path).
 4. Tune the lens: `magnify` (0.2-2, default 1), `strength` percentage (default 100), `bezelRatio` (default 0.62), `spread` (default 0.58).
 5. Choose the profile: `thin`, `standard`, `soft`, or `prominent`.
-6. Tune `dispersion` (default 0.07, 0 disables the extra passes).
+6. Tune `dispersion` (default 0.035, 0 disables the extra passes). Use lower values for large bars and higher values only for small rim-heavy controls.
 7. Tune hover/press/focus light and pointer glare.
 8. Only then tune motion timing.
 
@@ -98,7 +102,7 @@ For README previews and first-run demos, bias slightly stronger than production:
 
 - `strength`: 130-180% of measured scale.
 - `magnify`: 1.15-1.4.
-- `dispersion`: 0.08-0.13.
+- `dispersion`: 0.006-0.06 by surface size. Long docks stay near the low end; small rim-heavy controls can use the high end.
 - `saturate`: 1.65-1.75.
 - `contrast`: 1.14-1.2.
 

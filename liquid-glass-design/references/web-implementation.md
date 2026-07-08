@@ -52,6 +52,7 @@ Key rules:
 - On interactive controls, pointer movement may update `--lg-light-x`, `--lg-light-y`, `--lg-glare`, and small elastic offsets. Do not update the displacement map on pointer movement.
 - The refractive `backdrop-filter` is applied **directly to the surface element** — no background clones, no `background-attachment: fixed` hacks, which break in scroll containers and on mobile.
 - When a project needs a dedicated warped material layer, keep that layer behind a separate sharp content layer; do not rasterize or displace live foreground DOM.
+- Preserve foreground art geometry inside glass. For circular meters, records, avatars, album art, and preview dials, use an inner `aspect-ratio` locked element and center it inside the wide card instead of stretching gradients or rings across the container.
 
 ## SVG Filter Contract
 
@@ -102,7 +103,7 @@ Expose:
   bend={0.06}
   spread={0.58}
   bezelRatio={0.62}
-  dispersion={0.07}      // rim RGB separation; 0 = single pass
+  dispersion={0.035}     // rim RGB separation; 0 = single pass
   blur={0.2}             // px, refractive path
   glare={0.56}
   elasticity={0.12}
@@ -118,6 +119,7 @@ The component should:
 - Apply the measured map scale to its displacement nodes after each regen.
 - Expose profile/tuning props instead of hardcoding one visual for every shape.
 - Include a showcase page that actually exercises those props across small pills, circular controls, bars, and text panels. A component file alone is not a sufficient template.
+- Use lower `dispersion` and softer profiles for long docks/bars over detailed backdrops; reserve stronger chromatic detail for compact surfaces where only the rim shows it.
 - Keep component-owned filter SVGs out of layout flow. If a component emits an inline `<svg><filter>...</filter></svg>` next to the rendered surface, force the SVG to `position: absolute !important; width: 0; height: 0; overflow: hidden; pointer-events: none;` and exclude it from broad child rules such as `.glass > *`. Otherwise nested glass controls inside grid/flex bars can silently become extra layout items.
 - Keep pointer glare as CSS variable updates, not React state churn.
 - Fall back to CSS blur when SVG filter support is absent (SSR-safe).
@@ -127,7 +129,7 @@ The component should:
 ## Performance Rules
 
 - Cache by rounded width, height, radius, and map tuning options.
-- Map bitmaps are capped at 1.5x devicePixelRatio; the measured scale divides dpr back out.
+- Map bitmaps should be oversampled enough to keep curved controls smooth; the measured scale divides dpr back out.
 - One exact map per visible glass surface when quality matters; share only within identical shape families.
 - Keep filters off hidden elements.
 - Avoid `filter` animation on many large surfaces at once.

@@ -21,7 +21,7 @@ Every showcase should include:
 
 - Small pill buttons using a `thin` profile.
 - One circular or square control with a fixed aspect ratio.
-- One large bar or dock using a `prominent` profile.
+- One large bar or dock using a `soft` or carefully reduced `prominent` profile with low dispersion.
 - One text-heavy panel using a `soft` or `tinted` profile.
 - At least one selected/active state and one hover/focus-capable control.
 
@@ -43,7 +43,7 @@ For showcase surfaces, start stronger than production defaults:
 
 - Strength: `130-180` percent of measured scale.
 - Magnify: `1.15-1.4`.
-- Dispersion: `0.08-0.13`.
+- Dispersion: `0.006-0.06` by surface size. Long docks stay near the low end; compact rim-heavy controls can use more.
 - Refractive blur: `0.2-0.5px`.
 - Fallback blur: `5-8px`.
 - Tint: as low as legibility allows; increase only on bright or noisy backgrounds.
@@ -58,6 +58,9 @@ The preview image should make these facts visible without zooming:
 - The center remains readable.
 - The edge has a fine bright rim and restrained color separation.
 - Multiple surface sizes share a family resemblance but do not use identical tuning.
+- Circular/square artwork inside wide cards keeps its true aspect ratio.
+- Decorative sliders and progress rails do not cover the main circular/square artwork unless the composition clearly calls for overlap.
+- Long bars look clean over detailed backgrounds, without rainbow striping across the interior.
 - The scene includes enough dark and bright areas to prove contrast.
 - The first impression is a refined interface, not an engineering filter test or wallpaper sample.
 
@@ -74,3 +77,5 @@ If the screenshot could be mistaken for a generic blur card, reject it and retun
 - The material looks good only on one background scene.
 - High-frequency lines cover the whole screen and make the composition feel noisy or cheap.
 - The glass is strong but the UI has no believable product context, hierarchy, or focal point.
+- Wide cards stretch circular dials, avatars, records, or preview art into ovals.
+- Long docks use showcase-level dispersion and turn backdrop lines into colored vertical artifacts.

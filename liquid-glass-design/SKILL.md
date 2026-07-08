@@ -32,7 +32,7 @@ Use this skill to design, implement, or review high-quality Liquid Glass UI. Tre
 - Keep content primary. Glass controls should float above content and clarify interaction, not compete with the content.
 - Preserve readable contrast across black, bright, saturated, and photographic backgrounds.
 - The lens is the material. Use inverse lens mapping (identity center, edge magnification) with a **measured** `feDisplacementMap` scale — never a guessed strength. See `references/golden-glass-style.md`.
-- Pick a lens profile per shape: `thin` for small buttons, `standard` for general controls, `soft` for text-heavy panels, `prominent` for bars and showcase surfaces.
+- Pick a lens profile per shape: `thin` for small buttons, `standard` for general controls, `soft` for text-heavy panels and long docks over detailed backdrops, `prominent` for compact showcase surfaces where the rim can carry stronger lensing cleanly.
 - Keep blur near zero on the refractive path; the punch comes from `contrast`, the optics from displacement.
 - Chromatic dispersion belongs on the rim only, via per-channel scale differences. Never `feOffset` whole channels.
 - Use shadows, inner rims, pointer-aware glare, Fresnel-like edge light, and small specular glints as a system. Avoid large white sweeps, muddy blur, or one-note transparency.
@@ -41,6 +41,9 @@ Use this skill to design, implement, or review high-quality Liquid Glass UI. Tre
 - Cache generated displacement maps by size/radius/tuning and update them only on shape changes, not on every animation frame.
 - Respect `prefers-reduced-motion`, increased contrast, and reduced transparency by reducing morphing and increasing tint/opacity.
 - Keep foreground content sharp. If the implementation uses extra optical layers, separate the warped backdrop/material layer from the content layer so text and icons are never rasterized or distorted.
+- Keep ratio-sensitive artwork sharp and undistorted. Circular dials, records, avatars, icons, and square previews should live in an `aspect-ratio` locked inner layer rather than stretching with a wide glass card.
+- Keep decorative sliders, meters, and progress rails outside ratio-sensitive artwork unless overlap is the explicit design goal.
+- Tune chromatic dispersion by surface size. Large horizontal bars usually need very low dispersion; small rim-heavy pills can carry more color detail.
 - Reject outputs that only look acceptable in one curated screenshot. A good material survives dark, bright, image-like, and high-frequency backgrounds.
 - Reject demos that feel like technical filter tests rather than a designed interface. The first screen should communicate an app surface, control deck, editor, dashboard, media view, or other believable UI context.
 
@@ -62,8 +65,8 @@ Use these defaults unless the target design clearly calls for different values:
 - Border: 1px `rgba(255, 255, 255, .62)` plus a fine inner rim and a bright top edge (pseudo-element).
 - Refractive path (Chromium/Electron): `backdrop-filter: url(#per-surface-filter) blur(0.2px) saturate(1.72) brightness(1.12) contrast(1.18)`.
 - Cross-browser fallback (Safari/Firefox): same color ops with `blur(6px)` and no filter URL.
-- Lens tuning: `magnify 1.15-1.4` for visible app controls, `strength 130-180%` of the measured scale for showcase surfaces, `bezelRatio 0.62`, `spread 0.58`, `dispersion 0.08-0.13`.
-- Lens profiles: `thin` for pills, `standard` for balanced controls, `soft` for text-heavy panels, `prominent` for showcase bars.
+- Lens tuning: `magnify 1.06-1.4` for visible app controls, `strength 110-180%` of the measured scale for showcase surfaces, `bezelRatio 0.62`, `spread 0.58`, `dispersion 0.006-0.06` by surface size.
+- Lens profiles: `thin` for pills, `standard` for balanced controls, `soft` for text-heavy panels and long docks, `prominent` for compact hero surfaces.
 - Interaction: pointer-aware glare and 1-3px elastic drift on controls; keep panels optically alive but geometrically stable.
 - Radius: pill controls `999px`; large panels between `24px` and `52px` depending on geometry.
 - Filter region: `x="-35%" y="-35%" width="170%" height="170%"`.
@@ -76,6 +79,8 @@ Complete Liquid Glass work only when:
 - Controls remain visually distinct from content without hiding the content.
 - Text and icons are readable on dark, bright, saturated, and image/video backgrounds.
 - Edges show restrained lensing — the backdrop visibly magnifies and bends at the rim — with chromatic detail only at the rim, no fringing across the surface.
+- Large bars do not turn background grids, dots, waveforms, or photos into visible rainbow stripes.
+- Circular/square foreground art stays circular/square inside wide glass containers.
 - The demo/verification backdrop includes dark, bright, image-like, and high-frequency detail backgrounds so refraction cannot hide.
 - High-frequency detail proves refraction without overwhelming the visual direction; the showcase still reads as a designed interface.
 - The delivered example is a rendered, runnable showcase, not merely a folder or code snippet.

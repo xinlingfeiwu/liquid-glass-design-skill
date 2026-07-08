@@ -27,8 +27,9 @@ export default function App() {
               className={`top-button ${scene === item ? "is-active" : ""}`}
               radius={999}
               profile="thin"
-              strength={126}
-              magnify={1.14}
+              strength={112}
+              magnify={1.06}
+              dispersion={0.014}
               interactive
               onClick={() => setScene(item)}
             >
@@ -43,39 +44,39 @@ export default function App() {
           <span>control surfaces with real edge refraction</span>
         </section>
 
-        <LiquidGlass as="article" className="lg-panel media-card" radius={38} profile="prominent" strength={168} magnify={1.32} dispersion={0.08} glare={0.72}>
+        <LiquidGlass as="article" className="lg-panel media-card" radius={38} profile="prominent" strength={164} magnify={1.28} dispersion={0.052} glare={0.72}>
           <div className="media-topline">
             <span>Now Rendering</span>
             <strong>Liquid Pass 04</strong>
           </div>
           <div className="cover-art" aria-hidden="true">
             <span />
-            <i />
           </div>
+          <div className="cover-slider" aria-hidden="true" />
           <div className="equalizer" aria-hidden="true">
             <i /><i /><i /><i /><i /><i /><i /><i />
           </div>
         </LiquidGlass>
 
-        <LiquidGlass as="aside" className="lg-panel status-panel" variant="tinted" radius={30} profile="soft" strength={144} magnify={1.18} dispersion={0.05} glare={0.62}>
+        <LiquidGlass as="aside" className="lg-panel status-panel" variant="tinted" radius={30} profile="soft" strength={136} magnify={1.12} dispersion={0.024} glare={0.6}>
           <p className="label">Current Layer</p>
           <strong>Refraction</strong>
           <span>96%</span>
         </LiquidGlass>
 
         <section className="optics-stack" aria-label="Glass samples">
-          <LiquidGlass as="article" className="lg-panel metric-card" radius={28} profile="prominent" strength={152} magnify={1.24} dispersion={0.06} glare={0.66}>
+          <LiquidGlass as="article" className="lg-panel metric-card" radius={28} profile="prominent" strength={140} magnify={1.14} dispersion={0.028} glare={0.64}>
             <p className="label">Rim Depth</p>
             <strong>1.46</strong>
             <span className="sparkline" aria-hidden="true"><i /><i /><i /><i /></span>
           </LiquidGlass>
-          <LiquidGlass as="article" className="lg-panel compact-card" radius={28} profile="thin" strength={138} magnify={1.16} dispersion={0.05} glare={0.64}>
+          <LiquidGlass as="article" className="lg-panel compact-card" radius={28} profile="thin" strength={126} magnify={1.08} dispersion={0.022} glare={0.6}>
             <p className="label">Glare</p>
             <strong>62%</strong>
           </LiquidGlass>
         </section>
 
-        <LiquidGlass as="nav" className="lg-panel transport-bar" radius={46} profile="prominent" strength={172} magnify={1.32} dispersion={0.08} glare={0.72} aria-label="Playback controls">
+        <LiquidGlass as="nav" className="lg-panel transport-bar" radius={46} profile="soft" strength={144} magnify={1.12} dispersion={0.006} glare={0.72} aria-label="Playback controls">
           <div className="track-meta">
             <div className="mini-cover" aria-hidden="true" />
             <div>
@@ -85,20 +86,20 @@ export default function App() {
           </div>
 
           <div className="transport-actions">
-            <LiquidGlass as="button" className="lg-control-button" radius={999} profile="thin" strength={134} magnify={1.16} interactive aria-label="Previous">
+            <LiquidGlass as="button" className="lg-control-button" radius={999} profile="thin" strength={118} magnify={1.06} dispersion={0.014} interactive aria-label="Previous">
               <span>Prev</span>
             </LiquidGlass>
-            <LiquidGlass as="button" className="lg-control-button play-button" radius="50%" profile="prominent" strength={164} magnify={1.28} dispersion={0.07} glare={0.82} interactive aria-label="Play">
+            <LiquidGlass as="button" className="lg-control-button play-button" radius="50%" profile="prominent" strength={148} magnify={1.16} dispersion={0.028} glare={0.78} interactive aria-label="Play">
               <span>Play</span>
             </LiquidGlass>
-            <LiquidGlass as="button" className="lg-control-button" radius={999} profile="thin" strength={134} magnify={1.16} interactive aria-label="Next">
+            <LiquidGlass as="button" className="lg-control-button" radius={999} profile="thin" strength={118} magnify={1.06} dispersion={0.014} interactive aria-label="Next">
               <span>Next</span>
             </LiquidGlass>
           </div>
 
           <div className="progress" aria-hidden="true"><i /></div>
 
-          <LiquidGlass as="button" className="lg-control-button mode-button is-active" variant="clear" radius={999} profile="thin" strength={138} magnify={1.16} interactive>
+          <LiquidGlass as="button" className="lg-control-button mode-button is-active" variant="clear" radius={999} profile="thin" strength={118} magnify={1.06} dispersion={0.014} interactive>
             <span>Clear</span>
           </LiquidGlass>
         </LiquidGlass>

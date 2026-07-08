@@ -131,7 +131,7 @@ button {
 }
 
 .depth-card {
-  inset: 13% 12% 20% 48%;
+  inset: 12% 9% 28% 49%;
   border-radius: 38px;
   background:
     linear-gradient(150deg, rgba(255, 255, 255, 0.06), transparent 28%),
@@ -224,13 +224,14 @@ button {
   position: absolute;
   z-index: 4;
   right: clamp(42px, 8vw, 128px);
-  top: 13%;
+  top: 12.5%;
   width: min(500px, 34vw);
-  min-height: 560px;
+  height: clamp(460px, 49vh, 530px);
+  min-height: 0;
   display: grid;
   align-content: space-between;
-  gap: 24px;
-  padding: 26px;
+  gap: 20px;
+  padding: clamp(22px, 2vw, 26px);
 }
 
 .media-topline {
@@ -257,22 +258,47 @@ button {
 
 .cover-art {
   position: relative;
-  min-height: 290px;
+  min-height: clamp(235px, 27vh, 280px);
   border-radius: 30px;
   overflow: hidden;
   background:
-    radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.86), transparent 9%),
-    radial-gradient(circle at 68% 44%, rgba(119, 234, 255, 0.7), transparent 18%),
-    conic-gradient(from 220deg at 50% 50%, #172232, #2d93ba, #ebcc7d, #d76fa1, #5a61dd, #172232);
+    radial-gradient(circle at 25% 24%, rgba(255, 255, 255, 0.42), transparent 12%),
+    radial-gradient(circle at 70% 42%, rgba(126, 226, 255, 0.38), transparent 22%),
+    linear-gradient(135deg, #14546a 0%, #2c98b6 30%, #3954c7 66%, #bf6fba 100%);
   box-shadow:
     inset 0 0 0 1px rgba(255, 255, 255, 0.2),
     0 24px 60px rgba(0, 0, 0, 0.32);
 }
 
+.cover-art::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  top: 48%;
+  width: auto;
+  height: min(84%, 300px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.95), transparent 10%),
+    conic-gradient(from 222deg, #132234, #218eaa, #ebcd76, #dc789e, #6c72e7, #132234);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.28),
+    0 22px 42px rgba(0, 0, 0, 0.18);
+}
+
 .cover-art span {
   position: absolute;
-  inset: 14%;
+  z-index: 1;
+  left: 50%;
+  top: 48%;
+  width: auto;
+  height: min(84%, 300px);
+  aspect-ratio: 1;
   border-radius: 50%;
+  transform: translate(-50%, -50%);
   border: 1px solid rgba(255, 255, 255, 0.36);
   background:
     radial-gradient(circle, transparent 0 34%, rgba(255, 255, 255, 0.18) 35% 36%, transparent 37%),
@@ -280,13 +306,15 @@ button {
   mix-blend-mode: overlay;
 }
 
-.cover-art i {
-  position: absolute;
-  inset: auto 12% 12% 12%;
-  height: 18%;
+.cover-slider {
+  height: clamp(36px, 4.4vh, 46px);
+  margin: -2px 12% 0;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.24);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.38);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    inset 0 -1px 0 rgba(39, 59, 72, 0.22),
+    0 12px 28px rgba(0, 0, 0, 0.14);
 }
 
 .equalizer {
@@ -294,7 +322,7 @@ button {
   grid-template-columns: repeat(8, 1fr);
   align-items: end;
   gap: 10px;
-  height: 72px;
+  height: clamp(42px, 4.7vh, 54px);
 }
 
 .equalizer i,
@@ -318,7 +346,7 @@ button {
   position: absolute;
   z-index: 5;
   top: 18%;
-  right: clamp(560px, 42vw, 690px);
+  right: calc(clamp(42px, 8vw, 128px) + min(500px, 34vw) + 36px);
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: end;
@@ -342,8 +370,9 @@ button {
 .visual-stage > .optics-stack {
   position: absolute !important;
   z-index: 5;
-  right: clamp(28px, 5vw, 74px);
-  bottom: 24%;
+  right: calc(clamp(42px, 8vw, 128px) + min(500px, 34vw) + 36px);
+  top: calc(18% + 120px);
+  bottom: auto;
   display: grid;
   grid-template-columns: 1fr;
   gap: 14px;
@@ -437,6 +466,14 @@ button {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.top-strip .lg-surface,
+.transport-actions .lg-surface,
+.mode-button {
+  --lg-blur: 0.35px;
+  --lg-contrast: 1.14;
+  --lg-saturate: 1.58;
 }
 
 .lg-control-button {

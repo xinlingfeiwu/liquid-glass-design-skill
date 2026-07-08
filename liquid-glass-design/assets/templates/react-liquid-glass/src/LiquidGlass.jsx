@@ -29,7 +29,7 @@ export function LiquidGlass({
   bend = 0.06,
   spread = 0.58,
   bezelRatio = 0.62,
-  dispersion = 0.07,
+  dispersion = 0.035,
   blur = 0.2,
   glare = 0.56,
   elasticity = 0.12,
