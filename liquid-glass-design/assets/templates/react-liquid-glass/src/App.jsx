@@ -39,9 +39,9 @@ export default function App() {
         </header>
 
         <section className="hero-copy" aria-hidden="true">
-          <p>Liquid Glass Skill</p>
+          <p>Liquid Glass System</p>
           <h1>Optic Deck</h1>
-          <span>control surfaces with real edge refraction</span>
+          <span>precision controls with calibrated edge refraction</span>
         </section>
 
         <LiquidGlass as="article" className="lg-panel media-card" radius={38} profile="prominent" strength={164} magnify={1.28} dispersion={0.052} glare={0.72}>
@@ -58,13 +58,12 @@ export default function App() {
           </div>
         </LiquidGlass>
 
-        <LiquidGlass as="aside" className="lg-panel status-panel" variant="tinted" radius={30} profile="soft" strength={136} magnify={1.12} dispersion={0.024} glare={0.6}>
-          <p className="label">Current Layer</p>
-          <strong>Refraction</strong>
-          <span>96%</span>
-        </LiquidGlass>
-
-        <section className="optics-stack" aria-label="Glass samples">
+        <section className="insight-rail" aria-label="Glass samples">
+          <LiquidGlass as="aside" className="lg-panel status-panel" variant="tinted" radius={30} profile="soft" strength={136} magnify={1.12} dispersion={0.024} glare={0.6}>
+            <p className="label">Current Layer</p>
+            <strong>Refraction</strong>
+            <span>96%</span>
+          </LiquidGlass>
           <LiquidGlass as="article" className="lg-panel metric-card" radius={28} profile="prominent" strength={140} magnify={1.14} dispersion={0.028} glare={0.64}>
             <p className="label">Rim Depth</p>
             <strong>1.46</strong>

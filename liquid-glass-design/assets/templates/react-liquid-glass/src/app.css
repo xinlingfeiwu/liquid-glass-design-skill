@@ -29,18 +29,22 @@ button {
 }
 
 .visual-stage {
+  --deck-right: clamp(56px, 7vw, 132px);
+  --deck-width: clamp(500px, 30vw, 620px);
+  --rail-gap: clamp(24px, 2vw, 40px);
+  --rail-width: clamp(286px, 18vw, 340px);
   position: relative;
   min-height: calc(100vh - 48px);
   overflow: hidden;
   border-radius: 42px;
   background:
-    radial-gradient(circle at 18% 20%, rgba(63, 199, 221, 0.3), transparent 28%),
-    radial-gradient(circle at 74% 24%, rgba(146, 91, 255, 0.34), transparent 34%),
-    radial-gradient(circle at 72% 80%, rgba(255, 186, 91, 0.2), transparent 30%),
-    linear-gradient(135deg, #071016 0%, #111827 46%, #060a11 100%);
+    radial-gradient(circle at 18% 24%, rgba(48, 190, 203, 0.28), transparent 28%),
+    radial-gradient(circle at 76% 16%, rgba(130, 105, 210, 0.3), transparent 35%),
+    radial-gradient(circle at 72% 78%, rgba(199, 151, 81, 0.18), transparent 26%),
+    linear-gradient(135deg, #071016 0%, #0f1520 48%, #05070d 100%);
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.12),
-    inset 0 -80px 160px rgba(0, 0, 0, 0.36),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1),
+    inset 0 -90px 170px rgba(0, 0, 0, 0.42),
     0 40px 130px rgba(0, 0, 0, 0.58);
   transition: background 0.35s ease;
 }
@@ -75,19 +79,19 @@ button {
 }
 
 .glow-a {
-  top: 11%;
-  left: 7%;
-  width: 34%;
-  height: 42%;
-  background: radial-gradient(circle, rgba(72, 222, 235, 0.42), transparent 68%);
+  top: 13%;
+  left: 8%;
+  width: 30%;
+  height: 38%;
+  background: radial-gradient(circle, rgba(72, 222, 235, 0.32), transparent 68%);
 }
 
 .glow-b {
-  top: 4%;
-  right: 8%;
-  width: 38%;
-  height: 48%;
-  background: radial-gradient(circle, rgba(168, 112, 255, 0.4), transparent 66%);
+  top: 5%;
+  right: 9%;
+  width: 36%;
+  height: 44%;
+  background: radial-gradient(circle, rgba(168, 112, 255, 0.34), transparent 66%);
 }
 
 .glow-c {
@@ -99,30 +103,30 @@ button {
 }
 
 .photo-grain {
-  opacity: 0.22;
+  opacity: 0.14;
   background-image:
     radial-gradient(circle, rgba(255, 255, 255, 0.8) 1px, transparent 1.6px);
-  background-size: 42px 42px;
-  mask-image: linear-gradient(90deg, transparent 0 12%, #000 36% 100%);
+  background-size: 52px 52px;
+  mask-image: linear-gradient(90deg, transparent 0 18%, #000 42% 100%);
 }
 
 .contour-map {
-  inset: 8% 8% 18% 48%;
-  border-radius: 34px;
-  opacity: 0.52;
+  inset: 8% 7% 20% 50%;
+  border-radius: 42px;
+  opacity: 0.34;
   background:
     repeating-linear-gradient(104deg, rgba(255, 255, 255, 0.16) 0 1px, transparent 1px 24px),
     repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.08) 0 1px, transparent 1px 42px),
     radial-gradient(circle at 42% 34%, rgba(255, 255, 255, 0.2), transparent 26%);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
-  transform: perspective(1000px) rotateX(4deg) rotateY(-9deg);
+  transform: perspective(1000px) rotateX(4deg) rotateY(-8deg);
 }
 
 .signal-strips {
   top: auto;
   bottom: 0;
-  height: 32%;
-  opacity: 0.72;
+  height: 30%;
+  opacity: 0.5;
   background:
     linear-gradient(180deg, transparent 0 28%, rgba(110, 228, 255, 0.76) 29%, transparent 31%),
     linear-gradient(180deg, transparent 0 46%, rgba(255, 255, 255, 0.7) 47%, transparent 49%),
@@ -131,15 +135,15 @@ button {
 }
 
 .depth-card {
-  inset: 12% 9% 28% 49%;
-  border-radius: 38px;
+  inset: 10% 6% 24% 51%;
+  border-radius: 46px;
   background:
     linear-gradient(150deg, rgba(255, 255, 255, 0.06), transparent 28%),
     linear-gradient(160deg, rgba(11, 17, 26, 0.78), rgba(16, 26, 38, 0.38) 48%, rgba(5, 8, 13, 0.72));
   box-shadow:
     inset 0 0 0 1px rgba(255, 255, 255, 0.1),
     0 30px 90px rgba(0, 0, 0, 0.34);
-  opacity: 0.9;
+  opacity: 0.64;
   transform: perspective(1000px) rotateX(3deg) rotateY(-7deg);
 }
 
@@ -164,31 +168,32 @@ button {
 .top-strip {
   position: absolute;
   z-index: 6;
-  top: 26px;
-  left: 28px;
+  top: 34px;
+  right: var(--deck-right);
+  left: auto;
   display: flex;
-  gap: 10px;
+  gap: 8px;
 }
 
 .top-button,
 .lg-control-button {
   display: inline-grid;
   place-items: center;
-  min-width: 74px;
-  min-height: 42px;
-  padding: 0 18px;
-  font-size: 0.9rem;
+  min-width: 68px;
+  min-height: 38px;
+  padding: 0 16px;
+  font-size: 0.82rem;
   font-weight: 750;
 }
 
 .hero-copy {
   position: absolute;
   z-index: 3;
-  left: clamp(32px, 6vw, 86px);
-  top: 23%;
-  width: min(520px, 42vw);
+  left: clamp(56px, 7vw, 136px);
+  top: 27%;
+  width: min(500px, 34vw);
   display: grid;
-  gap: 16px;
+  gap: 18px;
   color: #fff;
   text-shadow: 0 12px 48px rgba(0, 0, 0, 0.54);
 }
@@ -203,35 +208,37 @@ button {
 .hero-copy p {
   text-transform: uppercase;
   letter-spacing: 0.16em;
-  font-size: 0.8rem;
+  font-size: 0.76rem;
 }
 
 .hero-copy h1 {
   margin: 0;
   max-width: 9ch;
-  font-size: clamp(4.5rem, 9vw, 9.4rem);
-  line-height: 0.84;
+  font-size: clamp(4.9rem, 7.8vw, 8.8rem);
+  line-height: 0.86;
   letter-spacing: 0;
 }
 
 .hero-copy span {
-  max-width: 440px;
-  font-size: clamp(1.05rem, 1.8vw, 1.55rem);
-  line-height: 1.35;
+  max-width: 380px;
+  color: rgba(221, 241, 255, 0.66);
+  font-size: clamp(1.05rem, 1.35vw, 1.35rem);
+  line-height: 1.4;
 }
 
 .media-card {
   position: absolute;
   z-index: 4;
-  right: clamp(42px, 8vw, 128px);
-  top: 12.5%;
-  width: min(500px, 34vw);
-  height: clamp(460px, 49vh, 530px);
+  right: var(--deck-right);
+  top: 12%;
+  bottom: clamp(230px, 22vh, 300px);
+  width: var(--deck-width);
+  height: auto;
   min-height: 0;
   display: grid;
   align-content: space-between;
-  gap: 20px;
-  padding: clamp(22px, 2vw, 26px);
+  gap: 22px;
+  padding: clamp(24px, 2.2vw, 32px);
 }
 
 .media-topline {
@@ -258,8 +265,8 @@ button {
 
 .cover-art {
   position: relative;
-  min-height: clamp(235px, 27vh, 280px);
-  border-radius: 30px;
+  min-height: clamp(260px, 31vh, 340px);
+  border-radius: 32px;
   overflow: hidden;
   background:
     radial-gradient(circle at 25% 24%, rgba(255, 255, 255, 0.42), transparent 12%),
@@ -307,8 +314,10 @@ button {
 }
 
 .cover-slider {
-  height: clamp(36px, 4.4vh, 46px);
-  margin: -2px 12% 0;
+  height: clamp(34px, 4vh, 44px);
+  width: 66%;
+  justify-self: center;
+  margin: 0;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.24);
   box-shadow:
@@ -343,15 +352,11 @@ button {
 .equalizer i:nth-child(8) { height: 52%; }
 
 .status-panel {
-  position: absolute;
-  z-index: 5;
-  top: 18%;
-  right: calc(clamp(42px, 8vw, 128px) + min(500px, 34vw) + 36px);
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: end;
   gap: 6px 18px;
-  width: 300px;
+  width: 100%;
   padding: 22px 24px;
 }
 
@@ -367,16 +372,16 @@ button {
   font-weight: 850;
 }
 
-.visual-stage > .optics-stack {
+.insight-rail {
   position: absolute !important;
   z-index: 5;
-  right: calc(clamp(42px, 8vw, 128px) + min(500px, 34vw) + 36px);
-  top: calc(18% + 120px);
-  bottom: auto;
+  right: calc(var(--deck-right) + var(--deck-width) + var(--rail-gap));
+  top: 17%;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 14px;
-  width: 260px;
+  align-content: start;
+  gap: 16px;
+  width: var(--rail-width);
 }
 
 .metric-card,
@@ -393,7 +398,7 @@ button {
 }
 
 .compact-card {
-  width: 74%;
+  width: 68%;
   justify-self: end;
 }
 
@@ -414,14 +419,15 @@ button {
   position: absolute;
   z-index: 7;
   left: 50%;
-  bottom: 28px;
+  right: auto;
+  bottom: 34px;
   display: grid;
-  grid-template-columns: minmax(190px, 0.85fr) auto minmax(180px, 1fr) auto;
+  grid-template-columns: minmax(190px, 0.9fr) auto minmax(220px, 1.1fr) auto;
   align-items: center;
   gap: 18px;
-  width: min(1080px, calc(100vw - 150px));
-  min-height: 92px;
-  padding: 12px 20px;
+  width: min(1120px, calc(100vw - 260px));
+  min-height: 90px;
+  padding: 12px 18px;
   transform: translateX(-50%);
 }
 
@@ -544,8 +550,7 @@ button {
   .top-strip,
   .hero-copy,
   .media-card,
-  .status-panel,
-  .visual-stage > .optics-stack,
+  .insight-rail,
   .transport-bar {
     position: relative !important;
     top: auto;
@@ -577,7 +582,8 @@ button {
 
   .media-card {
     overflow: hidden;
-    min-height: 420px;
+    height: auto;
+    min-height: 500px;
     max-width: 100%;
   }
 
