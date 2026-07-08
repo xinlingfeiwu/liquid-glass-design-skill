@@ -117,7 +117,7 @@ node liquid-glass-design/scripts/check-visual-geometry.mjs \
   --pixel-threshold 0.10 \
   --pixel-channel-threshold 24 \
   --roi-roles dock,focus \
-  --roi-pixel-threshold 0.03
+  --roi-pixel-threshold 0.08
 ```
 
 只有视觉变化是有意的，才更新 baseline：

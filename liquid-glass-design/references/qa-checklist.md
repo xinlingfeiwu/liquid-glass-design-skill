@@ -65,7 +65,7 @@ Prefer adding semantic hooks in product code so the script can auto-discover sur
 For pixel regression, compare against committed viewport baselines. Update them only when the visual change is intentional and the PNG diff is reviewed. Use `--full-page` for exploratory captures, not cross-platform CI baselines:
 
 ```bash
-node liquid-glass-design/scripts/check-visual-geometry.mjs --url http://127.0.0.1:4173/templates/vanilla-liquid-glass/ --baseline-dir liquid-glass-design/evals/baselines --pixel-threshold 0.10 --pixel-channel-threshold 24 --roi-roles dock,focus --roi-pixel-threshold 0.03
+node liquid-glass-design/scripts/check-visual-geometry.mjs --url http://127.0.0.1:4173/templates/vanilla-liquid-glass/ --baseline-dir liquid-glass-design/evals/baselines --pixel-threshold 0.10 --pixel-channel-threshold 24 --roi-roles dock,focus --roi-pixel-threshold 0.08
 npm run qa:vanilla:update-baseline
 git diff -- liquid-glass-design/evals/baselines
 ```

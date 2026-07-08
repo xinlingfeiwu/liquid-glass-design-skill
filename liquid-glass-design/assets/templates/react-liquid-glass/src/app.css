@@ -275,7 +275,7 @@ button {
 }
 
 .media-topline strong {
-  color: rgba(5, 10, 18, 0.98);
+  color: rgb(0, 4, 10);
   font-size: 1.08rem;
 }
 
@@ -509,13 +509,13 @@ button {
 }
 
 .transport-actions .lg-surface {
-  --lg-tint: rgba(5, 13, 22, 0.34);
+  --lg-tint: rgba(3, 8, 16, 0.58);
 }
 
 .transport-actions .lg-surface:hover,
 .transport-actions .lg-surface:focus-visible,
 .transport-actions .lg-surface.is-active {
-  --lg-tint: rgba(5, 13, 22, 0.42);
+  --lg-tint: rgba(3, 8, 16, 0.66);
 }
 
 .lg-control-button {

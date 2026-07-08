@@ -407,7 +407,7 @@ html.lg-svg-ok .lg-surface[data-lg-refraction].lg-map-ready {
 }
 
 .media-topline strong {
-  color: rgba(5, 10, 18, 0.98);
+  color: rgb(0, 4, 10);
   font-size: 1.08rem;
 }
 
@@ -644,13 +644,13 @@ html.lg-svg-ok .lg-surface[data-lg-refraction].lg-map-ready {
 }
 
 .transport-actions .lg-button {
-  --lg-tint: rgba(5, 13, 22, 0.34);
+  --lg-tint: rgba(3, 8, 16, 0.58);
 }
 
 .transport-actions .lg-button:hover,
 .transport-actions .lg-button:focus-visible,
 .transport-actions .lg-button.is-active {
-  --lg-tint: rgba(5, 13, 22, 0.42);
+  --lg-tint: rgba(3, 8, 16, 0.66);
 }
 
 .icon-button {

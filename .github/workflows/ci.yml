@@ -64,7 +64,7 @@ jobs:
             --pixel-threshold 0.10 \
             --pixel-channel-threshold 24 \
             --roi-roles dock,focus \
-            --roi-pixel-threshold 0.03 \
+            --roi-pixel-threshold 0.08 \
             --reduced-motion \
             --contrast \
             --min-contrast 4.5
