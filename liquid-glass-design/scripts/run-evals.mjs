@@ -2,10 +2,12 @@
 
 import { readdir, readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 
-const skillDir = resolve(new URL("..", import.meta.url).pathname);
+const scriptDir = dirname(fileURLToPath(import.meta.url));
+const skillDir = resolve(scriptDir, "..");
 const evalPath = join(skillDir, "evals", "evals.json");
 const baselinePath = join(skillDir, "evals", "baseline.json");
 
@@ -40,6 +42,10 @@ function regexAny(patterns, text) {
   return patterns.some((pattern) => new RegExp(pattern, "i").test(text));
 }
 
+function regexGroups(groups, text) {
+  return (groups || []).every((patterns) => regexAny(patterns, text));
+}
+
 async function readCombined(paths) {
   const chunks = [];
   for (const path of paths) {
@@ -64,10 +70,23 @@ async function main() {
   const staticResults = [];
 
   for (const test of evals.trigger_cases || []) {
-    const matched = regexAny(test.match_any || [], `${test.query}\n${description}`);
+    const queryMatched = test.query_match_all
+      ? regexGroups(test.query_match_all, test.query)
+      : regexAny(test.match_any || [], test.query);
+    const descriptionMatched = test.description_match_all
+      ? regexGroups(test.description_match_all, description)
+      : true;
     const excluded = regexAny(test.exclude_any || [], test.query);
-    const actual = matched && !excluded;
-    triggerResults.push({ id: test.id, expected: test.expected, actual, pass: actual === test.expected });
+    const actual = queryMatched && descriptionMatched && !excluded;
+    triggerResults.push({
+      id: test.id,
+      expected: test.expected,
+      actual,
+      pass: actual === test.expected,
+      queryMatched,
+      descriptionMatched,
+      excluded
+    });
   }
 
   for (const assertion of evals.static_assertions || []) {
@@ -78,22 +97,28 @@ async function main() {
   }
 
   const pluginEval = spawnSync("plugin-eval", ["--version"], { encoding: "utf8" });
-  const report = {
-    generatedAt: new Date().toISOString(),
-    pluginEvalAvailable: !pluginEval.error && pluginEval.status === 0,
+  const stableReport = {
+    schemaVersion: evals.schemaVersion || "2.0",
     triggerResults,
     staticResults
   };
-  report.passed = [...triggerResults, ...staticResults].filter((result) => result.pass).length;
-  report.total = triggerResults.length + staticResults.length;
-  report.failed = [...triggerResults, ...staticResults].filter((result) => !result.pass).map((result) => result.id);
+  stableReport.passed = [...triggerResults, ...staticResults].filter((result) => result.pass).length;
+  stableReport.total = triggerResults.length + staticResults.length;
+  stableReport.failed = [...triggerResults, ...staticResults].filter((result) => !result.pass).map((result) => result.id);
+
+  const report = {
+    ...stableReport,
+    environment: {
+      pluginEvalAvailable: !pluginEval.error && pluginEval.status === 0
+    }
+  };
 
   if (args["write-baseline"]) {
-    await writeFile(baselinePath, `${JSON.stringify(report, null, 2)}\n`);
+    await writeFile(baselinePath, `${JSON.stringify(stableReport, null, 2)}\n`);
   }
 
   console.log(JSON.stringify(report, null, 2));
-  if (report.failed.length > 0) process.exit(1);
+  if (stableReport.failed.length > 0) process.exit(1);
 }
 
 main().catch((error) => {

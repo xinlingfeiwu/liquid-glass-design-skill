@@ -93,8 +93,8 @@ Use the same mental model as shader-grade renderers when reviewing CSS/SVG outpu
 
 Implement:
 
-- `createLiquidGlassDisplacementMap(options) -> { url, scale, key }` — inverse lens mapping on canvas; `scale` is measured from the generated field (see `golden-glass-style.md`). Options should include `profile`, `magnify`, `bend`, `spread`, and `bezelRatio`.
-- `syncLiquidGlassMap(element, filterRefs, cacheKey)` — regenerates the map only when size/radius/tuning changed and applies `scale * strength` to every displacement node. `filterRefs = { image, displacements: [{ node, mul }] }`.
+- `createLiquidGlassDisplacementMap(options) -> { url, scale, key }` — inverse lens mapping on canvas; `scale` is measured from the generated field (see `golden-glass-style.md`). Options should include `profile`, `magnify`, `bend`, `spread`, `bezelRatio`, and optional `supersample`.
+- `syncLiquidGlassMap(element, filterRefs, cacheKey)` — regenerates the map only when size/radius/map tuning changed and applies `scale * strength * channelMultiplier` to every displacement node. `filterRefs = { image, displacements: [{ node, mul }] }`.
 - `supportsLiquidGlassSvgFilter()` — decides whether to enable the refraction path.
 - Pointer-light handling — updates only CSS variables for glint and elastic drift; never regenerates maps.
 
@@ -115,12 +115,14 @@ Expose:
   bend={activeDefaultBend}
   spread={activeDefaultSpread}
   bezelRatio={activeDefaultBezelRatio}
+  supersample={2}
   dispersion={activeDefaultDispersion}
   blur={activeDefaultBlur}
   glare={surfaceGlare}
   elasticity={controlElasticity}
   tint={activeDefaultTint}
   interactive
+  ref={surfaceRef}
 />
 ```
 
@@ -128,7 +130,9 @@ The component should:
 
 - Render children normally; do not rasterize text.
 - Use a stable internal filter id and per-instance filter.
-- Apply the measured map scale to its displacement nodes after each regen.
+- Forward a ref to the rendered surface when the host component supports refs.
+- Apply the measured map scale to its displacement nodes after each regen, and update strength/dispersion as scale-only changes without regenerating the PNG map.
+- Add a ready class only after the `<feImage>` map href is written; support detection alone is not map readiness.
 - Expose profile/tuning props instead of hardcoding one visual for every shape.
 - Include a showcase page that actually exercises those props across small pills, circular controls, bars, and text panels. A component file alone is not a sufficient template.
 - Use lower `dispersion` and softer profiles for long docks/bars over detailed backdrops; reserve stronger chromatic detail for compact surfaces where only the rim shows it.
@@ -140,8 +144,8 @@ The component should:
 
 ## Performance Rules
 
-- Cache by rounded width, height, radius, and map tuning options.
-- Map bitmaps should be oversampled enough to keep curved controls smooth; the measured scale divides dpr back out.
+- Cache by rounded width, height, radius, supersample, and map tuning options. Do not include `strength` or `dispersion` in the bitmap cache key.
+- Map bitmaps should be oversampled enough to keep curved controls smooth; the measured scale divides the supersample factor back out.
 - One exact map per visible glass surface when quality matters; share only within identical shape families.
 - Keep filters off hidden elements.
 - Avoid `filter` animation on many large surfaces at once.

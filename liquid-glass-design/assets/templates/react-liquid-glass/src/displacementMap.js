@@ -1,3 +1,5 @@
+const DEFAULT_SUPERSAMPLE = 2;
+
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
@@ -60,11 +62,12 @@ export function createLiquidGlassDisplacementMap(options = {}) {
   const spread = numberOption(options.spread, 0.58, 0.4, 1);
   const bezelRatio = numberOption(options.bezelRatio, 0.62, 0.2, 1);
   const profile = String(options.profile || "standard");
-  const dpr = clamp((typeof window !== "undefined" && window.devicePixelRatio) || 1, 2, 2);
+  // Fixed 2x supersampling is the quality default; pass `supersample` to tune cost.
+  const supersample = numberOption(options.supersample, DEFAULT_SUPERSAMPLE, 1, 3);
 
-  const w = Math.max(160, Math.round(width * dpr));
-  const h = Math.max(96, Math.round(height * dpr));
-  const r = Math.max(4, Math.round(radius * dpr));
+  const w = Math.max(160, Math.round(width * supersample));
+  const h = Math.max(96, Math.round(height * supersample));
+  const r = Math.max(4, Math.round(radius * supersample));
   const shortSide = Math.min(w, h);
   const bezel = clamp(shortSide * 0.5 * bezelRatio, 10, 220);
 
@@ -129,8 +132,8 @@ export function createLiquidGlassDisplacementMap(options = {}) {
 
   return {
     url: canvas.toDataURL("image/png"),
-    scale: (range * 2) / dpr,
-    key: `${w}x${h}:${r}:${magnify}:${bend}:${spread}:${bezelRatio}:${profile}`
+    scale: (range * 2) / supersample,
+    key: `${w}x${h}:${r}:${magnify}:${bend}:${spread}:${bezelRatio}:${profile}:${supersample}`
   };
 }
 

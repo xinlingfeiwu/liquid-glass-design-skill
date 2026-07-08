@@ -619,3 +619,53 @@ button {
     justify-self: center;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .visual-stage {
+    transition: none;
+  }
+
+  .contour-map,
+  .depth-card {
+    transform: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .visual-stage {
+    background:
+      radial-gradient(circle at 18% 24%, rgba(64, 215, 228, 0.18), transparent 26%),
+      linear-gradient(135deg, #03080c 0%, #07101a 52%, #030509 100%);
+  }
+
+  .photo-grain {
+    opacity: 0.08;
+  }
+
+  .signal-strips {
+    opacity: 0.34;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .visual-stage,
+  .visual-stage[data-scene="noir"],
+  .visual-stage[data-scene="flux"] {
+    background: #071019;
+  }
+
+  .aurora-glow {
+    opacity: 0.18;
+    filter: blur(10px);
+  }
+
+  .contour-map,
+  .depth-card {
+    opacity: 0.12;
+  }
+
+  .photo-grain,
+  .signal-strips {
+    opacity: 0.08;
+  }
+}

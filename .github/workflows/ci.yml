@@ -51,8 +51,47 @@ jobs:
       - name: Package dry run
         run: node liquid-glass-design/scripts/package-skill.mjs --dry-run
 
+      - name: Lean package dry run
+        run: node liquid-glass-design/scripts/package-skill.mjs --dry-run --lean
+
       - name: React template build
         working-directory: liquid-glass-design/assets/templates/react-liquid-glass
         run: |
           npm ci
           npm run build
+
+      - name: Install Playwright for visual QA
+        run: |
+          npm install --no-save playwright@^1.53.0
+          npx playwright install --with-deps chromium
+
+      - name: Vanilla template visual QA
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/screenshots artifacts/baselines
+          python3 -m http.server 4173 --directory liquid-glass-design/assets/templates/vanilla-liquid-glass > /tmp/liquid-glass-http.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for _ in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then
+              break
+            fi
+            sleep 0.5
+          done
+          node liquid-glass-design/scripts/check-visual-geometry.mjs \
+            --url http://127.0.0.1:4173 \
+            --screenshot-dir artifacts/screenshots \
+            --baseline-dir artifacts/baselines \
+            --update-baseline
+          node liquid-glass-design/scripts/check-visual-geometry.mjs \
+            --url http://127.0.0.1:4173 \
+            --baseline-dir artifacts/baselines \
+            --pixel-threshold 0.01
+
+      - name: Upload visual QA screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: liquid-glass-visual-qa
+          path: artifacts/screenshots
+          if-no-files-found: ignore

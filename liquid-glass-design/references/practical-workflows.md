@@ -4,6 +4,8 @@ Use this reference when turning the skill into actual work. Pick one workflow, t
 
 ## Workflow A: Build A New Liquid Glass UI
 
+**Task type:** `showcase` or greenfield `product-integration`.
+
 1. Define the product scene in one sentence: editor, dashboard, media surface, command deck, map, camera, terminal, or other believable context.
 2. Choose a composition recipe from `design-recipes.md` before writing CSS:
    - one focal object or content surface;
@@ -16,6 +18,8 @@ Use this reference when turning the skill into actual work. Pick one workflow, t
 
 ## Workflow B: Upgrade An Existing UI
 
+**Task type:** `product-integration`.
+
 1. Preserve the app's real task and information hierarchy. Do not replace the product with a generic demo background.
 2. Take a screenshot and mark collision zones: overlapping panels, cramped gaps, clipped rims, text over busy imagery, and controls that are not anchored to a layout system.
 3. Select the closest recipe from `design-recipes.md`, then fix layout before optics:
@@ -27,6 +31,8 @@ Use this reference when turning the skill into actual work. Pick one workflow, t
 5. Compare before/after screenshots at the same viewport. If hierarchy got noisier, revert the extra glass before tuning filters again.
 
 ## Workflow C: Review Weak Liquid Glass Output
+
+**Task type:** `review/QA`.
 
 Use this pass when an implementation looks cheap, blurry, chaotic, or unlike real liquid glass.
 
@@ -42,16 +48,20 @@ Reject the result if the answer to composition, optics, clarity, or geometry is 
 
 ## Workflow D: Adopt The Templates
 
+**Task type:** `component-template`.
+
 1. Copy the vanilla or React template only as a starting point. Replace the scene and labels with the target product context.
 2. Keep the public contracts stable:
    - CSS: `.lg-surface`, `.lg-panel`, `.lg-button`, `.lg-clear`, `.lg-tinted`;
    - JS: `createLiquidGlassDisplacementMap(options)` and `syncLiquidGlassMap(...)`;
-   - React: `<LiquidGlass variant radius profile strength magnify dispersion blur tint interactive>`.
+   - React: `<LiquidGlass variant radius profile strength magnify dispersion blur tint supersample interactive ref>`.
 3. Keep the filter root hidden and out of layout. In React, component-owned SVG filter nodes must not become flex/grid children.
 4. Retune surface profiles after resizing. Reusing one map/strength across buttons, cards, and docks is a common reason the effect feels weak or jagged.
 5. Generate a fresh preview with a cache-busting filename after visual changes.
 
 ## Workflow E: Visual QA Loop
+
+**Task type:** final verification for `product-integration`, `showcase`, `component-template`, or `review/QA`.
 
 Run this loop before claiming the UI is production-ready:
 

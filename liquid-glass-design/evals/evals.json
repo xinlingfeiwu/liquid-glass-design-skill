@@ -6,35 +6,78 @@
       "id": "trigger-glassmorphism-card",
       "query": "Build a glassmorphism card with premium Liquid Glass refraction.",
       "expected": true,
-      "match_any": ["liquid glass", "glassmorphism", "refraction", "backdrop-filter"],
+      "query_match_all": [
+        ["liquid glass", "glassmorphism", "refraction"],
+        ["card", "ui", "interface", "control"]
+      ],
+      "description_match_all": [
+        ["Liquid Glass", "glassmorphism", "refraction", "backdrop-filter"]
+      ],
       "exclude_any": []
     },
     {
       "id": "trigger-chinese-frosted-nav",
       "query": "帮我做一个高级的毛玻璃导航栏，要有液态玻璃质感。",
       "expected": true,
-      "match_any": ["毛玻璃", "液态玻璃", "glass", "translucent"],
+      "query_match_all": [
+        ["毛玻璃", "液态玻璃"],
+        ["导航栏", "导航", "界面", "UI"]
+      ],
+      "description_match_all": [
+        ["Liquid Glass", "glassmorphism", "translucent"]
+      ],
       "exclude_any": []
     },
     {
       "id": "trigger-svg-displacement",
       "query": "Use SVG feDisplacementMap and chromatic aberration for a glass toolbar.",
       "expected": true,
-      "match_any": ["feDisplacementMap", "chromatic", "glass toolbar"],
+      "query_match_all": [
+        ["feDisplacementMap", "chromatic"],
+        ["toolbar", "control", "UI"]
+      ],
+      "description_match_all": [
+        ["feDisplacementMap", "chromatic aberration", "refraction"]
+      ],
       "exclude_any": []
     },
     {
       "id": "no-trigger-water-physics",
       "query": "Make a realistic glass water simulation with fluid physics.",
       "expected": false,
-      "match_any": ["glass"],
+      "query_match_all": [
+        ["glass"],
+        ["simulation", "physics"]
+      ],
+      "description_match_all": [
+        ["glass", "Liquid Glass"]
+      ],
       "exclude_any": ["water simulation", "fluid physics"]
+    },
+    {
+      "id": "no-trigger-wine-glass-logo",
+      "query": "Design a wine glass logo for a restaurant.",
+      "expected": false,
+      "query_match_all": [
+        ["glass"],
+        ["logo"]
+      ],
+      "description_match_all": [
+        ["glass", "Liquid Glass"]
+      ],
+      "exclude_any": ["wine glass logo", "logo for a restaurant"]
     },
     {
       "id": "no-trigger-window-repair",
       "query": "Help me replace a broken glass window at home.",
       "expected": false,
-      "match_any": ["glass"],
+      "query_match_all": [
+        ["glass"],
+        ["window"]
+      ],
+      "description_match_all": [
+        ["glass", "Liquid Glass"]
+      ],
       "exclude_any": ["window at home", "broken glass"]
     }
   ],
@@ -62,7 +105,7 @@
     {
       "id": "package-script-excludes-heavy-directories",
       "paths": ["scripts/package-skill.mjs"],
-      "must_include_any": ["node_modules", "dist", "dry-run"]
+      "must_include_any": ["node_modules", "dist", "dry-run", "lean"]
     }
   ]
 }

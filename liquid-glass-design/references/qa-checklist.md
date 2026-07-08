@@ -80,7 +80,8 @@ node liquid-glass-design/scripts/check-visual-geometry.mjs --url http://127.0.0.
 ## Performance
 
 - Confirm displacement maps regenerate only when dimensions/radius/options change.
-- Confirm the canvas/SDF map path is cached by size, radius, profile, magnify, bend, spread, bezel ratio, and strength.
+- Confirm the canvas/SDF map path is cached by size, radius, profile, magnify, bend, spread, bezel ratio, and supersample.
+- Confirm `strength` and chromatic dispersion update `feDisplacementMap scale` only; they must not regenerate the PNG map.
 - Confirm movement by transform does not regenerate maps.
 - Confirm pointer glare updates CSS variables only and does not trigger map regeneration.
 - Confirm large hidden surfaces do not keep expensive filters active.

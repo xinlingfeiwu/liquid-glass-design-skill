@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useRef, useState } from "react";
 import { createLiquidGlassDisplacementMap, supportsLiquidGlassSvgFilter } from "./displacementMap.js";
 import "./liquidGlass.css";
 
@@ -17,7 +17,7 @@ const XLINK_NS = "http://www.w3.org/1999/xlink";
  * tint:                surface fill behind the highlight gradient
  * interactive:         hover/press/focus states
  */
-export function LiquidGlass({
+export const LiquidGlass = forwardRef(function LiquidGlass({
   as: Component = "div",
   children,
   className = "",
@@ -29,6 +29,7 @@ export function LiquidGlass({
   bend = 0.06,
   spread = 0.58,
   bezelRatio = 0.62,
+  supersample = 2,
   dispersion = 0.035,
   blur = 0.2,
   glare = 0.56,
@@ -36,26 +37,42 @@ export function LiquidGlass({
   tint,
   interactive = false,
   style,
+  onPointerEnter,
   onPointerMove,
   onPointerLeave,
   onPointerDown,
   onPointerUp,
   ...props
-}) {
+}, forwardedRef) {
   const rawId = useId();
   const filterId = useMemo(() => `lg-filter-${rawId.replace(/[^a-zA-Z0-9_-]/g, "")}`, [rawId]);
   const surfaceRef = useRef(null);
   const mapRef = useRef(null);
   const dispRefs = useRef([]);
-  const cacheRef = useRef("");
+  const mapCacheRef = useRef({ mapKey: "", scale: 0 });
+  const pointerRectRef = useRef(null);
   const [svgFilterOk, setSvgFilterOk] = useState(false);
+  const [mapReady, setMapReady] = useState(false);
+
+  useImperativeHandle(forwardedRef, () => surfaceRef.current, []);
 
   useEffect(() => {
     setSvgFilterOk(supportsLiquidGlassSvgFilter(filterId));
   }, [filterId]);
 
   useEffect(() => {
-    if (!svgFilterOk || !surfaceRef.current || !mapRef.current) return undefined;
+    if (!svgFilterOk || !surfaceRef.current || !mapRef.current) {
+      setMapReady(false);
+      return undefined;
+    }
+
+    const applyScale = (scale) => {
+      dispRefs.current.forEach((node, index) => {
+        if (!node) return;
+        const mul = dispersion > 0 ? [1 + dispersion, 1, 1 - dispersion][index] : 1;
+        node.setAttribute("scale", (scale * (strength / 100) * mul).toFixed(2));
+      });
+    };
 
     const updateMap = () => {
       const element = surfaceRef.current;
@@ -68,36 +85,35 @@ export function LiquidGlass({
         Math.round(rect.width),
         Math.round(rect.height),
         Math.round(computedRadius),
-        strength,
         profile,
         magnify,
         bend,
         spread,
         bezelRatio,
-        dispersion
+        supersample
       ].join(":");
-      if (cacheRef.current === key) return;
 
-      const map = createLiquidGlassDisplacementMap({
-        width: rect.width,
-        height: rect.height,
-        radius: computedRadius,
-        profile,
-        magnify,
-        bend,
-        spread,
-        bezelRatio
-      });
-      if (!map.url) return;
+      if (mapCacheRef.current.mapKey !== key) {
+        const map = createLiquidGlassDisplacementMap({
+          width: rect.width,
+          height: rect.height,
+          radius: computedRadius,
+          profile,
+          magnify,
+          bend,
+          spread,
+          bezelRatio,
+          supersample
+        });
+        if (!map.url) return;
 
-      cacheRef.current = key;
-      mapNode.setAttribute("href", map.url);
-      mapNode.setAttributeNS(XLINK_NS, "href", map.url);
-      dispRefs.current.forEach((node, index) => {
-        if (!node) return;
-        const mul = dispersion > 0 ? [1 + dispersion, 1, 1 - dispersion][index] : 1;
-        node.setAttribute("scale", (map.scale * (strength / 100) * mul).toFixed(2));
-      });
+        mapCacheRef.current = { mapKey: key, scale: map.scale };
+        mapNode.setAttribute("href", map.url);
+        mapNode.setAttributeNS(XLINK_NS, "href", map.url);
+      }
+
+      applyScale(mapCacheRef.current.scale);
+      setMapReady(true);
     };
 
     updateMap();
@@ -110,14 +126,14 @@ export function LiquidGlass({
 
     window.addEventListener("resize", updateMap);
     return () => window.removeEventListener("resize", updateMap);
-  }, [svgFilterOk, radius, strength, profile, magnify, bend, spread, bezelRatio, dispersion]);
+  }, [svgFilterOk, radius, strength, profile, magnify, bend, spread, bezelRatio, supersample, dispersion]);
 
   const mergedStyle = {
     "--lg-radius": typeof radius === "number" ? `${radius}px` : radius,
     "--lg-blur": typeof blur === "number" ? `${blur}px` : blur,
     "--lg-glare": glare,
     ...(tint ? { "--lg-tint": tint } : null),
-    "--lg-filter-url": svgFilterOk ? `url("#${filterId}")` : "none",
+    "--lg-filter-url": svgFilterOk && mapReady ? `url("#${filterId}")` : "none",
     ...style
   };
 
@@ -128,7 +144,7 @@ export function LiquidGlass({
   const updatePointerLight = (event) => {
     if (!interactive || !surfaceRef.current) return;
     const element = surfaceRef.current;
-    const rect = element.getBoundingClientRect();
+    const rect = pointerRectRef.current || element.getBoundingClientRect();
     if (rect.width < 2 || rect.height < 2) return;
     const x = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
     const y = Math.max(0, Math.min(1, (event.clientY - rect.top) / rect.height));
@@ -141,6 +157,7 @@ export function LiquidGlass({
 
   const resetPointerLight = () => {
     if (!surfaceRef.current) return;
+    pointerRectRef.current = null;
     surfaceRef.current.style.setProperty("--lg-light-x", "84%");
     surfaceRef.current.style.setProperty("--lg-light-y", "12%");
     surfaceRef.current.style.setProperty("--lg-glare", String(glare));
@@ -182,9 +199,16 @@ export function LiquidGlass({
           `lg-${variant}`,
           interactive ? "lg-interactive" : "",
           svgFilterOk ? "lg-svg-ok" : "",
+          mapReady ? "lg-map-ready" : "",
           className
         ].filter(Boolean).join(" ")}
         style={mergedStyle}
+        onPointerEnter={(event) => {
+          if (interactive && surfaceRef.current) {
+            pointerRectRef.current = surfaceRef.current.getBoundingClientRect();
+          }
+          onPointerEnter?.(event);
+        }}
         onPointerMove={(event) => {
           updatePointerLight(event);
           onPointerMove?.(event);
@@ -212,4 +236,4 @@ export function LiquidGlass({
       </Component>
     </>
   );
-}
+});

@@ -1,0 +1,43 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  package-skill:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Build skill packages
+        run: |
+          node liquid-glass-design/scripts/package-skill.mjs
+          node liquid-glass-design/scripts/package-skill.mjs --lean
+          ls -lh dist
+
+      - name: Publish GitHub Release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" --title "$TAG" --notes "Liquid Glass Design Skill package release."
+          fi
+          gh release upload "$TAG" \
+            dist/liquid-glass-design.skill \
+            dist/liquid-glass-design.skill.zip \
+            dist/liquid-glass-design.lean.skill \
+            dist/liquid-glass-design.lean.skill.zip \
+            --clobber

@@ -34,11 +34,19 @@ Use $liquid-glass-design to upgrade this existing UI into premium Liquid Glass w
 
 ### Cowork / `.skill` 上传
 
+可以直接下载最新 Release 资产：
+
+- Full 包：[liquid-glass-design.skill](https://github.com/xinlingfeiwu/liquid-glass-design-skill/releases/latest/download/liquid-glass-design.skill)
+- Lean 包：[liquid-glass-design.lean.skill](https://github.com/xinlingfeiwu/liquid-glass-design-skill/releases/latest/download/liquid-glass-design.lean.skill)
+
+也可以本地打包：
+
 ```bash
 node liquid-glass-design/scripts/package-skill.mjs
+node liquid-glass-design/scripts/package-skill.mjs --lean
 ```
 
-然后在 Cowork 设置中上传 `dist/liquid-glass-design.skill`。打包脚本会排除 `node_modules/`、`dist/`、缓存和日志，避免上传超限。
+然后在 Cowork 设置中上传 `dist/liquid-glass-design.skill` 或 `dist/liquid-glass-design.lean.skill`。Full 包保留 eval/dev 资源；Lean 包会剔除 `evals/`、`agents/openai.yaml`、研究记录、模板 lockfile 和 eval-only 脚本。
 
 ### Claude Code / Plugin
 
@@ -98,6 +106,7 @@ node --check liquid-glass-design/scripts/*.mjs
 node liquid-glass-design/scripts/test-displacement-map.mjs
 node liquid-glass-design/scripts/run-evals.mjs
 node liquid-glass-design/scripts/package-skill.mjs --dry-run
+node liquid-glass-design/scripts/package-skill.mjs --dry-run --lean
 ```
 
 React 模板：

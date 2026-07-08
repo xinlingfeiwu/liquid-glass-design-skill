@@ -59,7 +59,7 @@
 }
 
 /* Chromium path: true refraction with near-zero blur so lensing stays crisp. */
-.lg-surface.lg-svg-ok {
+.lg-surface.lg-svg-ok.lg-map-ready {
   backdrop-filter: var(--lg-filter-url) blur(var(--lg-blur)) saturate(var(--lg-saturate)) brightness(var(--lg-brightness)) contrast(var(--lg-contrast));
   -webkit-backdrop-filter: var(--lg-filter-url) blur(var(--lg-blur)) saturate(var(--lg-saturate)) brightness(var(--lg-brightness)) contrast(var(--lg-contrast));
 }

@@ -1,36 +1,59 @@
 {
-  "generatedAt": "2026-07-08T06:29:08.267Z",
-  "pluginEvalAvailable": false,
+  "schemaVersion": "2.0",
   "triggerResults": [
     {
       "id": "trigger-glassmorphism-card",
       "expected": true,
       "actual": true,
-      "pass": true
+      "pass": true,
+      "queryMatched": true,
+      "descriptionMatched": true,
+      "excluded": false
     },
     {
       "id": "trigger-chinese-frosted-nav",
       "expected": true,
       "actual": true,
-      "pass": true
+      "pass": true,
+      "queryMatched": true,
+      "descriptionMatched": true,
+      "excluded": false
     },
     {
       "id": "trigger-svg-displacement",
       "expected": true,
       "actual": true,
-      "pass": true
+      "pass": true,
+      "queryMatched": true,
+      "descriptionMatched": true,
+      "excluded": false
     },
     {
       "id": "no-trigger-water-physics",
       "expected": false,
       "actual": false,
-      "pass": true
+      "pass": true,
+      "queryMatched": true,
+      "descriptionMatched": true,
+      "excluded": true
+    },
+    {
+      "id": "no-trigger-wine-glass-logo",
+      "expected": false,
+      "actual": false,
+      "pass": true,
+      "queryMatched": true,
+      "descriptionMatched": true,
+      "excluded": true
     },
     {
       "id": "no-trigger-window-repair",
       "expected": false,
       "actual": false,
-      "pass": true
+      "pass": true,
+      "queryMatched": true,
+      "descriptionMatched": true,
+      "excluded": true
     }
   ],
   "staticResults": [
@@ -65,7 +88,7 @@
       "forbidden": []
     }
   ],
-  "passed": 10,
-  "total": 10,
+  "passed": 11,
+  "total": 11,
   "failed": []
 }

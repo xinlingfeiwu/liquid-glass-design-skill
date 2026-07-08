@@ -20,7 +20,7 @@ Scan the QR code to join the `liquid-glass-skill` group chat.
 - `liquid-glass-design/references/` - practical workflows, design recipes, prompt patterns, showcase quality gates, the golden-glass single source of truth, web implementation contracts, GitHub research, and QA checklists.
 - `liquid-glass-design/scripts/generate-displacement-map.mjs` - a zero-dependency PNG displacement map generator that prints the exact `feDisplacementMap` scale.
 - `liquid-glass-design/scripts/check-visual-geometry.mjs` - a Playwright-based QA helper for overlap, dock centering, viewport containment, and screenshots.
-- `liquid-glass-design/scripts/package-skill.mjs` - creates a `.skill` package while excluding `node_modules`, `dist`, caches, logs, and other heavy local artifacts.
+- `liquid-glass-design/scripts/package-skill.mjs` - creates full or lean `.skill` packages while excluding `node_modules`, `dist`, caches, logs, and other heavy local artifacts.
 - `liquid-glass-design/scripts/run-evals.mjs` - executable smoke evals for trigger coverage and forbidden implementation patterns.
 - `liquid-glass-design/evals/evals.json` - trigger cases and static assertions for checking practical, premium Liquid Glass outcomes.
 - `liquid-glass-design/assets/templates/vanilla-liquid-glass/` - a no-build HTML/CSS/JS Optic Deck showcase with per-surface filters, lens profiles, pointer glare, multi-background optical QA, and lens maps.
@@ -65,13 +65,19 @@ Then ask Claude Code to build or review Liquid Glass UI — the skill triggers o
 
 ### Cowork / `.skill` Upload
 
-Create a portable package:
+Download the latest portable package:
+
+- Full package: [liquid-glass-design.skill](https://github.com/xinlingfeiwu/liquid-glass-design-skill/releases/latest/download/liquid-glass-design.skill)
+- Lean package: [liquid-glass-design.lean.skill](https://github.com/xinlingfeiwu/liquid-glass-design-skill/releases/latest/download/liquid-glass-design.lean.skill)
+
+Or create a portable package locally:
 
 ```bash
 node liquid-glass-design/scripts/package-skill.mjs
+node liquid-glass-design/scripts/package-skill.mjs --lean
 ```
 
-Upload `dist/liquid-glass-design.skill` in Cowork settings. The package excludes local `node_modules/`, template `dist/`, caches, and logs so it stays small enough for upload.
+Upload `dist/liquid-glass-design.skill` or `dist/liquid-glass-design.lean.skill` in Cowork settings. The full package includes eval/dev resources; the lean package removes `evals/`, `agents/openai.yaml`, research notes, template lockfiles, and eval-only scripts.
 
 ### Claude Code Plugin / Marketplace
 
@@ -113,12 +119,14 @@ The component API:
   bend={0.06}
   spread={0.58}
   bezelRatio={0.62}
+  supersample={2}       // fixed 2x default; tune 1-3 for quality/cost
   dispersion={0.035}    // rim RGB separation; 0 = single pass
   blur={0.2}            // px on the refractive path
   glare={0.56}
   elasticity={0.12}
   tint="rgba(20, 25, 32, .32)"
   interactive
+  ref={surfaceRef}
 >
   Controls
 </LiquidGlass>
@@ -194,6 +202,7 @@ node --check liquid-glass-design/assets/templates/react-liquid-glass/src/displac
 node liquid-glass-design/scripts/test-displacement-map.mjs
 node liquid-glass-design/scripts/run-evals.mjs
 node liquid-glass-design/scripts/package-skill.mjs --dry-run
+node liquid-glass-design/scripts/package-skill.mjs --dry-run --lean
 ```
 
 For the React template:

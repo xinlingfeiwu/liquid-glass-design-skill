@@ -1,5 +1,6 @@
 const SVG_NS = "http://www.w3.org/2000/svg";
 const XLINK_NS = "http://www.w3.org/1999/xlink";
+const DEFAULT_SUPERSAMPLE = 2;
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
@@ -64,11 +65,12 @@ export function createLiquidGlassDisplacementMap(options = {}) {
   const spread = numberOption(options.spread, 0.58, 0.4, 1);
   const bezelRatio = numberOption(options.bezelRatio, 0.62, 0.2, 1);
   const profile = String(options.profile || "standard");
-  const dpr = clamp((typeof window !== "undefined" && window.devicePixelRatio) || 1, 2, 2);
+  // Fixed 2x supersampling is the quality default; pass `supersample` to tune cost.
+  const supersample = numberOption(options.supersample, DEFAULT_SUPERSAMPLE, 1, 3);
 
-  const w = Math.max(160, Math.round(width * dpr));
-  const h = Math.max(96, Math.round(height * dpr));
-  const r = Math.max(4, Math.round(radius * dpr));
+  const w = Math.max(160, Math.round(width * supersample));
+  const h = Math.max(96, Math.round(height * supersample));
+  const r = Math.max(4, Math.round(radius * supersample));
   const shortSide = Math.min(w, h);
   const bezel = clamp(shortSide * 0.5 * bezelRatio, 10, 220);
 
@@ -137,8 +139,8 @@ export function createLiquidGlassDisplacementMap(options = {}) {
 
   return {
     url: canvas.toDataURL("image/png"),
-    scale: (range * 2) / dpr,
-    key: `${w}x${h}:${r}:${magnify}:${bend}:${spread}:${bezelRatio}:${profile}`
+    scale: (range * 2) / supersample,
+    key: `${w}x${h}:${r}:${magnify}:${bend}:${spread}:${bezelRatio}:${profile}:${supersample}`
   };
 }
 
@@ -263,29 +265,36 @@ export function syncLiquidGlassMap(element, filterRefs, cacheKey = "default") {
   const bezelRatio = numberOption(element.dataset.lgBezel, 0.62, 0.2, 1);
   const profile = String(element.dataset.lgProfile || "standard");
   const id = String(cacheKey || "default");
-  const key = `${Math.round(rect.width)}x${Math.round(rect.height)}:${Math.round(radius)}:${strength}:${magnify}:${bend}:${spread}:${bezelRatio}:${profile}`;
-  if (liquidGlassMapCache.get(id) === key) return key;
+  const supersample = numberOption(element.dataset.lgSupersample, DEFAULT_SUPERSAMPLE, 1, 3);
+  const mapKey = `${Math.round(rect.width)}x${Math.round(rect.height)}:${Math.round(radius)}:${magnify}:${bend}:${spread}:${bezelRatio}:${profile}:${supersample}`;
+  let cached = liquidGlassMapCache.get(id);
 
-  const map = createLiquidGlassDisplacementMap({
-    width: rect.width,
-    height: rect.height,
-    radius,
-    magnify,
-    bend,
-    spread,
-    bezelRatio,
-    profile
-  });
-  if (!map.url) return "";
+  if (!cached || cached.mapKey !== mapKey) {
+    const map = createLiquidGlassDisplacementMap({
+      width: rect.width,
+      height: rect.height,
+      radius,
+      magnify,
+      bend,
+      spread,
+      bezelRatio,
+      profile,
+      supersample
+    });
+    if (!map.url) return "";
 
-  filterRefs.image.setAttribute("href", map.url);
-  filterRefs.image.setAttributeNS(XLINK_NS, "href", map.url);
+    filterRefs.image.setAttribute("href", map.url);
+    filterRefs.image.setAttributeNS(XLINK_NS, "href", map.url);
+    cached = { mapKey, scale: map.scale };
+    liquidGlassMapCache.set(id, cached);
+  }
+
   filterRefs.displacements.forEach(({ node, mul }) => {
-    node.setAttribute("scale", (map.scale * strength * mul).toFixed(2));
+    node.setAttribute("scale", (cached.scale * strength * mul).toFixed(2));
   });
+  element.classList.add("lg-map-ready");
 
-  liquidGlassMapCache.set(id, key);
-  return key;
+  return `${mapKey}:${strength}`;
 }
 
 function initPointerLighting(surfaces) {
@@ -299,8 +308,14 @@ function initPointerLighting(surfaces) {
 
     if (!isInteractive) return;
 
+    let pointerRect = null;
+
+    element.addEventListener("pointerenter", () => {
+      pointerRect = element.getBoundingClientRect();
+    });
+
     element.addEventListener("pointermove", (event) => {
-      const rect = element.getBoundingClientRect();
+      const rect = pointerRect || element.getBoundingClientRect();
       if (rect.width < 2 || rect.height < 2) return;
       const x = clamp((event.clientX - rect.left) / rect.width, 0, 1);
       const y = clamp((event.clientY - rect.top) / rect.height, 0, 1);
@@ -312,6 +327,7 @@ function initPointerLighting(surfaces) {
     });
 
     element.addEventListener("pointerleave", () => {
+      pointerRect = null;
       element.style.setProperty("--lg-light-x", "84%");
       element.style.setProperty("--lg-light-y", "12%");
       element.style.setProperty("--lg-glare", String(baseGlare));
