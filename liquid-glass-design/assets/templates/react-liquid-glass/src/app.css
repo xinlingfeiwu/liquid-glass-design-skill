@@ -251,11 +251,12 @@ button {
 
 .label {
   margin: 0;
-  color: rgba(216, 239, 255, 0.72);
+  color: rgba(238, 248, 255, 0.78);
   font-size: 0.76rem;
   font-weight: 820;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+  text-shadow: 0 1px 14px rgba(3, 8, 16, 0.34);
 }
 
 .media-topline span {
