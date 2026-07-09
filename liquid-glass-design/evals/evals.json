@@ -100,23 +100,22 @@
     {
       "id": "qa-script-supports-data-role-and-baseline",
       "paths": ["scripts/check-visual-geometry.mjs"],
-      "must_include_all": ["data-lg-role", "baseline-dir", "pixel-threshold"]
+      "must_include_all": ["data-lg-role", "baseline-dir", "pixel-threshold", "roi-baseline-only"]
     },
     {
       "id": "qa-script-supports-fallback-contrast-and-core",
       "paths": ["scripts/check-visual-geometry.mjs"],
-      "must_include_all": ["playwright-core", "force-fallback", "expect-svg-filter", "contrast", "min-contrast", "adaptive-synced"]
+      "must_include_all": ["playwright-core", "force-fallback", "expect-svg-filter", "contrast", "min-contrast", "adaptive-synced", "adaptive-mode-diversity", "adaptive-luminance-range"]
     },
     {
-      "id": "templates-use-shared-core",
-      "paths": ["assets/templates/vanilla-liquid-glass/liquid-glass.js", "assets/templates/react-liquid-glass/src/displacementMap.js", "assets/templates/web-component-liquid-glass/liquid-glass-element.js"],
-      "must_include_all": ["core/liquid-glass-core\\.js", "createLiquidGlassDisplacementPixels", "supportsLiquidGlassSvgFilter"],
-      "must_not_include": ["navigator\\.userAgent", "Firefox", "Safari"]
+      "id": "templates-use-generated-core-copies",
+      "paths": ["../package.json", "scripts/sync-template-core.mjs", "assets/templates/vanilla-liquid-glass", "assets/templates/react-liquid-glass/src", "assets/templates/web-component-liquid-glass"],
+      "must_include_all": ["sync:templates", "GENERATED FROM liquid-glass-design/assets/core/liquid-glass-core\\.js", "\\./liquid-glass-core\\.js", "createLiquidGlassDisplacementPixels", "supportsLiquidGlassSvgFilter"]
     },
     {
       "id": "templates-expose-adaptive-glass",
       "paths": ["assets/core/liquid-glass-core.js", "assets/templates/vanilla-liquid-glass", "assets/templates/react-liquid-glass", "assets/templates/web-component-liquid-glass"],
-      "must_include_all": ["syncAdaptiveLiquidGlass", "data-lg-adaptive", "adaptive\\?", "adaptive-inset", "--lg-adaptive-tint"]
+      "must_include_all": ["createAdaptiveLiquidGlassController", "syncAdaptiveLiquidGlass", "data-lg-adaptive", "adaptive\\?", "adaptive-inset", "throttleMs", "--lg-adaptive-tint"]
     },
     {
       "id": "core-uses-engine-fallback-for-svg-backdrop-filters",

@@ -454,6 +454,14 @@ button {
   gap: 12px;
 }
 
+.track-meta > div:last-child {
+  min-width: 0;
+  padding: 5px 9px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(4, 9, 16, 0.32), rgba(4, 10, 18, 0.16));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
 .mini-cover {
   width: 58px;
   aspect-ratio: 1;
@@ -652,6 +660,10 @@ button {
   .transport-bar {
     grid-template-columns: 1fr;
     padding: 16px;
+  }
+
+  .track-meta > div:last-child {
+    background: linear-gradient(135deg, rgba(4, 9, 16, 0.46), rgba(4, 10, 18, 0.24));
   }
 
   .transport-actions {

@@ -7,6 +7,7 @@ export type LiquidGlassAdaptiveOptions = {
   fallbackLuminance?: number;
   brightTintAlpha?: number;
   darkTintAlpha?: number;
+  throttleMs?: number;
 };
 
 export type LiquidGlassProps<T extends ElementType = "div"> = {

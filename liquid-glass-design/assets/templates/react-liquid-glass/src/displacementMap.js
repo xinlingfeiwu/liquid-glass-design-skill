@@ -2,11 +2,12 @@ import {
   DEFAULT_SUPERSAMPLE,
   clamp,
   clearAdaptiveLiquidGlass,
+  createAdaptiveLiquidGlassController,
   createLiquidGlassDisplacementPixels,
   numberOption,
   syncAdaptiveLiquidGlass,
   supportsLiquidGlassSvgFilter
-} from "../../../core/liquid-glass-core.js";
+} from "./liquid-glass-core.js";
 
 /**
  * Inverse lens mapping displacement map.
@@ -54,4 +55,4 @@ export function createLiquidGlassDisplacementMap(options = {}) {
   };
 }
 
-export { clearAdaptiveLiquidGlass, syncAdaptiveLiquidGlass, supportsLiquidGlassSvgFilter };
+export { clearAdaptiveLiquidGlass, createAdaptiveLiquidGlassController, syncAdaptiveLiquidGlass, supportsLiquidGlassSvgFilter };

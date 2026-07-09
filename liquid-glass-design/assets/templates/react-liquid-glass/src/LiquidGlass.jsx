@@ -1,9 +1,9 @@
 import { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useRef, useState } from "react";
 import {
   clearAdaptiveLiquidGlass,
+  createAdaptiveLiquidGlassController,
   createLiquidGlassDisplacementMap,
-  supportsLiquidGlassSvgFilter,
-  syncAdaptiveLiquidGlass
+  supportsLiquidGlassSvgFilter
 } from "./displacementMap.js";
 import "./liquidGlass.css";
 
@@ -74,33 +74,17 @@ export const LiquidGlass = forwardRef(function LiquidGlass({
       return undefined;
     }
 
-    const options = typeof adaptive === "object" ? adaptive : {};
-    let frame = 0;
-    const sync = () => {
-      frame = 0;
-      if (surfaceRef.current) syncAdaptiveLiquidGlass(surfaceRef.current, options);
-    };
-    const schedule = () => {
-      if (frame) return;
-      frame = requestAnimationFrame(sync);
-    };
-
-    sync();
+    const controller = createAdaptiveLiquidGlassController(element, () => (
+      typeof adaptive === "object" ? adaptive : {}
+    ));
+    const schedule = () => controller.schedule();
     window.addEventListener("resize", schedule, { passive: true });
     window.addEventListener("scroll", schedule, { passive: true, capture: true });
 
-    let observer;
-    if ("ResizeObserver" in window) {
-      observer = new ResizeObserver(schedule);
-      observer.observe(element);
-    }
-
     return () => {
-      if (frame) cancelAnimationFrame(frame);
-      observer?.disconnect();
       window.removeEventListener("resize", schedule);
       window.removeEventListener("scroll", schedule, { capture: true });
-      clearAdaptiveLiquidGlass(element);
+      controller.destroy();
     };
   }, [adaptive]);
 

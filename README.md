@@ -18,7 +18,8 @@ Scan the QR code to join the `liquid-glass-skill` group chat.
 
 - `liquid-glass-design/SKILL.md` - the skill entrypoint (workflow, rules, defaults, acceptance criteria).
 - `liquid-glass-design/references/` - practical workflows, design recipes, prompt patterns, showcase quality gates, the golden-glass single source of truth, web/Electron implementation contracts, GitHub research, and QA checklists.
-- `liquid-glass-design/assets/core/liquid-glass-core.js` - shared SDF, lens-profile, displacement-pixel, adaptive tint, and browser support logic used by every template and script.
+- `liquid-glass-design/assets/core/liquid-glass-core.js` - the single source for SDF, lens-profile, displacement-pixel, adaptive tint, and browser support logic. Template-local generated copies keep every template folder portable.
+- `liquid-glass-design/scripts/sync-template-core.mjs` - syncs generated template-local core files from the shared core and checks drift in CI.
 - `liquid-glass-design/scripts/generate-displacement-map.mjs` - a zero-dependency PNG displacement map generator that prints the exact `feDisplacementMap` scale.
 - `liquid-glass-design/scripts/check-visual-geometry.mjs` - a Playwright-based QA helper for overlap, dock centering, viewport containment, fallback behavior, contrast estimates, screenshots, and committed PNG baselines.
 - `liquid-glass-design/scripts/package-skill.mjs` - creates full or lean `.skill` packages while excluding `node_modules`, `dist`, caches, logs, and other heavy local artifacts.
@@ -27,6 +28,18 @@ Scan the QR code to join the `liquid-glass-skill` group chat.
 - `liquid-glass-design/assets/templates/vanilla-liquid-glass/` - a no-build HTML/CSS/JS Optic Deck showcase with per-surface filters, lens profiles, pointer glare, multi-background optical QA, and lens maps.
 - `liquid-glass-design/assets/templates/web-component-liquid-glass/` - a portable `<liquid-glass>` custom element for Vue, Svelte, Angular, plain HTML, and mixed stacks.
 - `liquid-glass-design/assets/templates/react-liquid-glass/` - a React/Vite `<LiquidGlass>` component template with profile/tuning props, `.d.ts` types, and the same redesigned showcase-grade demo scene.
+
+## Template Portability
+
+Each template folder is intentionally self-contained. You can copy `vanilla-liquid-glass/`, `web-component-liquid-glass/`, or `react-liquid-glass/` into another project without also copying `assets/core/`.
+
+When editing this repository, modify `liquid-glass-design/assets/core/liquid-glass-core.js` first, then run:
+
+```bash
+npm run sync:templates
+```
+
+Do not edit generated `liquid-glass-core.js` files inside template folders directly; CI runs `npm run sync:templates:check`.
 
 ## Install The Skill
 
@@ -146,7 +159,7 @@ The component API:
   glare={0.56}
   elasticity={0.12}
   tint="rgba(20, 25, 32, .32)"
-  adaptive              // or { sampleInset, fallbackLuminance, brightTintAlpha, darkTintAlpha }
+  adaptive              // or { sampleInset, fallbackLuminance, brightTintAlpha, darkTintAlpha, throttleMs }
   interactive
   ref={surfaceRef}
 >
@@ -164,18 +177,21 @@ Use adaptive glass when a control crosses mixed backdrops, such as bright media,
   data-lg-refraction
   data-lg-adaptive
   data-lg-adaptive-inset="0.18"
+  data-lg-adaptive-throttle="160"
 >
   Play
 </button>
 ```
 
 ```jsx
-<LiquidGlass adaptive={{ sampleInset: 0.18 }} interactive>
+<LiquidGlass adaptive={{ sampleInset: 0.18, throttleMs: 160 }} interactive>
   Play
 </LiquidGlass>
 ```
 
-The surface exposes `data-lg-adaptive-mode="bright|balanced|dark"` and `data-lg-adaptive-luminance` for debugging. It updates on mount, resize, scroll, and explicit scene/background changes — not every animation frame.
+The surface exposes `data-lg-adaptive-mode="bright|balanced|dark"` and `data-lg-adaptive-luminance` for debugging. It updates on mount, resize, scroll, and explicit scene/background changes through a throttled controller; offscreen surfaces pause through `IntersectionObserver`.
+
+Adaptive sampling can read CSS colors/gradients and same-origin `<img>`, `<video>`, or `<canvas>` pixels. Cross-origin media without CORS and opaque `url()` CSS backgrounds fall back to `fallbackLuminance`, so use explicit tints for critical text over unknown media.
 
 ## Generate A Displacement Map
 
@@ -200,21 +216,23 @@ npm i -D playwright && npx playwright install chromium
 node liquid-glass-design/scripts/check-visual-geometry.mjs \
   --url http://127.0.0.1:4173/templates/vanilla-liquid-glass/ \
   --screenshot-dir ./shots \
+  --adaptive \
   --contrast \
   --min-contrast 4.5
 ```
 
-The script checks dock centering, focus/dock overlap, rail/focus overlap, viewport containment, JS console errors, SVG-filter readiness/fallback, adaptive tint sync, estimated text contrast, and can save screenshots for desktop and mobile viewports. It accepts either `playwright` or `playwright-core`.
+The script checks dock centering, focus/dock overlap, rail/focus overlap, viewport containment, JS console errors, SVG-filter readiness/fallback, adaptive tint sync and mode diversity, estimated text contrast, and can save screenshots for desktop and mobile viewports. It accepts either `playwright` or `playwright-core`.
 
-For visual regression, compare against the committed baseline PNGs in `liquid-glass-design/evals/baselines/`:
+For visual regression, compare against committed ROI baseline PNGs in `liquid-glass-design/evals/baselines/`:
 
 ```bash
 node liquid-glass-design/scripts/check-visual-geometry.mjs \
   --url http://127.0.0.1:4173/templates/vanilla-liquid-glass/ \
   --baseline-dir liquid-glass-design/evals/baselines \
-  --pixel-threshold 0.10 \
+  --full-page \
   --pixel-channel-threshold 24 \
   --roi-roles dock,focus \
+  --roi-baseline-only \
   --roi-pixel-threshold 0.08
 ```
 

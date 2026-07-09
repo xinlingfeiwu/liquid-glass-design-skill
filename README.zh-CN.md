@@ -61,6 +61,18 @@ node liquid-glass-design/scripts/package-skill.mjs --lean
 - 做 Electron 集成：读取 `references/electron.md`，先处理窗口、拖拽区、renderer 缓存和平台 fallback。
 - 做视觉验收：使用 `check-visual-geometry.mjs` 检查重叠、居中、viewport containment、fallback、contrast 和 committed baseline 像素回归。
 
+## 模板可移植性
+
+三个模板目录都是可独立拷贝的：`vanilla-liquid-glass/`、`web-component-liquid-glass/`、`react-liquid-glass/` 内部都带有由共享 core 生成的 `liquid-glass-core.js`，复制模板目录时不需要再额外复制 `assets/core/`。
+
+维护本仓库时，只修改 `liquid-glass-design/assets/core/liquid-glass-core.js`，然后执行：
+
+```bash
+npm run sync:templates
+```
+
+不要直接改模板目录里的生成版 `liquid-glass-core.js`；CI 会运行 `npm run sync:templates:check` 检查漂移。
+
 ## 运行 Demo
 
 Vanilla：
@@ -107,18 +119,21 @@ npm run dev:web-component
   data-lg-refraction
   data-lg-adaptive
   data-lg-adaptive-inset="0.18"
+  data-lg-adaptive-throttle="160"
 >
   Play
 </button>
 ```
 
 ```jsx
-<LiquidGlass adaptive={{ sampleInset: 0.18 }} interactive>
+<LiquidGlass adaptive={{ sampleInset: 0.18, throttleMs: 160 }} interactive>
   Play
 </LiquidGlass>
 ```
 
-调试时可查看 `data-lg-adaptive-mode="bright|balanced|dark"` 和 `data-lg-adaptive-luminance`。它只在挂载、resize、scroll 和主动切换背景时更新，不会每帧采样。
+调试时可查看 `data-lg-adaptive-mode="bright|balanced|dark"` 和 `data-lg-adaptive-luminance`。它通过节流控制器在挂载、resize、scroll 和主动切换背景时更新，离屏表面会通过 `IntersectionObserver` 暂停采样，不会每帧采样。
+
+自适应采样可以读取 CSS 颜色/渐变，以及同源 `<img>`、`<video>`、`<canvas>` 像素。没有 CORS 的跨域媒体和不透明 CSS `url()` 背景会回退到 `fallbackLuminance`，关键文字区域仍建议保留明确 tint。
 
 ## 视觉 QA
 
@@ -127,21 +142,23 @@ npm i -D playwright && npx playwright install chromium
 node liquid-glass-design/scripts/check-visual-geometry.mjs \
   --url http://127.0.0.1:4173/templates/vanilla-liquid-glass/ \
   --screenshot-dir ./shots \
+  --adaptive \
   --contrast \
   --min-contrast 4.5
 ```
 
-像素回归默认对比仓库内提交的 baseline：
+像素回归默认对比仓库内提交的 ROI 裁剪 baseline：
 
-QA 脚本会检查重叠、居中、viewport containment、SVG/filter fallback、自适应 tint 是否同步、对比度和像素 baseline。
+QA 脚本会检查重叠、居中、viewport containment、SVG/filter fallback、自适应 tint 是否同步、adaptive mode 是否在亮暗背景中切换、对比度和像素 baseline。
 
 ```bash
 node liquid-glass-design/scripts/check-visual-geometry.mjs \
   --url http://127.0.0.1:4173/templates/vanilla-liquid-glass/ \
   --baseline-dir liquid-glass-design/evals/baselines \
-  --pixel-threshold 0.10 \
+  --full-page \
   --pixel-channel-threshold 24 \
   --roi-roles dock,focus \
+  --roi-baseline-only \
   --roi-pixel-threshold 0.08
 ```
 

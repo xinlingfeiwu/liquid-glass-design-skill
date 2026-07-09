@@ -2,11 +2,11 @@ import {
   DEFAULT_SUPERSAMPLE,
   clamp,
   clearAdaptiveLiquidGlass,
+  createAdaptiveLiquidGlassController,
   createLiquidGlassDisplacementPixels,
   numberOption,
-  syncAdaptiveLiquidGlass,
   supportsLiquidGlassSvgFilter
-} from "../../core/liquid-glass-core.js";
+} from "./liquid-glass-core.js";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 const XLINK_NS = "http://www.w3.org/1999/xlink";
@@ -224,6 +224,7 @@ export class LiquidGlassElement extends HTMLElement {
     "tint",
     "adaptive",
     "adaptive-inset",
+    "adaptive-throttle",
     "interactive"
   ];
 
@@ -234,8 +235,7 @@ export class LiquidGlassElement extends HTMLElement {
     this.mapKey = "";
     this.scale = 0;
     this.resizeObserver = null;
-    this.adaptiveResizeObserver = null;
-    this.adaptiveFrame = 0;
+    this.adaptiveController = null;
     this.adaptiveListenersActive = false;
     this.pointerRect = null;
     this.svgFilterOk = false;
@@ -293,22 +293,22 @@ export class LiquidGlassElement extends HTMLElement {
 
   adaptiveOptions() {
     return {
-      sampleInset: numberOption(this.getAttribute("adaptive-inset"), 0.18, 0.05, 0.45)
+      sampleInset: numberOption(this.getAttribute("adaptive-inset"), 0.18, 0.05, 0.45),
+      throttleMs: numberOption(this.getAttribute("adaptive-throttle"), 160, 50, 2000)
     };
   }
 
   syncAdaptiveGlass() {
-    this.adaptiveFrame = 0;
     if (!this.isAdaptiveEnabled()) {
       clearAdaptiveLiquidGlass(this);
       return;
     }
-    syncAdaptiveLiquidGlass(this, this.adaptiveOptions());
+    this.adaptiveController?.sync();
   }
 
   scheduleAdaptive() {
-    if (!this.isConnected || !this.isAdaptiveEnabled() || this.adaptiveFrame) return;
-    this.adaptiveFrame = requestAnimationFrame(() => this.syncAdaptiveGlass());
+    if (!this.isConnected || !this.isAdaptiveEnabled()) return;
+    this.adaptiveController?.schedule();
   }
 
   initAdaptiveGlass() {
@@ -317,23 +317,15 @@ export class LiquidGlassElement extends HTMLElement {
       clearAdaptiveLiquidGlass(this);
       return;
     }
-    this.syncAdaptiveGlass();
+    this.adaptiveController = createAdaptiveLiquidGlassController(this, () => this.adaptiveOptions());
     window.addEventListener("resize", this.scheduleAdaptive, { passive: true });
     window.addEventListener("scroll", this.scheduleAdaptive, { passive: true, capture: true });
     this.adaptiveListenersActive = true;
-    if ("ResizeObserver" in window) {
-      this.adaptiveResizeObserver = new ResizeObserver(this.scheduleAdaptive);
-      this.adaptiveResizeObserver.observe(this);
-    }
   }
 
   disconnectAdaptiveGlass() {
-    if (this.adaptiveFrame) {
-      cancelAnimationFrame(this.adaptiveFrame);
-      this.adaptiveFrame = 0;
-    }
-    this.adaptiveResizeObserver?.disconnect();
-    this.adaptiveResizeObserver = null;
+    this.adaptiveController?.destroy();
+    this.adaptiveController = null;
     if (this.adaptiveListenersActive) {
       window.removeEventListener("resize", this.scheduleAdaptive);
       window.removeEventListener("scroll", this.scheduleAdaptive, { capture: true });

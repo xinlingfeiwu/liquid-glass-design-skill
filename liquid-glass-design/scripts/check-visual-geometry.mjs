@@ -2,10 +2,11 @@
 
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import { inflateSync } from "node:zlib";
+import { deflateSync, inflateSync } from "node:zlib";
 
 const DEFAULT_VIEWPORTS = "2048x1114,1440x900,390x844";
 const PNG_SIGNATURE = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
+let crcTable;
 
 function parseArgs(argv) {
   const args = {};
@@ -45,9 +46,13 @@ Options:
   --pixel-channel-threshold 16    Per-pixel channel delta threshold
   --roi-roles dock,focus          Optional role crops for stricter pixel checks
   --roi-pixel-threshold 0.01      Max changed-pixel ratio inside role crops
+  --roi-baseline-only             Store/compare only role crop PNGs, not full-frame baselines
   --expect-svg-filter enabled|disabled|auto
   --force-fallback                Force template fallback path before page scripts run
   --reduced-motion                Emulate prefers-reduced-motion: reduce
+  --adaptive                      Require adaptive surfaces to sync and vary across mixed backdrops
+  --adaptive-min-modes 2          Minimum distinct adaptive modes when --adaptive is enabled
+  --adaptive-min-luminance-range .2  Minimum adaptive luminance spread when --adaptive is enabled
   --contrast                      Estimate text/background contrast from screenshots
   --contrast-selector ".label"    Text selector for contrast checks
   --min-contrast 4.5              Minimum estimated contrast ratio
@@ -113,6 +118,38 @@ function paeth(a, b, c) {
   if (pa <= pb && pa <= pc) return a;
   if (pb <= pc) return b;
   return c;
+}
+
+function getCrcTable() {
+  if (crcTable) return crcTable;
+  crcTable = new Uint32Array(256);
+  for (let index = 0; index < 256; index += 1) {
+    let value = index;
+    for (let bit = 0; bit < 8; bit += 1) {
+      value = value & 1 ? 0xedb88320 ^ (value >>> 1) : value >>> 1;
+    }
+    crcTable[index] = value >>> 0;
+  }
+  return crcTable;
+}
+
+function crc32(buffer) {
+  const table = getCrcTable();
+  let crc = 0xffffffff;
+  for (const byte of buffer) {
+    crc = table[(crc ^ byte) & 0xff] ^ (crc >>> 8);
+  }
+  return (crc ^ 0xffffffff) >>> 0;
+}
+
+function pngChunk(type, data = Buffer.alloc(0)) {
+  const typeBuffer = Buffer.from(type, "ascii");
+  const chunkData = Buffer.isBuffer(data) ? data : Buffer.from(data);
+  const length = Buffer.alloc(4);
+  length.writeUInt32BE(chunkData.length, 0);
+  const crc = Buffer.alloc(4);
+  crc.writeUInt32BE(crc32(Buffer.concat([typeBuffer, chunkData])), 0);
+  return Buffer.concat([length, typeBuffer, chunkData, crc]);
 }
 
 function decodePng(buffer) {
@@ -188,6 +225,53 @@ function decodePng(buffer) {
   }
 
   return { width, height, rgba };
+}
+
+function encodeRgbaPng(width, height, rgba) {
+  const stride = width * 4;
+  const raw = Buffer.alloc((stride + 1) * height);
+
+  for (let y = 0; y < height; y += 1) {
+    const rawOffset = y * (stride + 1);
+    raw[rawOffset] = 0;
+    raw.set(rgba.subarray(y * stride, y * stride + stride), rawOffset + 1);
+  }
+
+  const header = Buffer.alloc(13);
+  header.writeUInt32BE(width, 0);
+  header.writeUInt32BE(height, 4);
+  header[8] = 8;
+  header[9] = 6;
+  header[10] = 0;
+  header[11] = 0;
+  header[12] = 0;
+
+  return Buffer.concat([
+    PNG_SIGNATURE,
+    pngChunk("IHDR", header),
+    pngChunk("IDAT", deflateSync(raw, { level: 9 })),
+    pngChunk("IEND")
+  ]);
+}
+
+function cropPngBuffer(buffer, rect) {
+  const png = decodePng(buffer);
+  const left = Math.max(0, Math.floor(rect.left));
+  const top = Math.max(0, Math.floor(rect.top));
+  const right = Math.min(png.width, Math.ceil(rect.right));
+  const bottom = Math.min(png.height, Math.ceil(rect.bottom));
+  const width = Math.max(0, right - left);
+  const height = Math.max(0, bottom - top);
+  if (!width || !height) return null;
+
+  const rgba = new Uint8Array(width * height * 4);
+  for (let y = 0; y < height; y += 1) {
+    const sourceStart = ((top + y) * png.width + left) * 4;
+    const sourceEnd = sourceStart + width * 4;
+    rgba.set(png.rgba.subarray(sourceStart, sourceEnd), y * width * 4);
+  }
+
+  return encodeRgbaPng(width, height, rgba);
 }
 
 function comparePngBuffers(actualBuffer, baselineBuffer, channelThreshold) {
@@ -352,8 +436,12 @@ async function main() {
   const pixelChannelThreshold = Number(args["pixel-channel-threshold"] ?? 16);
   const roiRoles = String(args["roi-roles"] || "").split(",").map((role) => role.trim()).filter(Boolean);
   const roiPixelThreshold = Number(args["roi-pixel-threshold"] ?? pixelThreshold);
+  const roiBaselineOnly = Boolean(args["roi-baseline-only"]);
   const expectSvgFilter = String(args["expect-svg-filter"] || "auto");
   const runContrast = Boolean(args.contrast);
+  const requireAdaptive = Boolean(args.adaptive);
+  const adaptiveMinModes = Number(args["adaptive-min-modes"] ?? 2);
+  const adaptiveMinLuminanceRange = Number(args["adaptive-min-luminance-range"] ?? 0.2);
   const fullPage = Boolean(args["full-page"]);
   const contrastSelector = String(args["contrast-selector"] || '[data-lg-contrast], .hero-copy h1, .hero-copy span, .lg-surface strong, .lg-surface .label, .lg-button span, .track-meta span');
   const minContrast = Number(args["min-contrast"] ?? 4.5);
@@ -420,6 +508,18 @@ async function main() {
         }
         const surfaces = Array.from(document.querySelectorAll("[data-lg-refraction]"));
         const adaptiveSurfaces = Array.from(document.querySelectorAll("[data-lg-adaptive], liquid-glass[adaptive]"));
+        const adaptiveModes = adaptiveSurfaces.map((element) => ({
+          tag: element.tagName.toLowerCase(),
+          mode: element.dataset.lgAdaptiveMode || "",
+          luminance: element.dataset.lgAdaptiveLuminance || ""
+        }));
+        const numericLuminances = adaptiveModes
+          .map((item) => Number.parseFloat(item.luminance))
+          .filter((value) => Number.isFinite(value));
+        const distinctModes = new Set(adaptiveModes.map((item) => item.mode).filter(Boolean));
+        const luminanceRange = numericLuminances.length
+          ? Math.max(...numericLuminances) - Math.min(...numericLuminances)
+          : 0;
         return {
           rects: {
             stage: rect(query.stage),
@@ -436,11 +536,9 @@ async function main() {
           adaptive: {
             surfaceCount: adaptiveSurfaces.length,
             syncedCount: adaptiveSurfaces.filter((element) => element.dataset.lgAdaptiveMode && element.dataset.lgAdaptiveLuminance).length,
-            modes: adaptiveSurfaces.map((element) => ({
-              tag: element.tagName.toLowerCase(),
-              mode: element.dataset.lgAdaptiveMode || "",
-              luminance: element.dataset.lgAdaptiveLuminance || ""
-            }))
+            modeCount: distinctModes.size,
+            luminanceRange,
+            modes: adaptiveModes
           },
           motion: {
             reducedMotionMatches: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
@@ -492,7 +590,43 @@ async function main() {
 
       if (baselineDir) {
         const baselinePath = `${baselineDir.replace(/\/$/, "")}/${fileName}`;
-        if (updateBaseline) {
+        if (roiBaselineOnly) {
+          if (!roiRoles.length) {
+            diffs.push({ viewport: viewport.label, status: "roi-baseline-needs-roles", baselinePath, pass: false });
+          }
+          for (const role of roiRoles) {
+            const roleRect = rects[role];
+            const roleBaselinePath = `${baselineDir.replace(/\/$/, "")}/liquid-glass-${viewport.label}-${role}.png`;
+            if (!roleRect) {
+              diffs.push({ viewport: viewport.label, role, status: "missing-role", baselinePath: roleBaselinePath, pass: false });
+              continue;
+            }
+            const cropped = cropPngBuffer(screenshot, roleRect);
+            if (!cropped) {
+              diffs.push({ viewport: viewport.label, role, status: "empty-roi", baselinePath: roleBaselinePath, pass: false });
+              continue;
+            }
+            if (updateBaseline) {
+              await writeFile(roleBaselinePath, cropped);
+              diffs.push({ viewport: viewport.label, role, status: "roi-updated", baselinePath: roleBaselinePath, pass: true });
+            } else if (existsSync(roleBaselinePath)) {
+              const roiComparison = comparePngBuffers(cropped, await readFile(roleBaselinePath), pixelChannelThreshold);
+              const roiPass = roiComparison.pass && roiComparison.changedRatio <= roiPixelThreshold;
+              diffs.push({
+                viewport: viewport.label,
+                role,
+                status: `roi-${roiComparison.reason}`,
+                baselinePath: roleBaselinePath,
+                pass: roiPass,
+                changedRatio: round(roiComparison.changedRatio),
+                threshold: roiPixelThreshold,
+                pixels: roiComparison.pixels
+              });
+            } else {
+              diffs.push({ viewport: viewport.label, role, status: "missing-roi-baseline", baselinePath: roleBaselinePath, pass: false });
+            }
+          }
+        } else if (updateBaseline) {
           await writeFile(baselinePath, screenshot);
           diffs.push({ viewport: viewport.label, status: "updated", baselinePath, pass: true });
         } else if (existsSync(baselinePath)) {
@@ -565,6 +699,28 @@ async function main() {
           value: pageState.adaptive.syncedCount,
           limit: pageState.adaptive.surfaceCount
         });
+      }
+      if (requireAdaptive) {
+        checks.push(
+          {
+            name: "adaptive-surfaces-present",
+            pass: pageState.adaptive.surfaceCount > 0,
+            value: pageState.adaptive.surfaceCount,
+            limit: ">0"
+          },
+          {
+            name: "adaptive-mode-diversity",
+            pass: pageState.adaptive.modeCount >= adaptiveMinModes,
+            value: pageState.adaptive.modeCount,
+            limit: adaptiveMinModes
+          },
+          {
+            name: "adaptive-luminance-range",
+            pass: pageState.adaptive.luminanceRange >= adaptiveMinLuminanceRange,
+            value: round(pageState.adaptive.luminanceRange),
+            limit: adaptiveMinLuminanceRange
+          }
+        );
       }
       if (reducedMotion) {
         checks.push(

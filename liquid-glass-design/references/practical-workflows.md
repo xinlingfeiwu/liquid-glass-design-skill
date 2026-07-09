@@ -50,7 +50,7 @@ Reject the result if the answer to composition, optics, clarity, or geometry is 
 
 **Task type:** `component-template`.
 
-1. Copy the vanilla, Web Component, or React template only as a starting point. Replace the scene and labels with the target product context.
+1. Copy the full vanilla, Web Component, or React template folder as a starting point. Each template includes a generated local `liquid-glass-core.js`, so the folder stays portable when moved into another project. Replace the scene and labels with the target product context.
 2. Keep the public contracts stable:
    - CSS: `.lg-surface`, `.lg-panel`, `.lg-button`, `.lg-clear`, `.lg-tinted`;
    - JS: `createLiquidGlassDisplacementMap(options)` and `syncLiquidGlassMap(...)`;
@@ -59,6 +59,8 @@ Reject the result if the answer to composition, optics, clarity, or geometry is 
 3. Keep the filter root hidden and out of layout. In React, component-owned SVG filter nodes must not become flex/grid children.
 4. Retune surface profiles after resizing. Reusing one map/strength across buttons, cards, and docks is a common reason the effect feels weak or jagged.
 5. Generate a fresh preview with a cache-busting filename after visual changes.
+
+Repository maintenance note: if shared core behavior changes, update `assets/core/liquid-glass-core.js` and run `npm run sync:templates`. Do not edit template-local generated core copies by hand.
 
 ## Workflow E: Visual QA Loop
 

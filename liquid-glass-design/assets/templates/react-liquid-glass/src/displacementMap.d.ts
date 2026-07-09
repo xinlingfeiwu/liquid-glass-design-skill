@@ -23,6 +23,7 @@ export interface LiquidGlassAdaptiveOptions {
   fallbackLuminance?: number;
   brightTintAlpha?: number;
   darkTintAlpha?: number;
+  throttleMs?: number;
 }
 
 export interface LiquidGlassAdaptiveResult {
@@ -42,5 +43,15 @@ export function syncAdaptiveLiquidGlass(
   element: HTMLElement,
   options?: LiquidGlassAdaptiveOptions
 ): LiquidGlassAdaptiveResult;
+
+export function createAdaptiveLiquidGlassController(
+  element: HTMLElement,
+  options?: LiquidGlassAdaptiveOptions | (() => LiquidGlassAdaptiveOptions)
+): {
+  schedule: (request?: { immediate?: boolean }) => void;
+  sync: () => LiquidGlassAdaptiveResult | null;
+  destroy: () => void;
+  readonly visible: boolean;
+};
 
 export function clearAdaptiveLiquidGlass(element?: HTMLElement | null): void;

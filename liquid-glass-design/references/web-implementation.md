@@ -104,7 +104,8 @@ Implement:
 - `createLiquidGlassDisplacementMap(options) -> { url, scale, key }` — inverse lens mapping on canvas; `scale` is measured from the generated field (see `golden-glass-style.md`). Options should include `profile`, `magnify`, `bend`, `spread`, `bezelRatio`, and optional `supersample`.
 - `syncLiquidGlassMap(element, filterRefs, cacheKey)` — regenerates the map only when size/radius/map tuning changed and applies `scale * strength * channelMultiplier` to every displacement node. `filterRefs = { image, displacements: [{ node, mul }] }`.
 - `supportsLiquidGlassSvgFilter()` — decides whether to enable the refraction path with a known-engine fallback gate plus feature detection (`CSS.supports` plus style assignment). Keep a force-fallback hook for QA.
-- `syncAdaptiveLiquidGlass(element, options)` — optional low-frequency backdrop sampling that estimates luminance around a surface and writes `--lg-adaptive-tint`, `--lg-adaptive-border`, `--lg-adaptive-saturate`, `--lg-adaptive-brightness`, and `--lg-adaptive-contrast`. Use it for controls that cross bright/dark content; do not run it every animation frame.
+- `syncAdaptiveLiquidGlass(element, options)` — optional backdrop sampling that estimates luminance around a surface and writes `--lg-adaptive-tint`, `--lg-adaptive-border`, `--lg-adaptive-saturate`, `--lg-adaptive-brightness`, and `--lg-adaptive-contrast`.
+- `createAdaptiveLiquidGlassController(element, options)` — wraps adaptive sync in throttling and `IntersectionObserver` visibility gating. Use this for runtime surfaces instead of calling sync directly on scroll.
 - Pointer-light handling — updates only CSS variables for glint and elastic drift; never regenerates maps.
 
 Use `ResizeObserver` for shape changes. Use `requestAnimationFrame` to batch
@@ -130,7 +131,7 @@ Expose:
   glare={surfaceGlare}
   elasticity={controlElasticity}
   tint={activeDefaultTint}
-  adaptive={false}       // true or { sampleInset, fallbackLuminance, brightTintAlpha, darkTintAlpha }
+  adaptive={false}       // true or { sampleInset, fallbackLuminance, brightTintAlpha, darkTintAlpha, throttleMs }
   interactive
   ref={surfaceRef}
 />
@@ -144,7 +145,7 @@ The component should:
 - Apply the measured map scale to its displacement nodes after each regen, and update strength/dispersion as scale-only changes without regenerating the PNG map.
 - Add a ready class only after the `<feImage>` map href is written; support detection alone is not map readiness.
 - Expose profile/tuning props instead of hardcoding one visual for every shape.
-- Expose `adaptive` for surfaces that move across mixed backdrops. When enabled, sample at low frequency and tune CSS variables; keep it disabled by default so existing design systems remain deterministic.
+- Expose `adaptive` for surfaces that move across mixed backdrops. When enabled, sample through a throttled controller and tune CSS variables; keep it disabled by default so existing design systems remain deterministic.
 - Include a showcase page that actually exercises those props across small pills, circular controls, bars, and text panels. A component file alone is not a sufficient template.
 - Use lower `dispersion` and softer profiles for long docks/bars over detailed backdrops; reserve stronger chromatic detail for compact surfaces where only the rim shows it.
 - Keep component-owned filter SVGs out of layout flow. If a component emits an inline `<svg><filter>...</filter></svg>` next to the rendered surface, force the SVG to `position: absolute !important; width: 0; height: 0; overflow: hidden; pointer-events: none;` and exclude it from broad child rules such as `.glass > *`. Otherwise nested glass controls inside grid/flex bars can silently become extra layout items.
@@ -157,6 +158,8 @@ The component should:
 ## Performance Rules
 
 - Cache by rounded width, height, radius, supersample, and map tuning options. Do not include `strength` or `dispersion` in the bitmap cache key.
+- Adaptive tint is for slowly changing backdrops. Throttle scroll/resize sampling to roughly 100-250ms, pause offscreen surfaces, and expose `throttleMs` for dense pages.
+- Sampling can estimate CSS colors/gradients and same-origin image/video/canvas pixels. Cross-origin media without CORS and opaque CSS `url()` backgrounds should fall back to `fallbackLuminance` plus conservative tint.
 - Map bitmaps should be oversampled enough to keep curved controls smooth; the measured scale divides the supersample factor back out.
 - One exact map per visible glass surface when quality matters; share only within identical shape families.
 - Keep filters off hidden elements.

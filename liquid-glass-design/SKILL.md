@@ -58,6 +58,10 @@ Use this skill to design, implement, or review high-quality Liquid Glass UI. Tre
 | README prompts/distribution | `references/prompt-patterns.md`, repository `README.md` | `scripts/package-skill.mjs` |
 | Research/engine choice | `references/github-research.md` | Use only when selecting CSS/SVG vs React vs WebGL |
 
+## Repository Maintenance
+
+When maintaining this skill repository, edit `assets/core/liquid-glass-core.js` first and run `npm run sync:templates`. Template folders carry generated local core copies so `vanilla-liquid-glass/`, `react-liquid-glass/`, and `web-component-liquid-glass/` remain independently copyable.
+
 ## Acceptance Criteria
 
 For `product-integration` tasks, complete only when:

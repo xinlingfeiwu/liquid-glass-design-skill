@@ -26,7 +26,8 @@ function readPngSize(png) {
 }
 
 const standard = createLiquidGlassDisplacementPng({ width: 96, height: 48, radius: 24, profile: "standard" });
-const thin = createLiquidGlassDisplacementPng({ width: 96, height: 48, radius: 24, profile: "thin" });
+const standardPixels = createLiquidGlassDisplacementPixels({ width: 96, height: 48, radius: 24, profile: "standard" });
+const thinPixels = createLiquidGlassDisplacementPixels({ width: 96, height: 48, radius: 24, profile: "thin" });
 const pixels = createLiquidGlassDisplacementPixels({ width: 64, height: 32, radius: 16, profile: "soft" });
 const dataUri = createLiquidGlassDisplacementDataUri({ width: 64, height: 32, radius: 16, profile: "prominent" });
 
@@ -37,8 +38,8 @@ assert.ok(Number.isFinite(pixels.scale) && pixels.scale > 0, "pixel map scale sh
 assert.equal(pixels.data.length, 64 * 32 * 4, "pixel map should be RGBA");
 assert.equal(pixels.data[2], 0, "blue channel should stay neutral because the filter reads R/G only");
 assert.ok(dataUri.url.startsWith("data:image/png;base64,"), "data URI should be a PNG");
-assert.notEqual(hash(standard), hash(thin), "different profiles should produce different maps");
-assert.equal(hash(standard), "7bb5faadfc35ebe6ce9f6cdaa95d45ce405d9e8dfdb910958431e50508d79c22", "core map output should stay deterministic");
+assert.notEqual(hash(standardPixels.data), hash(thinPixels.data), "different profiles should produce different raw maps");
+assert.equal(hash(standardPixels.data), "554f3cd70a221db73e590f53febc853a090857c40e9bf36ac8e43a2521511dee", "core raw map pixels should stay deterministic");
 assert.ok(relativeLuminance(parseCssColor("rgb(255, 255, 255)")) > relativeLuminance(parseCssColor("rgb(0, 0, 0)")), "white should measure brighter than black");
 assert.equal(parseCssColor("rgb(255 255 255 / 50%)").a, 0.5, "modern CSS alpha percentages should parse");
 assert.equal(computeAdaptiveLiquidGlassVars(0.82).mode, "bright", "bright backdrops should use bright mode");

@@ -1,3 +1,6 @@
+// GENERATED FROM liquid-glass-design/assets/core/liquid-glass-core.js.
+// Do not edit this template-local copy directly; run `npm run sync:templates`.
+
 export const DEFAULT_SUPERSAMPLE = 2;
 
 export function clamp(value, min, max) {

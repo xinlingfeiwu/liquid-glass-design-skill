@@ -17,7 +17,7 @@ Run this checklist before finalizing Liquid Glass UI.
 - Compare against a high-frequency procedural or photographic background even if the final product background is dark; weak glass often hides on simple gradients.
 - Confirm high-frequency detail is local and purposeful; reject previews that read as noisy wallpaper or a raw filter test.
 - Confirm rims, glare, tint, and refraction read as one material, not as a cloudy card overlay.
-- For adaptive surfaces, inspect `data-lg-adaptive-mode` and `data-lg-adaptive-luminance`; verify bright backgrounds gain enough tint and dark backgrounds remain transparent enough.
+- For adaptive surfaces, inspect `data-lg-adaptive-mode` and `data-lg-adaptive-luminance`; verify bright/dark backdrops produce distinct modes and bright backgrounds gain enough tint while dark backgrounds remain transparent enough.
 - Confirm shape-specific profiles are intentional: small pills stay crisp, text panels stay readable, showcase bars carry stronger lensing.
 - Confirm the first viewport has a clear product/UI composition and focal point before judging the optical material.
 - Confirm the README/screenshot preview is generated from the current runnable demo and uses a cache-busting filename when pushed to GitHub.
@@ -51,7 +51,7 @@ console.table({
 Bundled script check when the page is runnable and Playwright is installed:
 
 ```bash
-node liquid-glass-design/scripts/check-visual-geometry.mjs --url http://127.0.0.1:4173/templates/vanilla-liquid-glass/ --screenshot-dir ./shots --contrast --min-contrast 4.5
+node liquid-glass-design/scripts/check-visual-geometry.mjs --url http://127.0.0.1:4173/templates/vanilla-liquid-glass/ --screenshot-dir ./shots --adaptive --contrast --min-contrast 4.5
 ```
 
 Prefer adding semantic hooks in product code so the script can auto-discover surfaces:
@@ -66,7 +66,7 @@ Prefer adding semantic hooks in product code so the script can auto-discover sur
 For pixel regression, compare against committed viewport baselines. Update them only when the visual change is intentional and the PNG diff is reviewed. Use `--full-page` for exploratory captures, not cross-platform CI baselines:
 
 ```bash
-node liquid-glass-design/scripts/check-visual-geometry.mjs --url http://127.0.0.1:4173/templates/vanilla-liquid-glass/ --baseline-dir liquid-glass-design/evals/baselines --pixel-threshold 0.10 --pixel-channel-threshold 24 --roi-roles dock,focus --roi-pixel-threshold 0.08
+node liquid-glass-design/scripts/check-visual-geometry.mjs --url http://127.0.0.1:4173/templates/vanilla-liquid-glass/ --baseline-dir liquid-glass-design/evals/baselines --pixel-threshold 0.10 --pixel-channel-threshold 24 --roi-roles dock,focus --roi-pixel-threshold 0.08 --adaptive
 npm run qa:vanilla:update-baseline
 git diff -- liquid-glass-design/evals/baselines
 ```

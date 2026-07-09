@@ -2,11 +2,11 @@ import {
   DEFAULT_SUPERSAMPLE,
   clamp,
   clearAdaptiveLiquidGlass,
+  createAdaptiveLiquidGlassController,
   createLiquidGlassDisplacementPixels,
   numberOption,
-  syncAdaptiveLiquidGlass,
   supportsLiquidGlassSvgFilter
-} from "../../core/liquid-glass-core.js";
+} from "./liquid-glass-core.js";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 const XLINK_NS = "http://www.w3.org/1999/xlink";
@@ -249,31 +249,22 @@ function initAdaptiveGlass(surfaces) {
   surfaces.filter((element) => !isAdaptiveEnabled(element)).forEach(clearAdaptiveLiquidGlass);
   if (!adaptiveSurfaces.length) return () => {};
 
-  let frame = 0;
-  const sync = () => {
-    frame = 0;
-    adaptiveSurfaces.forEach((element) => {
-      syncAdaptiveLiquidGlass(element, {
-        sampleInset: numberOption(element.dataset.lgAdaptiveInset, 0.18, 0.05, 0.45)
-      });
-    });
-  };
-  const schedule = () => {
-    if (frame) return;
-    frame = requestAnimationFrame(sync);
-  };
+  const controllers = adaptiveSurfaces.map((element) => createAdaptiveLiquidGlassController(element, () => ({
+    sampleInset: numberOption(element.dataset.lgAdaptiveInset, 0.18, 0.05, 0.45),
+    throttleMs: numberOption(element.dataset.lgAdaptiveThrottle, 160, 50, 2000)
+  })));
+  const schedule = () => controllers.forEach((controller) => controller.schedule());
 
-  sync();
   window.addEventListener("resize", schedule, { passive: true });
   window.addEventListener("scroll", schedule, { passive: true, capture: true });
   document.addEventListener("liquidglass:adaptive-sync", schedule);
 
-  if ("ResizeObserver" in window) {
-    const observer = new ResizeObserver(schedule);
-    adaptiveSurfaces.forEach((element) => observer.observe(element));
-  }
-
-  return schedule;
+  return () => {
+    window.removeEventListener("resize", schedule);
+    window.removeEventListener("scroll", schedule, { capture: true });
+    document.removeEventListener("liquidglass:adaptive-sync", schedule);
+    controllers.forEach((controller) => controller.destroy());
+  };
 }
 
 function initLiquidGlass() {

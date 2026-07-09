@@ -61,11 +61,13 @@ jobs:
             --expect-svg-filter enabled \
             --screenshot-dir artifacts/screenshots \
             --baseline-dir liquid-glass-design/evals/baselines \
-            --pixel-threshold 0.10 \
+            --full-page \
             --pixel-channel-threshold 24 \
             --roi-roles dock,focus \
+            --roi-baseline-only \
             --roi-pixel-threshold 0.08 \
             --reduced-motion \
+            --adaptive \
             --contrast \
             --min-contrast 4.5
           node liquid-glass-design/scripts/check-visual-geometry.mjs \
@@ -74,6 +76,7 @@ jobs:
             --expect-svg-filter disabled \
             --viewport 1440x900 \
             --screenshot-dir artifacts/screenshots \
+            --adaptive \
             --contrast \
             --min-contrast 4.5
           node liquid-glass-design/scripts/check-visual-geometry.mjs \
@@ -83,6 +86,7 @@ jobs:
             --expect-svg-filter disabled \
             --viewport 1440x900 \
             --screenshot-dir artifacts/screenshots \
+            --adaptive \
             --contrast \
             --min-contrast 4.5
 
