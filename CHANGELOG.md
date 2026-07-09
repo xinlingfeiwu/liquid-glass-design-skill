@@ -7,7 +7,7 @@
 - Added npm publish automation for `liquid-glass-core` and `@liquid-glass-design/react`, with provenance support, existing-version skips, token auth, and Trusted Publishing opt-in.
 - Reworked GitHub Pages publishing into one bundle containing `preview/` and live demos for vanilla, React, and Web Component templates.
 - Relaxed contributor Node engines to `>=20` while keeping CI, release, and nightly workflows pinned to Node 24.
-- Added README badges for stars, license, PRs, sponsorship, and direct `.skill` download.
+- Added README badges for stars, license, PRs, and direct `.skill` download.
 
 ## 0.3.1 - 2026-07-09
 
