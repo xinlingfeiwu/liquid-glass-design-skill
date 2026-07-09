@@ -1,5 +1,13 @@
 # Liquid Glass Design Skill
 
+<p align="left">
+  <a href="https://github.com/xinlingfeiwu/liquid-glass-design-skill/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/xinlingfeiwu/liquid-glass-design-skill?style=for-the-badge&logo=github&label=Stars"></a>
+  <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/github/license/xinlingfeiwu/liquid-glass-design-skill?style=for-the-badge&label=License"></a>
+  <a href="https://github.com/xinlingfeiwu/liquid-glass-design-skill/pulls"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-44cc11?style=for-the-badge"></a>
+  <a href="https://github.com/sponsors/xinlingfeiwu"><img alt="Sponsor" src="https://img.shields.io/badge/Sponsor-%E2%9D%A4-ffb3c7?style=for-the-badge&logo=github"></a>
+  <a href="https://github.com/xinlingfeiwu/liquid-glass-design-skill/releases/latest/download/liquid-glass-design.skill"><img alt="Download Skill" src="https://img.shields.io/github/v/release/xinlingfeiwu/liquid-glass-design-skill?style=for-the-badge&label=Download%20Skill&color=2563eb"></a>
+</p>
+
 一套面向 AI Agent 的 Liquid Glass 设计与实现 Skill，用于生成、升级和审查高品质液态玻璃界面。它包含 CSS/SVG 折射、Canvas displacement map、React 组件模板、视觉 QA、打包脚本和可执行 smoke eval。
 
 ![Liquid Glass preview](https://raw.githubusercontent.com/xinlingfeiwu/liquid-glass-design-skill/gh-pages/preview/preview-latest.png)
