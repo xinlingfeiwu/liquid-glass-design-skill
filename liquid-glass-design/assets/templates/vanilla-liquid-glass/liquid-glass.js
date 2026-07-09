@@ -254,15 +254,18 @@ function initAdaptiveGlass(surfaces) {
     throttleMs: numberOption(element.dataset.lgAdaptiveThrottle, 160, 50, 2000)
   })));
   const schedule = () => controllers.forEach((controller) => controller.schedule());
+  const syncNow = () => controllers.forEach((controller) => controller.sync({ immediate: true }));
 
   window.addEventListener("resize", schedule, { passive: true });
   window.addEventListener("scroll", schedule, { passive: true, capture: true });
-  document.addEventListener("liquidglass:adaptive-sync", schedule);
+  document.addEventListener("liquidglass:adaptive-sync", syncNow);
+  window.__LG_ADAPTIVE_SYNC__ = syncNow;
 
   return () => {
     window.removeEventListener("resize", schedule);
     window.removeEventListener("scroll", schedule, { capture: true });
-    document.removeEventListener("liquidglass:adaptive-sync", schedule);
+    document.removeEventListener("liquidglass:adaptive-sync", syncNow);
+    if (window.__LG_ADAPTIVE_SYNC__ === syncNow) delete window.__LG_ADAPTIVE_SYNC__;
     controllers.forEach((controller) => controller.destroy());
   };
 }

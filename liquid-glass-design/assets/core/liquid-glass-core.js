@@ -384,10 +384,10 @@ export function createAdaptiveLiquidGlassController(element, options = {}) {
     }
   };
 
-  const sync = () => {
+  const sync = (request = {}) => {
     frame = 0;
     timer = 0;
-    if (disposed || !element?.isConnected || !visible) return null;
+    if (disposed || !element?.isConnected || (!visible && !request.immediate)) return null;
     const currentOptions = readAdaptiveOptions(options);
     lastSync = Date.now();
     return syncAdaptiveLiquidGlass(element, currentOptions);
@@ -400,8 +400,8 @@ export function createAdaptiveLiquidGlassController(element, options = {}) {
     const elapsed = Date.now() - lastSync;
     const wait = request.immediate ? 0 : Math.max(0, throttleMs - elapsed);
     const queueFrame = () => {
-      frame = root.requestAnimationFrame?.(sync) || 0;
-      if (!frame) sync();
+      frame = root.requestAnimationFrame?.(() => sync(request)) || 0;
+      if (!frame) sync(request);
     };
 
     if (wait > 0) {
@@ -428,7 +428,7 @@ export function createAdaptiveLiquidGlassController(element, options = {}) {
     resizeObserver.observe(element);
   }
 
-  schedule({ immediate: true });
+  sync({ immediate: true });
 
   return {
     schedule,

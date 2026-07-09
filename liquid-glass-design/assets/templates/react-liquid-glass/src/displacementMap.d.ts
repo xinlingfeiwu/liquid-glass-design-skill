@@ -49,7 +49,7 @@ export function createAdaptiveLiquidGlassController(
   options?: LiquidGlassAdaptiveOptions | (() => LiquidGlassAdaptiveOptions)
 ): {
   schedule: (request?: { immediate?: boolean }) => void;
-  sync: () => LiquidGlassAdaptiveResult | null;
+  sync: (request?: { immediate?: boolean }) => LiquidGlassAdaptiveResult | null;
   destroy: () => void;
   readonly visible: boolean;
 };

@@ -492,7 +492,8 @@ async function main() {
       if (waitMs > 0) await page.waitForTimeout(waitMs);
       if (requireAdaptive) {
         await page.evaluate(() => {
-          document.dispatchEvent(new CustomEvent("liquidglass:adaptive-sync"));
+          if (typeof window.__LG_ADAPTIVE_SYNC__ === "function") window.__LG_ADAPTIVE_SYNC__();
+          else document.dispatchEvent(new CustomEvent("liquidglass:adaptive-sync"));
         });
         await page.waitForFunction(() => {
           const surfaces = Array.from(document.querySelectorAll("[data-lg-adaptive], liquid-glass[adaptive]"));
