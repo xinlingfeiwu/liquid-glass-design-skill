@@ -490,6 +490,15 @@ async function main() {
       });
       await page.goto(String(args.url), { waitUntil: "networkidle", timeout: 30000 });
       if (waitMs > 0) await page.waitForTimeout(waitMs);
+      if (requireAdaptive) {
+        await page.evaluate(() => {
+          document.dispatchEvent(new CustomEvent("liquidglass:adaptive-sync"));
+        });
+        await page.waitForFunction(() => {
+          const surfaces = Array.from(document.querySelectorAll("[data-lg-adaptive], liquid-glass[adaptive]"));
+          return surfaces.length > 0 && surfaces.every((element) => element.dataset.lgAdaptiveMode && element.dataset.lgAdaptiveLuminance);
+        }, null, { timeout: 2500 }).catch(() => {});
+      }
 
       const pageState = await page.evaluate((query) => {
         function rect(selector) {
