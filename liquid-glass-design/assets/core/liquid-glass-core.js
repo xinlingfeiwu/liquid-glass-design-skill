@@ -320,8 +320,8 @@ export function computeAdaptiveLiquidGlassVars(luminance, options = {}) {
   const bright = smoothStep(0.52, 0.86, luma);
   const balanced = smoothStep(0.24, 0.56, luma);
   const mode = luma >= 0.62 ? "bright" : luma <= 0.32 ? "dark" : "balanced";
-  const brightTintAlpha = numberOption(options.brightTintAlpha, 0.34 + bright * 0.24, 0.12, 0.72);
-  const darkTintAlpha = numberOption(options.darkTintAlpha, 0.28 + balanced * 0.1, 0.12, 0.5);
+  const brightTintAlpha = numberOption(options.brightTintAlpha, 0.42 + bright * 0.22, 0.12, 0.72);
+  const darkTintAlpha = numberOption(options.darkTintAlpha, 0.34 + balanced * 0.14, 0.12, 0.58);
   const tint = `rgba(5, 9, 16, ${formatAlpha(luma >= 0.56 ? brightTintAlpha : darkTintAlpha)})`;
 
   return {

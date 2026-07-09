@@ -653,12 +653,21 @@ html.lg-svg-ok .lg-surface[data-lg-refraction].lg-map-ready {
 
 .transport-actions .lg-button {
   --lg-tint: rgba(3, 8, 16, 0.58);
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.72),
+    0 0 18px rgba(0, 0, 0, 0.62);
 }
 
 .transport-actions .lg-button:hover,
 .transport-actions .lg-button:focus-visible,
 .transport-actions .lg-button.is-active {
   --lg-tint: rgba(3, 8, 16, 0.66);
+}
+
+html:not(.lg-svg-ok) .transport-actions .lg-button {
+  --lg-adaptive-tint: rgba(3, 8, 16, 0.64) !important;
+  --lg-adaptive-brightness: 0.94 !important;
+  --lg-adaptive-contrast: 1.24 !important;
 }
 
 .icon-button {
