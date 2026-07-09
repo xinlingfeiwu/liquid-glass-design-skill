@@ -8,6 +8,8 @@ The refraction core uses inverse lens mapping: a canvas-generated displacement m
 
 ![Liquid Glass preview](https://raw.githubusercontent.com/xinlingfeiwu/liquid-glass-design-skill/gh-pages/preview/preview-latest.png)
 
+Live demos: [Vanilla](https://xinlingfeiwu.github.io/liquid-glass-design-skill/demo/vanilla/) | [React](https://xinlingfeiwu.github.io/liquid-glass-design-skill/demo/react/) | [Web Component](https://xinlingfeiwu.github.io/liquid-glass-design-skill/demo/web-component/)
+
 ## Join The QQ Group
 
 Scan the QR code to join the `liquid-glass-skill` group chat.
@@ -29,6 +31,7 @@ Scan the QR code to join the `liquid-glass-skill` group chat.
 - `skills/liquid-glass-design/evals/evals.json` - trigger cases and static assertions for checking practical, premium Liquid Glass outcomes.
 - `packages/liquid-glass-core/` - publish-ready core package for displacement pixels, adaptive tinting, and support detection.
 - `packages/react-liquid-glass/` - publish-ready React wrapper package with CSS and TypeScript declarations.
+- `.claude-plugin/marketplace.json`, `.claude-plugin/plugin.json`, and `.codex-plugin/plugin.json` - plugin distribution metadata that uses real in-repository paths and avoids symlink-based installs.
 - `skills/liquid-glass-design/assets/templates/vanilla-liquid-glass/` - a no-build HTML/CSS/JS Optic Deck showcase with per-surface filters, lens profiles, pointer glare, multi-background optical QA, and lens maps.
 - `skills/liquid-glass-design/assets/templates/web-component-liquid-glass/` - a portable `<liquid-glass>` custom element for Vue, Svelte, Angular, plain HTML, and mixed stacks.
 - `skills/liquid-glass-design/assets/templates/react-liquid-glass/` - a React/Vite `<LiquidGlass>` component template with profile/tuning props, `.d.ts` types, and the same redesigned showcase-grade demo scene.
@@ -100,18 +103,39 @@ Upload `dist/liquid-glass-design.skill` or `dist/liquid-glass-design.lean.skill`
 
 ### Claude Code Plugin / Marketplace
 
-Use the same packaged `.skill` file for Claude-compatible plugin or marketplace submission flows. This repository also includes `.claude-plugin/` and `.codex-plugin/` metadata scaffolds so the skill can be wrapped for plugin distribution. Keep `skills/liquid-glass-design/LICENSE` inside the skill folder so the license travels with the standalone package.
+This repository includes validated Claude Code plugin metadata plus a local marketplace manifest:
+
+```bash
+claude plugin validate --strict .
+claude plugin validate --strict .claude-plugin/marketplace.json
+claude plugin marketplace add "$(pwd)" --scope user
+claude plugin install liquid-glass-design@liquid-glass-design-skill
+```
+
+For CI and machines without a global `claude` command, use:
+
+```bash
+npm run plugin:claude:install-smoke
+```
+
+The install smoke test adds this repository as a marketplace in an isolated Claude home, installs `liquid-glass-design@liquid-glass-design-skill`, and verifies it appears in `plugin list`. Keep `skills/liquid-glass-design/LICENSE` inside the skill folder so the license travels with standalone packages and plugin installs.
 
 ## NPM Packages
 
-For product integration, you can copy a template folder or install the publish-ready packages from `packages/`:
+For product integration, you can copy a template folder or install the packages once a release has published them:
+
+```bash
+npm install liquid-glass-core @liquid-glass-design/react
+```
+
+Before publishing, verify package contents locally:
 
 ```bash
 npm pack --dry-run ./packages/liquid-glass-core
 npm pack --dry-run ./packages/react-liquid-glass
 ```
 
-The packages are versioned with the skill. `liquid-glass-core` exposes the shared math/adaptive/support primitives; `@liquid-glass-design/react` exposes `<LiquidGlass>` plus the matching CSS.
+The packages are versioned with the skill. `liquid-glass-core` exposes the shared math/adaptive/support primitives; `@liquid-glass-design/react` exposes `<LiquidGlass>` plus the matching CSS. Tag releases run `npm run npm:publish` with provenance when either `NPM_TOKEN` is available or GitHub Actions Trusted Publishing is enabled via `NPM_PUBLISH_ENABLED=1`; existing package versions are skipped safely.
 
 ### Other agents
 
@@ -266,7 +290,7 @@ npm run qa:vanilla:webkit-detect
 npm run qa:vanilla:reduced-motion
 ```
 
-Committed baseline PNGs are CI regression assets and are excluded from packaged `.skill` files; use `npm run package:skill` or the lean package without shipping screenshot history to end users. CI publishes `preview/preview-latest.png` to the orphan `gh-pages` branch from the 1440x900 visual QA screenshot, so the README preview tracks the runnable demo without adding binary churn to `main`.
+Committed baseline PNGs are CI regression assets and are excluded from packaged `.skill` files; use `npm run package:skill` or the lean package without shipping screenshot history to end users. CI publishes a single GitHub Pages bundle containing `preview/preview-latest.png` plus `demo/vanilla/`, `demo/react/`, and `demo/web-component/`, so preview and live demos cannot overwrite each other on `gh-pages`.
 
 ## Design Rules
 
@@ -285,6 +309,8 @@ Committed baseline PNGs are CI regression assets and are excluded from packaged 
 - Provide reduced motion, increased contrast, and reduced transparency fallbacks.
 
 ## Validate
+
+Requires Node 20 or newer. CI, release, and nightly behavior eval workflows pin Node 24 for reproducible browser screenshots and package publishing.
 
 ```bash
 npm test

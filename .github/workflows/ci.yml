@@ -34,6 +34,9 @@ jobs:
       - name: Plugin manifest validation
         run: npm run plugin:validate
 
+      - name: Claude plugin install smoke
+        run: npm run plugin:claude:install-smoke
+
       - name: Package dry run
         run: npm run package:dry
 
@@ -99,24 +102,20 @@ jobs:
             --contrast \
             --min-contrast 4.5
 
-      - name: Prepare README preview artifact
+      - name: Prepare GitHub Pages bundle
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           set -euo pipefail
-          mkdir -p artifacts/preview
-          node skills/liquid-glass-design/scripts/update-readme-preview.mjs \
-            --source artifacts/screenshots/liquid-glass-1440x900.png \
-            --target artifacts/preview/preview-latest.png
+          npm run pages:prepare
 
-      - name: Publish README preview to gh-pages
+      - name: Publish GitHub Pages bundle
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: artifacts/preview
-          destination_dir: preview
+          publish_dir: artifacts/pages
           force_orphan: true
-          commit_message: "docs: update preview image"
+          commit_message: "docs: update pages bundle"
 
       - name: Upload visual QA screenshots
         if: always()

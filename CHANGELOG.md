@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.2 - 2026-07-09
+
+- Promoted `data-lg-role="stage|focus|dock|rail"` from QA examples into the core skill contract so generated pages are measurable by default.
+- Added a Claude Code marketplace manifest and validated marketplace add/install/list in an isolated Claude home.
+- Added npm publish automation for `liquid-glass-core` and `@liquid-glass-design/react`, with provenance support, existing-version skips, token auth, and Trusted Publishing opt-in.
+- Reworked GitHub Pages publishing into one bundle containing `preview/` and live demos for vanilla, React, and Web Component templates.
+- Relaxed contributor Node engines to `>=20` while keeping CI, release, and nightly workflows pinned to Node 24.
+
 ## 0.3.1 - 2026-07-09
 
 - Moved the published skill source into a real `skills/liquid-glass-design/` directory so GitHub ZIP downloads and Windows checkouts no longer depend on symlink support.

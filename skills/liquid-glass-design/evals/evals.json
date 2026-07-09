@@ -103,6 +103,11 @@
       "must_include_all": ["data-lg-role", "baseline-dir", "pixel-threshold", "roi-baseline-only"]
     },
     {
+      "id": "skill-requires-measurable-layout-roles",
+      "paths": ["SKILL.md"],
+      "must_include_all": ["data-lg-role=\"stage\"", "data-lg-role=\"focus\"", "data-lg-role=\"dock\"", "data-lg-role=\"rail\"", "check-visual-geometry\\.mjs"]
+    },
+    {
       "id": "qa-script-supports-fallback-contrast-and-core",
       "paths": ["scripts/check-visual-geometry.mjs"],
       "must_include_all": ["playwright-core", "force-fallback", "expect-svg-filter", "contrast", "min-contrast", "adaptive-synced", "adaptive-mode-diversity", "adaptive-luminance-range"]
@@ -134,19 +139,19 @@
     },
     {
       "id": "distribution-has-npm-packages-and-plugin-metadata",
-      "paths": ["../../packages", "../../.codex-plugin/plugin.json", "../../.claude-plugin/plugin.json", "../../README.md", "../../scripts/validate-plugin-manifests.mjs"],
-      "must_include_all": ["liquid-glass-core", "@liquid-glass-design/react", "\\.codex-plugin", "\\.claude-plugin", "npm pack --dry-run"]
+      "paths": ["../../packages", "../../.codex-plugin/plugin.json", "../../.claude-plugin/plugin.json", "../../.claude-plugin/marketplace.json", "../../README.md", "../../package.json", "../../scripts/publish-npm-packages.mjs", "../../scripts/validate-plugin-manifests.mjs", "../../.github/workflows/release.yml"],
+      "must_include_all": ["liquid-glass-core", "@liquid-glass-design/react", "\\.codex-plugin", "\\.claude-plugin", "marketplace\\.json", "npm pack --dry-run", "npm:publish", "--provenance", "NPM_PUBLISH_ENABLED"]
     },
     {
       "id": "plugin-manifests-avoid-symlink-and-parent-escape",
-      "paths": ["../../.codex-plugin/plugin.json", "../../.claude-plugin/plugin.json", "../../scripts/validate-plugin-manifests.mjs"],
-      "must_include_all": ["\\.\\/skills\\/", "assertNoSymlink", "must not escape the plugin root", "manifest\\.json is intentionally not supported"],
+      "paths": ["../../package.json", "../../.codex-plugin/plugin.json", "../../.claude-plugin/plugin.json", "../../.claude-plugin/marketplace.json", "../../scripts/validate-claude-plugin-install.mjs", "../../scripts/validate-plugin-manifests.mjs"],
+      "must_include_all": ["\\.\\/skills\\/", "assertNoSymlink", "must not escape the plugin root", "manifest\\.json is intentionally not supported", "marketplace", "plugin list", "install-smoke"],
       "must_not_include": ["\\.\\.\\/liquid-glass-design"]
     },
     {
-      "id": "ci-serves-template-directories-and-updates-preview",
-      "paths": ["../../package.json", "../../.github/workflows/ci.yml", "scripts/update-readme-preview.mjs", "../../README.md"],
-      "must_include_all": ["assets/templates/vanilla-liquid-glass", "http://127\\.0\\.0\\.1:4173/", "preview-latest\\.png", "peaceiris/actions-gh-pages", "update-readme-preview"]
+      "id": "ci-serves-template-directories-and-publishes-combined-pages",
+      "paths": ["../../package.json", "../../.github/workflows/ci.yml", "../../scripts/prepare-pages.mjs", "../../README.md"],
+      "must_include_all": ["assets/templates/vanilla-liquid-glass", "http://127\\.0\\.0\\.1:4173/", "preview-latest\\.png", "peaceiris/actions-gh-pages", "pages:prepare", "publish_dir:\\s*artifacts/pages", "demo/vanilla", "demo/react", "demo/web-component"]
     },
     {
       "id": "behavior-eval-scaffold-is-runnable",

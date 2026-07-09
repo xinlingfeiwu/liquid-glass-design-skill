@@ -1,6 +1,6 @@
 {
   "name": "@liquid-glass-design/react",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "React Liquid Glass surface component with SVG refraction, adaptive tinting, and typed props.",
   "type": "module",
   "license": "MIT",
@@ -10,6 +10,10 @@
     "type": "git",
     "url": "git+https://github.com/xinlingfeiwu/liquid-glass-design-skill.git",
     "directory": "packages/react-liquid-glass"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "exports": {
     ".": {

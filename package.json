@@ -1,10 +1,10 @@
 {
   "name": "liquid-glass-design-skill",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=24 <25"
+    "node": ">=20"
   },
   "scripts": {
     "validate": "python3 quick_validate.py skills/liquid-glass-design",
@@ -13,8 +13,12 @@
     "preview:update": "node skills/liquid-glass-design/scripts/update-readme-preview.mjs",
     "behavior:eval": "node skills/liquid-glass-design/scripts/run-behavior-eval.mjs",
     "npm:pack": "npm pack --dry-run ./packages/liquid-glass-core && npm pack --dry-run ./packages/react-liquid-glass",
+    "npm:publish": "node scripts/publish-npm-packages.mjs",
     "plugin:validate": "node scripts/validate-plugin-manifests.mjs",
-    "check": "node --check scripts/validate-plugin-manifests.mjs && node --check skills/liquid-glass-design/assets/core/liquid-glass-core.js && node --check skills/liquid-glass-design/scripts/generate-displacement-map.mjs && node --check skills/liquid-glass-design/scripts/check-visual-geometry.mjs && node --check skills/liquid-glass-design/scripts/package-skill.mjs && node --check skills/liquid-glass-design/scripts/run-evals.mjs && node --check skills/liquid-glass-design/scripts/run-behavior-eval.mjs && node --check skills/liquid-glass-design/scripts/sync-template-core.mjs && node --check skills/liquid-glass-design/scripts/test-displacement-map.mjs && node --check skills/liquid-glass-design/scripts/update-readme-preview.mjs && node --check skills/liquid-glass-design/assets/templates/vanilla-liquid-glass/liquid-glass.js && node --check skills/liquid-glass-design/assets/templates/react-liquid-glass/src/displacementMap.js && node --check skills/liquid-glass-design/assets/templates/web-component-liquid-glass/liquid-glass-element.js && npm run sync:templates:check",
+    "plugin:claude:validate": "node scripts/validate-claude-plugin-install.mjs",
+    "plugin:claude:install-smoke": "node scripts/validate-claude-plugin-install.mjs --install",
+    "pages:prepare": "node scripts/prepare-pages.mjs",
+    "check": "node --check scripts/prepare-pages.mjs && node --check scripts/publish-npm-packages.mjs && node --check scripts/validate-claude-plugin-install.mjs && node --check scripts/validate-plugin-manifests.mjs && node --check skills/liquid-glass-design/assets/core/liquid-glass-core.js && node --check skills/liquid-glass-design/scripts/generate-displacement-map.mjs && node --check skills/liquid-glass-design/scripts/check-visual-geometry.mjs && node --check skills/liquid-glass-design/scripts/package-skill.mjs && node --check skills/liquid-glass-design/scripts/run-evals.mjs && node --check skills/liquid-glass-design/scripts/run-behavior-eval.mjs && node --check skills/liquid-glass-design/scripts/sync-template-core.mjs && node --check skills/liquid-glass-design/scripts/test-displacement-map.mjs && node --check skills/liquid-glass-design/scripts/update-readme-preview.mjs && node --check skills/liquid-glass-design/assets/templates/vanilla-liquid-glass/liquid-glass.js && node --check skills/liquid-glass-design/assets/templates/react-liquid-glass/src/displacementMap.js && node --check skills/liquid-glass-design/assets/templates/web-component-liquid-glass/liquid-glass-element.js && npm run sync:templates:check",
     "test:maps": "node skills/liquid-glass-design/scripts/test-displacement-map.mjs",
     "eval": "node skills/liquid-glass-design/scripts/run-evals.mjs",
     "package:dry": "node skills/liquid-glass-design/scripts/package-skill.mjs --dry-run && node skills/liquid-glass-design/scripts/package-skill.mjs --dry-run --lean",

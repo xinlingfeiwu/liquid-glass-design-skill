@@ -52,6 +52,14 @@ function skillPaths(value, label) {
   fail(`${label} must be a string or array of strings`);
 }
 
+function requireArray(object, path) {
+  const value = path.split(".").reduce((current, part) => current?.[part], object);
+  if (!Array.isArray(value)) {
+    fail(`Missing required array field: ${path}`);
+  }
+  return value;
+}
+
 async function validateManifest(manifestPath, { claude = false } = {}) {
   if (!existsSync(manifestPath)) fail(`Missing plugin manifest: ${manifestPath}`);
   const manifest = await readJson(manifestPath);
@@ -86,6 +94,30 @@ async function validateManifest(manifestPath, { claude = false } = {}) {
   }
 }
 
+async function validateClaudeMarketplace(marketplacePath) {
+  if (!existsSync(marketplacePath)) fail(`Missing Claude marketplace manifest: ${marketplacePath}`);
+  const marketplace = await readJson(marketplacePath);
+
+  requireString(marketplace, "name");
+  requireString(marketplace, "description");
+  const plugins = requireArray(marketplace, "plugins");
+  if (marketplace.name !== "liquid-glass-design-skill") {
+    fail(".claude-plugin/marketplace.json name must be liquid-glass-design-skill");
+  }
+
+  const liquidGlass = plugins.find((plugin) => plugin?.name === "liquid-glass-design");
+  if (!liquidGlass) {
+    fail(".claude-plugin/marketplace.json must list liquid-glass-design");
+  }
+
+  const source = requireString(liquidGlass, "source");
+  const sourcePath = assertInsideRepo(source, ".claude-plugin/marketplace.json plugins[0].source");
+  await assertNoSymlink(sourcePath, ".claude-plugin/marketplace.json plugin source");
+  if (!existsSync(resolve(sourcePath, ".claude-plugin/plugin.json"))) {
+    fail(".claude-plugin/marketplace.json source must point at a plugin root");
+  }
+}
+
 async function main() {
   await assertNoSymlink(resolve(repoRoot, "skills"), "skills root");
   await assertNoSymlink(skillPath, "Liquid Glass skill directory");
@@ -95,13 +127,15 @@ async function main() {
 
   await validateManifest(resolve(repoRoot, ".codex-plugin/plugin.json"));
   await validateManifest(resolve(repoRoot, ".claude-plugin/plugin.json"), { claude: true });
+  await validateClaudeMarketplace(resolve(repoRoot, ".claude-plugin/marketplace.json"));
 
   console.log(JSON.stringify({
     status: "passed",
     skillPath: "skills/liquid-glass-design",
     manifests: [
       ".codex-plugin/plugin.json",
-      ".claude-plugin/plugin.json"
+      ".claude-plugin/plugin.json",
+      ".claude-plugin/marketplace.json"
     ]
   }, null, 2));
 }

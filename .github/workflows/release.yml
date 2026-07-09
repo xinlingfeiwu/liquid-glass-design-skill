@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  id-token: write
 
 jobs:
   package-skill:
@@ -41,3 +42,28 @@ jobs:
             dist/liquid-glass-design.lean.skill \
             dist/liquid-glass-design.lean.skill.zip \
             --clobber
+
+  publish-npm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org/
+
+      - name: Publish npm packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_PUBLISH_ENABLED: ${{ vars.NPM_PUBLISH_ENABLED }}
+        run: |
+          set -euo pipefail
+          if [ -z "${NODE_AUTH_TOKEN:-}" ] && [ "${NPM_PUBLISH_ENABLED:-}" != "1" ]; then
+            echo "Skipping npm publish because neither NPM_TOKEN nor NPM_PUBLISH_ENABLED=1 is configured."
+            echo "Use NPM_TOKEN for token auth, or set NPM_PUBLISH_ENABLED=1 after configuring npm Trusted Publishing."
+            exit 0
+          fi
+          npm run npm:publish

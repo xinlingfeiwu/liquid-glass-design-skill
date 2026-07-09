@@ -1,6 +1,6 @@
 {
   "name": "liquid-glass-core",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Core Liquid Glass displacement-map, adaptive tint, and support-detection primitives.",
   "type": "module",
   "license": "MIT",
@@ -10,6 +10,10 @@
     "type": "git",
     "url": "git+https://github.com/xinlingfeiwu/liquid-glass-design-skill.git",
     "directory": "packages/liquid-glass-core"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "exports": {
     ".": {

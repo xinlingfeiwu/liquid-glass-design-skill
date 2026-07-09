@@ -1,6 +1,7 @@
 {
+  "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
   "name": "liquid-glass-design",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Premium Liquid Glass design skill with templates, adaptive glass, and visual QA.",
   "author": {
     "name": "xinlingfeiwu",
@@ -9,31 +10,14 @@
   "license": "MIT",
   "homepage": "https://github.com/xinlingfeiwu/liquid-glass-design-skill",
   "repository": "https://github.com/xinlingfeiwu/liquid-glass-design-skill",
-  "skills": "./skills/",
+  "skills": [
+    "./skills/liquid-glass-design"
+  ],
   "keywords": [
     "liquid-glass",
     "glassmorphism",
     "svg-filter",
     "refraction",
     "frontend-design"
-  ],
-  "interface": {
-    "displayName": "Liquid Glass Design",
-    "shortDescription": "Premium Liquid Glass UI skill, templates, and QA.",
-    "longDescription": "Design, implement, package, and verify high-end Liquid Glass interfaces with CSS/SVG refraction, displacement maps, adaptive tinting, React/Web Component templates, and browser visual QA.",
-    "developerName": "xinlingfeiwu",
-    "category": "Design",
-    "capabilities": [
-      "Design",
-      "Write",
-      "Review"
-    ],
-    "websiteURL": "https://github.com/xinlingfeiwu/liquid-glass-design-skill",
-    "brandColor": "#7DD3FC",
-    "defaultPrompt": [
-      "Upgrade this toolbar into premium Liquid Glass.",
-      "Build a React LiquidGlass component.",
-      "Run Liquid Glass visual QA on this page."
-    ]
-  }
+  ]
 }

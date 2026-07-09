@@ -1,0 +1,13 @@
+{
+  "name": "liquid-glass-design-skill",
+  "description": "Premium Liquid Glass design skill, templates, adaptive glass, and visual QA.",
+  "owner": {
+    "name": "xinlingfeiwu"
+  },
+  "plugins": [
+    {
+      "name": "liquid-glass-design",
+      "source": "./"
+    }
+  ]
+}

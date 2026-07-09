@@ -4,6 +4,8 @@
 
 ![Liquid Glass preview](https://raw.githubusercontent.com/xinlingfeiwu/liquid-glass-design-skill/gh-pages/preview/preview-latest.png)
 
+在线 Demo：[Vanilla](https://xinlingfeiwu.github.io/liquid-glass-design-skill/demo/vanilla/) | [React](https://xinlingfeiwu.github.io/liquid-glass-design-skill/demo/react/) | [Web Component](https://xinlingfeiwu.github.io/liquid-glass-design-skill/demo/web-component/)
+
 ## 加入 QQ 群
 
 扫码加入 `liquid-glass-skill` 群聊。
@@ -55,18 +57,39 @@ mkdir -p ~/.claude/skills
 ln -sf "$(pwd)/skills/liquid-glass-design" ~/.claude/skills/liquid-glass-design
 ```
 
-也可以使用上面的 `.skill` 包走 Claude Code plugin/marketplace 兼容流程。本仓库也提供 `.claude-plugin/` 和 `.codex-plugin/` 元数据脚手架，便于后续接入插件分发。`skills/liquid-glass-design/LICENSE` 会随 skill 文件夹一起分发。
+也可以使用 Claude Code 插件/marketplace 方式安装。本仓库已经提供真实目录结构的 `.claude-plugin/` 和 `.codex-plugin/` 元数据，不依赖 symlink 或 `../` 逃逸路径：
+
+```bash
+claude plugin validate --strict .
+claude plugin validate --strict .claude-plugin/marketplace.json
+claude plugin marketplace add "$(pwd)" --scope user
+claude plugin install liquid-glass-design@liquid-glass-design-skill
+```
+
+如果机器上没有全局 `claude` 命令，可以用仓库脚本执行隔离安装烟测：
+
+```bash
+npm run plugin:claude:install-smoke
+```
+
+该脚本会在临时 Claude home 中添加本仓库 marketplace、安装 `liquid-glass-design@liquid-glass-design-skill`，并通过 `plugin list` 验证安装结果。`skills/liquid-glass-design/LICENSE` 会随 skill 文件夹一起分发。
 
 ### NPM 包
 
-如果要把能力集成进真实产品，可以复制模板目录，也可以使用 `packages/` 下的可发布包：
+如果要把能力集成进真实产品，可以复制模板目录，也可以在 release 发布后安装 npm 包：
+
+```bash
+npm install liquid-glass-core @liquid-glass-design/react
+```
+
+发布前可先检查包内容：
 
 ```bash
 npm pack --dry-run ./packages/liquid-glass-core
 npm pack --dry-run ./packages/react-liquid-glass
 ```
 
-`liquid-glass-core` 暴露 displacement pixels、自适应 tint、浏览器能力检测等共享能力；`@liquid-glass-design/react` 暴露 `<LiquidGlass>` 组件、CSS 和类型声明。
+`liquid-glass-core` 暴露 displacement pixels、自适应 tint、浏览器能力检测等共享能力；`@liquid-glass-design/react` 暴露 `<LiquidGlass>` 组件、CSS 和类型声明。打 tag 后 release workflow 会在存在 `NPM_TOKEN` 或启用 GitHub Actions Trusted Publishing 且设置 `NPM_PUBLISH_ENABLED=1` 时执行 `npm run npm:publish`，并开启 provenance；已经存在的版本会自动跳过。
 
 ## 使用方式
 
@@ -193,9 +216,11 @@ npm run qa:vanilla:webkit-detect
 npm run qa:vanilla:reduced-motion
 ```
 
-仓库里的 baseline PNG 只用于 CI 视觉回归，不会进入 full/lean `.skill` 分发包。CI 会用 1440x900 视觉 QA 截图把 `preview/preview-latest.png` 发布到 orphan `gh-pages` 分支，README 预览图不再依赖手动截图，也不会继续向 `main` 写入二进制预览图。
+仓库里的 baseline PNG 只用于 CI 视觉回归，不会进入 full/lean `.skill` 分发包。CI 会一次性发布 GitHub Pages bundle，里面同时包含 `preview/preview-latest.png`、`demo/vanilla/`、`demo/react/` 和 `demo/web-component/`，因此预览图和在线 Demo 不会互相覆盖。
 
 ## 校验
+
+需要 Node 20 或更新版本。CI、release 和 nightly behavior eval 会固定使用 Node 24，以保证浏览器截图和发布链路可复现。
 
 ```bash
 npm test

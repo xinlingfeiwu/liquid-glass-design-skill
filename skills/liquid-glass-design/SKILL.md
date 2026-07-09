@@ -2,7 +2,7 @@
 name: liquid-glass-design
 description: Create, upgrade, and review high-end Liquid Glass UI for web and Electron apps. Use for iOS 26-style Liquid Glass, premium glassmorphism, SVG feDisplacementMap refraction, backdrop-filter, adaptive tint, chromatic aberration, translucent controls, glass buttons, visual QA, design-system templates, CSS, JavaScript, React, or accessibility-safe glass interfaces.
 metadata:
-  version: 0.3.1
+  version: 0.3.2
 ---
 
 # Liquid Glass Design
@@ -40,6 +40,7 @@ Use this skill to design, implement, or review high-quality Liquid Glass UI. Tre
 - Use shadows, inner rims, pointer-aware glare, Fresnel-like edge light, and small specular glints as one material system.
 - Keep high-frequency detail local and purposeful. If line fields dominate the composition, redesign the scene before tuning glass.
 - Apply `backdrop-filter` directly to the surface element. No background-clone layers or `background-attachment: fixed` hacks.
+- Mark measurable layout roles in every runnable UI: `data-lg-role="stage"` on the product scene, `data-lg-role="focus"` on the primary glass/content surface, `data-lg-role="dock"` on the command bar, and `data-lg-role="rail"` on secondary control or metric groups when present. This is required so `check-visual-geometry.mjs` can verify centering, overlap, viewport containment, adaptive tint, and fallback behavior without custom selectors.
 - Cache generated displacement maps by size/radius/tuning and update them only on shape changes, not on every animation frame.
 - Respect `prefers-reduced-motion`, increased contrast, reduced transparency, and bright/noisy backdrops by reducing morphing and increasing or adapting tint/opacity.
 - Keep foreground content sharp and keep ratio-sensitive artwork in locked inner layers.

@@ -92,8 +92,8 @@ def main() -> None:
     frontmatter = parse_frontmatter(skill_text)
     if "name: liquid-glass-design" not in frontmatter:
         fail("SKILL.md frontmatter must declare name: liquid-glass-design")
-    if "version: 0.3.1" not in frontmatter:
-        fail("SKILL.md metadata.version must be 0.3.1")
+    if "version: 0.3.2" not in frontmatter:
+        fail("SKILL.md metadata.version must be 0.3.2")
     for term in REQUIRED_DESCRIPTION_TERMS:
         if term not in frontmatter:
             fail(f"SKILL.md description must include trigger term: {term}")
