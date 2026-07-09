@@ -9,11 +9,13 @@ const sourcePath = resolve(rootDir, "liquid-glass-design/assets/core/liquid-glas
 const targets = [
   "liquid-glass-design/assets/templates/vanilla-liquid-glass/liquid-glass-core.js",
   "liquid-glass-design/assets/templates/react-liquid-glass/src/liquid-glass-core.js",
-  "liquid-glass-design/assets/templates/web-component-liquid-glass/liquid-glass-core.js"
+  "liquid-glass-design/assets/templates/web-component-liquid-glass/liquid-glass-core.js",
+  "packages/liquid-glass-core/liquid-glass-core.js",
+  "packages/react-liquid-glass/src/liquid-glass-core.js"
 ].map((path) => resolve(rootDir, path));
 
 const header = `// GENERATED FROM liquid-glass-design/assets/core/liquid-glass-core.js.
-// Do not edit this template-local copy directly; run \`npm run sync:templates\`.
+// Do not edit this generated copy directly; run \`npm run sync:templates\`.
 
 `;
 

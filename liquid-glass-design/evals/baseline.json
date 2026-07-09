@@ -93,7 +93,21 @@
       "forbidden": []
     },
     {
-      "id": "templates-use-feature-detection-not-ua-blocks",
+      "id": "templates-use-generated-core-copies",
+      "pass": true,
+      "includePass": true,
+      "includeAllPass": true,
+      "forbidden": []
+    },
+    {
+      "id": "templates-expose-adaptive-glass",
+      "pass": true,
+      "includePass": true,
+      "includeAllPass": true,
+      "forbidden": []
+    },
+    {
+      "id": "core-uses-engine-fallback-for-svg-backdrop-filters",
       "pass": true,
       "includePass": true,
       "includeAllPass": true,
@@ -112,9 +126,30 @@
       "includePass": true,
       "includeAllPass": true,
       "forbidden": []
+    },
+    {
+      "id": "distribution-has-npm-packages-and-plugin-metadata",
+      "pass": true,
+      "includePass": true,
+      "includeAllPass": true,
+      "forbidden": []
+    },
+    {
+      "id": "ci-serves-template-directories-and-updates-preview",
+      "pass": true,
+      "includePass": true,
+      "includeAllPass": true,
+      "forbidden": []
+    },
+    {
+      "id": "behavior-eval-scaffold-is-runnable",
+      "pass": true,
+      "includePass": true,
+      "includeAllPass": true,
+      "forbidden": []
     }
   ],
-  "passed": 14,
-  "total": 14,
+  "passed": 19,
+  "total": 19,
   "failed": []
 }

@@ -1,0 +1,38 @@
+name: Nightly Behavior Eval
+
+on:
+  schedule:
+    - cron: "23 18 * * *"
+  workflow_dispatch:
+
+jobs:
+  behavior-eval:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install Playwright for generated-page QA
+        run: |
+          npm install --no-save playwright@^1.53.0
+          npx playwright install --with-deps chromium
+
+      - name: Run behavior-level eval when agent command is available
+        env:
+          RUN_BEHAVIOR_EVAL: ${{ secrets.ANTHROPIC_API_KEY != '' && '1' || '' }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          BEHAVIOR_EVAL_COMMAND: ${{ vars.BEHAVIOR_EVAL_COMMAND || 'claude' }}
+        run: npm run behavior:eval
+
+      - name: Upload generated behavior eval page
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: liquid-glass-behavior-eval
+          path: artifacts/behavior-eval
+          if-no-files-found: ignore

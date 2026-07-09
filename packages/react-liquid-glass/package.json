@@ -1,0 +1,45 @@
+{
+  "name": "@liquid-glass-design/react",
+  "version": "0.3.0",
+  "description": "React Liquid Glass surface component with SVG refraction, adaptive tinting, and typed props.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Liquid Glass Design Skill",
+  "homepage": "https://github.com/xinlingfeiwu/liquid-glass-design-skill#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xinlingfeiwu/liquid-glass-design-skill.git",
+    "directory": "packages/react-liquid-glass"
+  },
+  "exports": {
+    ".": {
+      "types": "./src/LiquidGlass.d.ts",
+      "import": "./src/LiquidGlass.jsx"
+    },
+    "./style.css": "./src/liquidGlass.css",
+    "./displacement-map": {
+      "types": "./src/displacementMap.d.ts",
+      "import": "./src/displacementMap.js"
+    }
+  },
+  "types": "./src/LiquidGlass.d.ts",
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": [
+    "./src/liquidGlass.css"
+  ],
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "keywords": [
+    "react",
+    "liquid-glass",
+    "glassmorphism",
+    "svg-filter",
+    "refraction"
+  ]
+}

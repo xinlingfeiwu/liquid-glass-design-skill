@@ -1,7 +1,8 @@
 // GENERATED FROM liquid-glass-design/assets/core/liquid-glass-core.js.
-// Do not edit this template-local copy directly; run `npm run sync:templates`.
+// Do not edit this generated copy directly; run `npm run sync:templates`.
 
 export const DEFAULT_SUPERSAMPLE = 2;
+const bitmapSampleCanvases = new WeakMap();
 
 export function clamp(value, min, max) {
   const numeric = Number(value);
@@ -211,11 +212,16 @@ function sampleBitmapElementColor(element, point, root) {
     const sampleX = Math.floor(clamp((point.x - rect.left) / rect.width, 0, 1) * (sourceWidth - 1));
     const sampleY = Math.floor(clamp((point.y - rect.top) / rect.height, 0, 1) * (sourceHeight - 1));
     const documentRef = element.ownerDocument || root.document;
-    const canvas = documentRef?.createElement?.("canvas");
+    let canvas = documentRef ? bitmapSampleCanvases.get(documentRef) : null;
+    if (!canvas && documentRef?.createElement) {
+      canvas = documentRef.createElement("canvas");
+      canvas.width = 1;
+      canvas.height = 1;
+      bitmapSampleCanvases.set(documentRef, canvas);
+    }
     const context = canvas?.getContext?.("2d", { willReadFrequently: true });
     if (!canvas || !context) return null;
-    canvas.width = 1;
-    canvas.height = 1;
+    context.clearRect(0, 0, 1, 1);
     context.drawImage(element, sampleX, sampleY, 1, 1, 0, 0, 1, 1);
     const [r, g, b, a] = context.getImageData(0, 0, 1, 1).data;
     return { r, g, b, a: a / 255 };

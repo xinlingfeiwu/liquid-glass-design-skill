@@ -1,0 +1,39 @@
+{
+  "name": "liquid-glass-design",
+  "version": "0.3.0",
+  "description": "Skill and template kit for premium Liquid Glass UI design, SVG refraction, adaptive glass, and visual QA.",
+  "author": {
+    "name": "xinlingfeiwu",
+    "url": "https://github.com/xinlingfeiwu"
+  },
+  "homepage": "https://github.com/xinlingfeiwu/liquid-glass-design-skill",
+  "repository": "https://github.com/xinlingfeiwu/liquid-glass-design-skill",
+  "license": "MIT",
+  "keywords": [
+    "liquid-glass",
+    "glassmorphism",
+    "svg-filter",
+    "refraction",
+    "frontend-design"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Liquid Glass Design",
+    "shortDescription": "Premium Liquid Glass UI skill, templates, and QA.",
+    "longDescription": "Design, implement, package, and verify high-end Liquid Glass interfaces with CSS/SVG refraction, displacement maps, adaptive tinting, React/Web Component templates, and browser visual QA.",
+    "developerName": "xinlingfeiwu",
+    "category": "Design",
+    "capabilities": [
+      "Design",
+      "Write",
+      "Review"
+    ],
+    "websiteURL": "https://github.com/xinlingfeiwu/liquid-glass-design-skill",
+    "brandColor": "#7DD3FC",
+    "defaultPrompt": [
+      "Upgrade this toolbar into premium Liquid Glass.",
+      "Build a React LiquidGlass component.",
+      "Run Liquid Glass visual QA on this page."
+    ]
+  }
+}

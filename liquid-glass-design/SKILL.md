@@ -2,7 +2,7 @@
 name: liquid-glass-design
 description: Create, upgrade, and review high-end Liquid Glass UI for web and Electron apps. Use for iOS 26-style Liquid Glass, premium glassmorphism, SVG feDisplacementMap refraction, backdrop-filter, adaptive tint, chromatic aberration, translucent controls, glass buttons, visual QA, design-system templates, CSS, JavaScript, React, or accessibility-safe glass interfaces.
 metadata:
-  version: 0.2.0
+  version: 0.3.0
 ---
 
 # Liquid Glass Design

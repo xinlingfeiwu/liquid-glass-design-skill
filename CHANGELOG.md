@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.3.0 - 2026-07-09
+
+- Added a portable `<liquid-glass>` Web Component template for Vue, Svelte, Angular, plain HTML, and mixed stacks.
+- Added adaptive glass tinting: shared backdrop-luminance sampling, `data-lg-adaptive`, React `adaptive`, Web Component `adaptive`, debug mode attributes, docs, eval coverage, and updated showcases.
+- Extracted shared Liquid Glass core math/support logic into `assets/core/liquid-glass-core.js` and generated template/package-local copies so runtime templates stay self-contained without drifting.
+- Hardened Safari/Firefox SVG-backdrop fallback detection with a shared engine deny-list plus CI coverage for WebKit without forced fallback.
+- Added ROI-only visual baselines, stricter ROI pixel checks, reduced-motion QA, WCAG 4.5 contrast enforcement, and reusable 1x1 bitmap sampling for adaptive glass.
+- Changed local dev scripts and CI visual QA to serve the vanilla and Web Component template directories directly, proving templates work when copied alone.
+- Added README preview automation via `docs/preview-latest.png`, generated from the 1440x900 visual QA screenshot on `main`.
+- Added publish-ready package scaffolds for `liquid-glass-core` and `@liquid-glass-design/react`.
+- Added optional nightly behavior eval scaffolding for agent-generated pages plus `.codex-plugin/` and `.claude-plugin/` plugin metadata.
+- Updated GitHub Actions to Node 24 and added npm package dry-run checks.
+
 ## 0.2.0 - 2026-07-08
 
 - Centralized Liquid Glass numeric defaults in `golden-glass-style.md` with separate production and showcase tables.
@@ -9,12 +22,8 @@
 - Hardened trigger evals so query terms and skill-description terms are checked separately instead of self-matching.
 - Added lean `.skill` packaging, visual self-QA in CI, and tag-based GitHub Release asset publishing.
 - Improved React/vanilla templates with explicit supersampling, scale-only strength updates, ready classes, forwarded refs, and lower pointer-move layout cost.
-- Added committed visual baselines, WebKit fallback QA, contrast checks, Electron integration guidance, and a portable `<liquid-glass>` Web Component template.
-- Hardened Safari/Firefox SVG-backdrop fallback detection with a shared engine deny-list plus CI coverage for WebKit without forced fallback.
-- Extracted shared Liquid Glass core math/support logic into `assets/core/liquid-glass-core.js` so the generator, vanilla template, React template, and Web Component no longer drift independently.
-- Added ROI pixel checks, reduced-motion QA, WCAG 4.5 contrast enforcement, and a reusable `quick_validate.py` structure/forbidden-term validator.
+- Added committed visual baselines, initial WebKit fallback QA, contrast checks, Electron integration guidance, and a reusable `quick_validate.py` structure/forbidden-term validator.
 - Excluded committed visual baselines from packaged `.skill` archives to keep distributed packages lightweight.
-- Added adaptive glass tinting: shared backdrop-luminance sampling, `data-lg-adaptive`, React `adaptive`, Web Component `adaptive`, debug mode attributes, docs, eval coverage, and updated showcases.
 
 ## 0.1.0 - 2026-07-08
 

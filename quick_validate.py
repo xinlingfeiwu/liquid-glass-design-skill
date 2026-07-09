@@ -33,8 +33,10 @@ REQUIRED_PATHS = [
     "scripts/generate-displacement-map.mjs",
     "scripts/check-visual-geometry.mjs",
     "scripts/package-skill.mjs",
+    "scripts/run-behavior-eval.mjs",
     "scripts/run-evals.mjs",
     "scripts/test-displacement-map.mjs",
+    "scripts/update-readme-preview.mjs",
     "references/golden-glass-style.md",
     "references/practical-workflows.md",
     "references/qa-checklist.md",
@@ -90,8 +92,8 @@ def main() -> None:
     frontmatter = parse_frontmatter(skill_text)
     if "name: liquid-glass-design" not in frontmatter:
         fail("SKILL.md frontmatter must declare name: liquid-glass-design")
-    if "version: 0.2.0" not in frontmatter:
-        fail("SKILL.md metadata.version must be 0.2.0")
+    if "version: 0.3.0" not in frontmatter:
+        fail("SKILL.md metadata.version must be 0.3.0")
     for term in REQUIRED_DESCRIPTION_TERMS:
         if term not in frontmatter:
             fail(f"SKILL.md description must include trigger term: {term}")

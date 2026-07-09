@@ -1,0 +1,35 @@
+{
+  "name": "liquid-glass-core",
+  "version": "0.3.0",
+  "description": "Core Liquid Glass displacement-map, adaptive tint, and support-detection primitives.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Liquid Glass Design Skill",
+  "homepage": "https://github.com/xinlingfeiwu/liquid-glass-design-skill#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xinlingfeiwu/liquid-glass-design-skill.git",
+    "directory": "packages/liquid-glass-core"
+  },
+  "exports": {
+    ".": {
+      "types": "./liquid-glass-core.d.ts",
+      "import": "./liquid-glass-core.js"
+    }
+  },
+  "types": "./liquid-glass-core.d.ts",
+  "files": [
+    "liquid-glass-core.js",
+    "liquid-glass-core.d.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "keywords": [
+    "liquid-glass",
+    "glassmorphism",
+    "svg-filter",
+    "displacement-map",
+    "refraction"
+  ]
+}

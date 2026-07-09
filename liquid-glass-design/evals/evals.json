@@ -131,6 +131,21 @@
       "id": "package-script-excludes-heavy-directories",
       "paths": ["scripts/package-skill.mjs"],
       "must_include_all": ["node_modules", "dist", "dry-run", "lean", "evals/baselines"]
+    },
+    {
+      "id": "distribution-has-npm-packages-and-plugin-metadata",
+      "paths": ["../packages", "../.codex-plugin/plugin.json", "../.claude-plugin/manifest.json", "../README.md"],
+      "must_include_all": ["liquid-glass-core", "@liquid-glass-design/react", "\\.codex-plugin", "\\.claude-plugin", "npm pack --dry-run"]
+    },
+    {
+      "id": "ci-serves-template-directories-and-updates-preview",
+      "paths": ["../package.json", "../.github/workflows/ci.yml", "scripts/update-readme-preview.mjs", "../README.md"],
+      "must_include_all": ["assets/templates/vanilla-liquid-glass", "http://127\\.0\\.0\\.1:4173/", "preview-latest\\.png", "update-readme-preview"]
+    },
+    {
+      "id": "behavior-eval-scaffold-is-runnable",
+      "paths": ["scripts/run-behavior-eval.mjs", "../.github/workflows/nightly-behavior-eval.yml"],
+      "must_include_all": ["RUN_BEHAVIOR_EVAL", "claude", "feDisplacementMap", "check-visual-geometry", "Nightly Behavior Eval"]
     }
   ]
 }

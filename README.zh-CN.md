@@ -2,7 +2,7 @@
 
 一套面向 AI Agent 的 Liquid Glass 设计与实现 Skill，用于生成、升级和审查高品质液态玻璃界面。它包含 CSS/SVG 折射、Canvas displacement map、React 组件模板、视觉 QA、打包脚本和可执行 smoke eval。
 
-![Liquid Glass preview](docs/preview-20260708-v4.png)
+![Liquid Glass preview](docs/preview-latest.png)
 
 ## 加入 QQ 群
 
@@ -50,7 +50,18 @@ node liquid-glass-design/scripts/package-skill.mjs --lean
 
 ### Claude Code / Plugin
 
-可以使用 symlink 安装，也可以使用上面的 `.skill` 包走 Claude Code plugin/marketplace 兼容流程。`liquid-glass-design/LICENSE` 会随 skill 文件夹一起分发。
+可以使用 symlink 安装，也可以使用上面的 `.skill` 包走 Claude Code plugin/marketplace 兼容流程。本仓库也提供 `.claude-plugin/` 和 `.codex-plugin/` 元数据脚手架，便于后续接入插件分发。`liquid-glass-design/LICENSE` 会随 skill 文件夹一起分发。
+
+### NPM 包
+
+如果要把能力集成进真实产品，可以复制模板目录，也可以使用 `packages/` 下的可发布包：
+
+```bash
+npm pack --dry-run ./packages/liquid-glass-core
+npm pack --dry-run ./packages/react-liquid-glass
+```
+
+`liquid-glass-core` 暴露 displacement pixels、自适应 tint、浏览器能力检测等共享能力；`@liquid-glass-design/react` 暴露 `<LiquidGlass>` 组件、CSS 和类型声明。
 
 ## 使用方式
 
@@ -81,7 +92,7 @@ Vanilla：
 npm run dev:vanilla
 ```
 
-打开 `http://127.0.0.1:4173/templates/vanilla-liquid-glass/`。
+打开 `http://127.0.0.1:4173/`。
 
 React：
 
@@ -97,7 +108,7 @@ Web Component：
 npm run dev:web-component
 ```
 
-打开 `http://127.0.0.1:4174/templates/web-component-liquid-glass/`。
+打开 `http://127.0.0.1:4174/`。
 
 任意 HTML/框架里可直接使用：
 
@@ -140,7 +151,7 @@ npm run dev:web-component
 ```bash
 npm i -D playwright && npx playwright install chromium
 node liquid-glass-design/scripts/check-visual-geometry.mjs \
-  --url http://127.0.0.1:4173/templates/vanilla-liquid-glass/ \
+  --url http://127.0.0.1:4173/ \
   --screenshot-dir ./shots \
   --adaptive \
   --contrast \
@@ -153,7 +164,7 @@ QA 脚本会检查重叠、居中、viewport containment、SVG/filter fallback�
 
 ```bash
 node liquid-glass-design/scripts/check-visual-geometry.mjs \
-  --url http://127.0.0.1:4173/templates/vanilla-liquid-glass/ \
+  --url http://127.0.0.1:4173/ \
   --baseline-dir liquid-glass-design/evals/baselines \
   --full-page \
   --pixel-channel-threshold 24 \
@@ -177,7 +188,7 @@ npm run qa:vanilla:webkit-detect
 npm run qa:vanilla:reduced-motion
 ```
 
-仓库里的 baseline PNG 只用于 CI 视觉回归，不会进入 full/lean `.skill` 分发包。
+仓库里的 baseline PNG 只用于 CI 视觉回归，不会进入 full/lean `.skill` 分发包。CI 会在 `main` 分支用 1440x900 视觉 QA 截图自动刷新 `docs/preview-latest.png`，README 预览图不再依赖手动截图。
 
 ## 校验
 
