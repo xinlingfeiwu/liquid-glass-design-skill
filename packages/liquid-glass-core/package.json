@@ -1,6 +1,6 @@
 {
   "name": "liquid-glass-core",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Core Liquid Glass displacement-map, adaptive tint, and support-detection primitives.",
   "type": "module",
   "license": "MIT",

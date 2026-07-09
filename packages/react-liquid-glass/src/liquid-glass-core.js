@@ -1,4 +1,4 @@
-// GENERATED FROM liquid-glass-design/assets/core/liquid-glass-core.js.
+// GENERATED FROM skills/liquid-glass-design/assets/core/liquid-glass-core.js.
 // Do not edit this generated copy directly; run `npm run sync:templates`.
 
 export const DEFAULT_SUPERSAMPLE = 2;

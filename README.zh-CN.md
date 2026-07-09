@@ -2,7 +2,7 @@
 
 一套面向 AI Agent 的 Liquid Glass 设计与实现 Skill，用于生成、升级和审查高品质液态玻璃界面。它包含 CSS/SVG 折射、Canvas displacement map、React 组件模板、视觉 QA、打包脚本和可执行 smoke eval。
 
-![Liquid Glass preview](docs/preview-latest.png)
+![Liquid Glass preview](https://raw.githubusercontent.com/xinlingfeiwu/liquid-glass-design-skill/gh-pages/preview/preview-latest.png)
 
 ## 加入 QQ 群
 
@@ -23,7 +23,7 @@ cd liquid-glass-design-skill
 
 ```bash
 mkdir -p ~/.codex/skills
-ln -sf "$(pwd)/liquid-glass-design" ~/.codex/skills/liquid-glass-design
+ln -sf "$(pwd)/skills/liquid-glass-design" ~/.codex/skills/liquid-glass-design
 ```
 
 推荐提示词：
@@ -42,15 +42,20 @@ Use $liquid-glass-design to upgrade this existing UI into premium Liquid Glass w
 也可以本地打包：
 
 ```bash
-node liquid-glass-design/scripts/package-skill.mjs
-node liquid-glass-design/scripts/package-skill.mjs --lean
+node skills/liquid-glass-design/scripts/package-skill.mjs
+node skills/liquid-glass-design/scripts/package-skill.mjs --lean
 ```
 
 然后在 Cowork 设置中上传 `dist/liquid-glass-design.skill` 或 `dist/liquid-glass-design.lean.skill`。Full 包保留 eval/dev 资源；Lean 包会剔除 `evals/`、`agents/openai.yaml`、研究记录、模板 lockfile 和 eval-only 脚本。
 
 ### Claude Code / Plugin
 
-可以使用 symlink 安装，也可以使用上面的 `.skill` 包走 Claude Code plugin/marketplace 兼容流程。本仓库也提供 `.claude-plugin/` 和 `.codex-plugin/` 元数据脚手架，便于后续接入插件分发。`liquid-glass-design/LICENSE` 会随 skill 文件夹一起分发。
+```bash
+mkdir -p ~/.claude/skills
+ln -sf "$(pwd)/skills/liquid-glass-design" ~/.claude/skills/liquid-glass-design
+```
+
+也可以使用上面的 `.skill` 包走 Claude Code plugin/marketplace 兼容流程。本仓库也提供 `.claude-plugin/` 和 `.codex-plugin/` 元数据脚手架，便于后续接入插件分发。`skills/liquid-glass-design/LICENSE` 会随 skill 文件夹一起分发。
 
 ### NPM 包
 
@@ -76,7 +81,7 @@ npm pack --dry-run ./packages/react-liquid-glass
 
 三个模板目录都是可独立拷贝的：`vanilla-liquid-glass/`、`web-component-liquid-glass/`、`react-liquid-glass/` 内部都带有由共享 core 生成的 `liquid-glass-core.js`，复制模板目录时不需要再额外复制 `assets/core/`。
 
-维护本仓库时，只修改 `liquid-glass-design/assets/core/liquid-glass-core.js`，然后执行：
+维护本仓库时，只修改 `skills/liquid-glass-design/assets/core/liquid-glass-core.js`，然后执行：
 
 ```bash
 npm run sync:templates
@@ -97,7 +102,7 @@ npm run dev:vanilla
 React：
 
 ```bash
-cd liquid-glass-design/assets/templates/react-liquid-glass
+cd skills/liquid-glass-design/assets/templates/react-liquid-glass
 npm install
 npm run dev
 ```
@@ -150,7 +155,7 @@ npm run dev:web-component
 
 ```bash
 npm i -D playwright && npx playwright install chromium
-node liquid-glass-design/scripts/check-visual-geometry.mjs \
+node skills/liquid-glass-design/scripts/check-visual-geometry.mjs \
   --url http://127.0.0.1:4173/ \
   --screenshot-dir ./shots \
   --adaptive \
@@ -163,9 +168,9 @@ node liquid-glass-design/scripts/check-visual-geometry.mjs \
 QA 脚本会检查重叠、居中、viewport containment、SVG/filter fallback、自适应 tint 是否同步、adaptive mode 是否在亮暗背景中切换、对比度和像素 baseline。
 
 ```bash
-node liquid-glass-design/scripts/check-visual-geometry.mjs \
+node skills/liquid-glass-design/scripts/check-visual-geometry.mjs \
   --url http://127.0.0.1:4173/ \
-  --baseline-dir liquid-glass-design/evals/baselines \
+  --baseline-dir skills/liquid-glass-design/evals/baselines \
   --full-page \
   --pixel-channel-threshold 24 \
   --roi-roles dock,focus \
@@ -177,7 +182,7 @@ node liquid-glass-design/scripts/check-visual-geometry.mjs \
 
 ```bash
 npm run qa:vanilla:update-baseline
-git diff -- liquid-glass-design/evals/baselines
+git diff -- skills/liquid-glass-design/evals/baselines
 ```
 
 验证 fallback：
@@ -188,7 +193,7 @@ npm run qa:vanilla:webkit-detect
 npm run qa:vanilla:reduced-motion
 ```
 
-仓库里的 baseline PNG 只用于 CI 视觉回归，不会进入 full/lean `.skill` 分发包。CI 会在 `main` 分支用 1440x900 视觉 QA 截图自动刷新 `docs/preview-latest.png`，README 预览图不再依赖手动截图。
+仓库里的 baseline PNG 只用于 CI 视觉回归，不会进入 full/lean `.skill` 分发包。CI 会用 1440x900 视觉 QA 截图把 `preview/preview-latest.png` 发布到 orphan `gh-pages` 分支，README 预览图不再依赖手动截图，也不会继续向 `main` 写入二进制预览图。
 
 ## 校验
 
@@ -199,7 +204,7 @@ npm test
 React 模板：
 
 ```bash
-cd liquid-glass-design/assets/templates/react-liquid-glass
+cd skills/liquid-glass-design/assets/templates/react-liquid-glass
 npm ci
 npm run build
 ```

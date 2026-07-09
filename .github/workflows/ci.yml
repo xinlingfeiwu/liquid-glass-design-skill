@@ -31,6 +31,9 @@ jobs:
       - name: Eval smoke
         run: npm run eval
 
+      - name: Plugin manifest validation
+        run: npm run plugin:validate
+
       - name: Package dry run
         run: npm run package:dry
 
@@ -38,7 +41,7 @@ jobs:
         run: npm run npm:pack
 
       - name: React template build
-        working-directory: liquid-glass-design/assets/templates/react-liquid-glass
+        working-directory: skills/liquid-glass-design/assets/templates/react-liquid-glass
         run: |
           npm ci
           npm run build
@@ -52,7 +55,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p artifacts/screenshots
-          python3 -m http.server 4173 --directory liquid-glass-design/assets/templates/vanilla-liquid-glass > /tmp/liquid-glass-http.log 2>&1 &
+          python3 -m http.server 4173 --directory skills/liquid-glass-design/assets/templates/vanilla-liquid-glass > /tmp/liquid-glass-http.log 2>&1 &
           server_pid=$!
           trap 'kill "$server_pid" 2>/dev/null || true' EXIT
           for _ in $(seq 1 60); do
@@ -61,12 +64,12 @@ jobs:
             fi
             sleep 0.5
           done
-          node liquid-glass-design/scripts/check-visual-geometry.mjs \
+          node skills/liquid-glass-design/scripts/check-visual-geometry.mjs \
             --url http://127.0.0.1:4173/ \
             --browser chromium \
             --expect-svg-filter enabled \
             --screenshot-dir artifacts/screenshots \
-            --baseline-dir liquid-glass-design/evals/baselines \
+            --baseline-dir skills/liquid-glass-design/evals/baselines \
             --full-page \
             --pixel-channel-threshold 24 \
             --roi-roles dock,focus \
@@ -76,7 +79,7 @@ jobs:
             --adaptive \
             --contrast \
             --min-contrast 4.5
-          node liquid-glass-design/scripts/check-visual-geometry.mjs \
+          node skills/liquid-glass-design/scripts/check-visual-geometry.mjs \
             --url http://127.0.0.1:4173/ \
             --browser webkit \
             --expect-svg-filter disabled \
@@ -85,7 +88,7 @@ jobs:
             --adaptive \
             --contrast \
             --min-contrast 4.5
-          node liquid-glass-design/scripts/check-visual-geometry.mjs \
+          node skills/liquid-glass-design/scripts/check-visual-geometry.mjs \
             --url http://127.0.0.1:4173/ \
             --browser webkit \
             --force-fallback \
@@ -96,20 +99,24 @@ jobs:
             --contrast \
             --min-contrast 4.5
 
-      - name: Refresh README preview from visual QA
+      - name: Prepare README preview artifact
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           set -euo pipefail
-          node liquid-glass-design/scripts/update-readme-preview.mjs \
+          mkdir -p artifacts/preview
+          node skills/liquid-glass-design/scripts/update-readme-preview.mjs \
             --source artifacts/screenshots/liquid-glass-1440x900.png \
-            --target docs/preview-latest.png
-          if ! git diff --quiet -- docs/preview-latest.png; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add docs/preview-latest.png
-            git commit -m "docs: update preview image [skip ci]"
-            git push
-          fi
+            --target artifacts/preview/preview-latest.png
+
+      - name: Publish README preview to gh-pages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: artifacts/preview
+          destination_dir: preview
+          force_orphan: true
+          commit_message: "docs: update preview image"
 
       - name: Upload visual QA screenshots
         if: always()

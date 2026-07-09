@@ -7,7 +7,8 @@ import { fileURLToPath } from "node:url";
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const skillDir = resolve(scriptDir, "..");
-const repoRoot = resolve(skillDir, "..");
+const skillParentDir = dirname(skillDir);
+const repoRoot = resolve(skillDir, "../..");
 const outputDir = resolve(repoRoot, "dist");
 const EXCLUDE_PARTS = new Set([".git", "node_modules", "dist", ".vite", "coverage", "__pycache__"]);
 const EXCLUDE_SUFFIXES = [".log", ".DS_Store"];
@@ -49,7 +50,7 @@ async function walk(dir, options) {
   const files = [];
   for (const entry of entries) {
     const fullPath = join(dir, entry);
-    const rel = relative(repoRoot, fullPath).replaceAll("\\", "/");
+    const rel = relative(skillParentDir, fullPath).replaceAll("\\", "/");
     if (isExcluded(rel, options)) continue;
     const info = await stat(fullPath);
     if (info.isDirectory()) {
@@ -96,7 +97,7 @@ async function main() {
   await rm(zipPath, { force: true });
   await rm(skillPath, { force: true });
   const zip = spawnSync("zip", ["-q", "-X", "-@", zipPath], {
-    cwd: repoRoot,
+    cwd: skillParentDir,
     input: `${files.map((file) => file.path).join("\n")}\n`,
     encoding: "utf8"
   });

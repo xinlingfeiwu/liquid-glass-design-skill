@@ -1,6 +1,6 @@
 {
   "name": "@liquid-glass-design/react",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "React Liquid Glass surface component with SVG refraction, adaptive tinting, and typed props.",
   "type": "module",
   "license": "MIT",

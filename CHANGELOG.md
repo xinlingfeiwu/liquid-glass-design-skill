@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.1 - 2026-07-09
+
+- Moved the published skill source into a real `skills/liquid-glass-design/` directory so GitHub ZIP downloads and Windows checkouts no longer depend on symlink support.
+- Reworked behavior evals to install the skill into an isolated Claude home before generation, use natural user prompts, and optionally run with/without-skill A/B comparisons.
+- Replaced `.claude-plugin/manifest.json` with `.claude-plugin/plugin.json` and added plugin-manifest validation for real skill paths, no parent-directory escapes, and no symlinked skill roots.
+- Aligned CI, nightly eval, release, npm scripts, and local validators on Node 24.
+- Moved README preview automation to the orphan `gh-pages` branch so preview updates do not add binary churn to `main`.
+
 ## 0.3.0 - 2026-07-09
 
 - Added a portable `<liquid-glass>` Web Component template for Vue, Svelte, Angular, plain HTML, and mixed stacks.
@@ -8,7 +16,7 @@
 - Hardened Safari/Firefox SVG-backdrop fallback detection with a shared engine deny-list plus CI coverage for WebKit without forced fallback.
 - Added ROI-only visual baselines, stricter ROI pixel checks, reduced-motion QA, WCAG 4.5 contrast enforcement, and reusable 1x1 bitmap sampling for adaptive glass.
 - Changed local dev scripts and CI visual QA to serve the vanilla and Web Component template directories directly, proving templates work when copied alone.
-- Added README preview automation via `docs/preview-latest.png`, generated from the 1440x900 visual QA screenshot on `main`.
+- Added README preview automation via the orphan `gh-pages` branch, generated from the 1440x900 visual QA screenshot without committing binary churn to `main`.
 - Added publish-ready package scaffolds for `liquid-glass-core` and `@liquid-glass-design/react`.
 - Added optional nightly behavior eval scaffolding for agent-generated pages plus `.codex-plugin/` and `.claude-plugin/` plugin metadata.
 - Updated GitHub Actions to Node 24 and added npm package dry-run checks.

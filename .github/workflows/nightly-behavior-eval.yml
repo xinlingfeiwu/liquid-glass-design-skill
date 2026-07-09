@@ -25,6 +25,7 @@ jobs:
       - name: Run behavior-level eval when agent command is available
         env:
           RUN_BEHAVIOR_EVAL: ${{ secrets.ANTHROPIC_API_KEY != '' && '1' || '' }}
+          BEHAVIOR_EVAL_AB: "1"
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           BEHAVIOR_EVAL_COMMAND: ${{ vars.BEHAVIOR_EVAL_COMMAND || 'claude' }}
         run: npm run behavior:eval

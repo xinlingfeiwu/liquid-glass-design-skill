@@ -4,8 +4,8 @@ import { copyFile, mkdir, stat } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
-const DEFAULT_TARGET = "docs/preview-latest.png";
+const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
+const DEFAULT_TARGET = "artifacts/preview/preview-latest.png";
 const DEFAULT_SOURCES = [
   "artifacts/screenshots/liquid-glass-1440x900.png",
   "artifacts/screenshots/liquid-glass-2048x1114.png",

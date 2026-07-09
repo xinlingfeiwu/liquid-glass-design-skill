@@ -1,14 +1,15 @@
 {
   "name": "liquid-glass-design",
   "version": "0.3.1",
-  "description": "Skill and template kit for premium Liquid Glass UI design, SVG refraction, adaptive glass, and visual QA.",
+  "description": "Premium Liquid Glass design skill with templates, adaptive glass, and visual QA.",
   "author": {
     "name": "xinlingfeiwu",
     "url": "https://github.com/xinlingfeiwu"
   },
+  "license": "MIT",
   "homepage": "https://github.com/xinlingfeiwu/liquid-glass-design-skill",
   "repository": "https://github.com/xinlingfeiwu/liquid-glass-design-skill",
-  "license": "MIT",
+  "skills": "./skills/",
   "keywords": [
     "liquid-glass",
     "glassmorphism",
@@ -16,7 +17,6 @@
     "refraction",
     "frontend-design"
   ],
-  "skills": "./skills/",
   "interface": {
     "displayName": "Liquid Glass Design",
     "shortDescription": "Premium Liquid Glass UI skill, templates, and QA.",

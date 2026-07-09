@@ -109,8 +109,8 @@
     },
     {
       "id": "templates-use-generated-core-copies",
-      "paths": ["../package.json", "scripts/sync-template-core.mjs", "assets/templates/vanilla-liquid-glass", "assets/templates/react-liquid-glass/src", "assets/templates/web-component-liquid-glass"],
-      "must_include_all": ["sync:templates", "GENERATED FROM liquid-glass-design/assets/core/liquid-glass-core\\.js", "\\./liquid-glass-core\\.js", "createLiquidGlassDisplacementPixels", "supportsLiquidGlassSvgFilter"]
+      "paths": ["../../package.json", "scripts/sync-template-core.mjs", "assets/templates/vanilla-liquid-glass", "assets/templates/react-liquid-glass/src", "assets/templates/web-component-liquid-glass"],
+      "must_include_all": ["sync:templates", "GENERATED FROM skills/liquid-glass-design/assets/core/liquid-glass-core\\.js", "\\./liquid-glass-core\\.js", "createLiquidGlassDisplacementPixels", "supportsLiquidGlassSvgFilter"]
     },
     {
       "id": "templates-expose-adaptive-glass",
@@ -134,18 +134,24 @@
     },
     {
       "id": "distribution-has-npm-packages-and-plugin-metadata",
-      "paths": ["../packages", "../.codex-plugin/plugin.json", "../.claude-plugin/manifest.json", "../README.md"],
+      "paths": ["../../packages", "../../.codex-plugin/plugin.json", "../../.claude-plugin/plugin.json", "../../README.md", "../../scripts/validate-plugin-manifests.mjs"],
       "must_include_all": ["liquid-glass-core", "@liquid-glass-design/react", "\\.codex-plugin", "\\.claude-plugin", "npm pack --dry-run"]
     },
     {
+      "id": "plugin-manifests-avoid-symlink-and-parent-escape",
+      "paths": ["../../.codex-plugin/plugin.json", "../../.claude-plugin/plugin.json", "../../scripts/validate-plugin-manifests.mjs"],
+      "must_include_all": ["\\.\\/skills\\/", "assertNoSymlink", "must not escape the plugin root", "manifest\\.json is intentionally not supported"],
+      "must_not_include": ["\\.\\.\\/liquid-glass-design"]
+    },
+    {
       "id": "ci-serves-template-directories-and-updates-preview",
-      "paths": ["../package.json", "../.github/workflows/ci.yml", "scripts/update-readme-preview.mjs", "../README.md"],
-      "must_include_all": ["assets/templates/vanilla-liquid-glass", "http://127\\.0\\.0\\.1:4173/", "preview-latest\\.png", "update-readme-preview"]
+      "paths": ["../../package.json", "../../.github/workflows/ci.yml", "scripts/update-readme-preview.mjs", "../../README.md"],
+      "must_include_all": ["assets/templates/vanilla-liquid-glass", "http://127\\.0\\.0\\.1:4173/", "preview-latest\\.png", "peaceiris/actions-gh-pages", "update-readme-preview"]
     },
     {
       "id": "behavior-eval-scaffold-is-runnable",
-      "paths": ["scripts/run-behavior-eval.mjs", "../.github/workflows/nightly-behavior-eval.yml"],
-      "must_include_all": ["RUN_BEHAVIOR_EVAL", "claude", "feDisplacementMap", "check-visual-geometry", "Nightly Behavior Eval"]
+      "paths": ["scripts/run-behavior-eval.mjs", "../../.github/workflows/nightly-behavior-eval.yml"],
+      "must_include_all": ["RUN_BEHAVIOR_EVAL", "claude", "installSkillForClaude", "\\.claude\\/skills", "compare-without-skill", "check-visual-geometry", "Nightly Behavior Eval"]
     }
   ]
 }

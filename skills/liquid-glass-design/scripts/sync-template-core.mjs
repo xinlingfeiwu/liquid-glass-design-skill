@@ -4,17 +4,18 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
-const sourcePath = resolve(rootDir, "liquid-glass-design/assets/core/liquid-glass-core.js");
+const skillDir = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const rootDir = resolve(skillDir, "../..");
+const sourcePath = resolve(skillDir, "assets/core/liquid-glass-core.js");
 const targets = [
-  "liquid-glass-design/assets/templates/vanilla-liquid-glass/liquid-glass-core.js",
-  "liquid-glass-design/assets/templates/react-liquid-glass/src/liquid-glass-core.js",
-  "liquid-glass-design/assets/templates/web-component-liquid-glass/liquid-glass-core.js",
+  "skills/liquid-glass-design/assets/templates/vanilla-liquid-glass/liquid-glass-core.js",
+  "skills/liquid-glass-design/assets/templates/react-liquid-glass/src/liquid-glass-core.js",
+  "skills/liquid-glass-design/assets/templates/web-component-liquid-glass/liquid-glass-core.js",
   "packages/liquid-glass-core/liquid-glass-core.js",
   "packages/react-liquid-glass/src/liquid-glass-core.js"
 ].map((path) => resolve(rootDir, path));
 
-const header = `// GENERATED FROM liquid-glass-design/assets/core/liquid-glass-core.js.
+const header = `// GENERATED FROM skills/liquid-glass-design/assets/core/liquid-glass-core.js.
 // Do not edit this generated copy directly; run \`npm run sync:templates\`.
 
 `;

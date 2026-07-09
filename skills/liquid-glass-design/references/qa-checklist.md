@@ -20,7 +20,7 @@ Run this checklist before finalizing Liquid Glass UI.
 - For adaptive surfaces, inspect `data-lg-adaptive-mode` and `data-lg-adaptive-luminance`; verify bright/dark backdrops produce distinct modes and bright backgrounds gain enough tint while dark backgrounds remain transparent enough.
 - Confirm shape-specific profiles are intentional: small pills stay crisp, text panels stay readable, showcase bars carry stronger lensing.
 - Confirm the first viewport has a clear product/UI composition and focal point before judging the optical material.
-- Confirm the README/screenshot preview is generated from the current runnable demo and refreshed through `docs/preview-latest.png`.
+- Confirm the README/screenshot preview is generated from the current runnable demo and published to the orphan `gh-pages` preview artifact, not committed back to `main`.
 - Confirm the user can open a real demo URL or HTML file; a directory listing of template folders is not a valid visual deliverable.
 
 ## Layout
@@ -51,7 +51,7 @@ console.table({
 Bundled script check when the page is runnable and Playwright is installed:
 
 ```bash
-node liquid-glass-design/scripts/check-visual-geometry.mjs --url http://127.0.0.1:4173/ --screenshot-dir ./shots --adaptive --contrast --min-contrast 4.5
+node skills/liquid-glass-design/scripts/check-visual-geometry.mjs --url http://127.0.0.1:4173/ --screenshot-dir ./shots --adaptive --contrast --min-contrast 4.5
 ```
 
 Prefer adding semantic hooks in product code so the script can auto-discover surfaces:
@@ -66,9 +66,9 @@ Prefer adding semantic hooks in product code so the script can auto-discover sur
 For pixel regression, compare against committed viewport baselines. Update them only when the visual change is intentional and the PNG diff is reviewed. Use `--full-page` for exploratory captures, not cross-platform CI baselines:
 
 ```bash
-node liquid-glass-design/scripts/check-visual-geometry.mjs --url http://127.0.0.1:4173/ --baseline-dir liquid-glass-design/evals/baselines --pixel-threshold 0.10 --pixel-channel-threshold 24 --roi-roles dock,focus --roi-pixel-threshold 0.08 --adaptive
+node skills/liquid-glass-design/scripts/check-visual-geometry.mjs --url http://127.0.0.1:4173/ --baseline-dir skills/liquid-glass-design/evals/baselines --pixel-threshold 0.10 --pixel-channel-threshold 24 --roi-roles dock,focus --roi-pixel-threshold 0.08 --adaptive
 npm run qa:vanilla:update-baseline
-git diff -- liquid-glass-design/evals/baselines
+git diff -- skills/liquid-glass-design/evals/baselines
 ```
 
 ## Accessibility

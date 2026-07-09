@@ -22,8 +22,8 @@ jobs:
 
       - name: Build skill packages
         run: |
-          node liquid-glass-design/scripts/package-skill.mjs
-          node liquid-glass-design/scripts/package-skill.mjs --lean
+          node skills/liquid-glass-design/scripts/package-skill.mjs
+          node skills/liquid-glass-design/scripts/package-skill.mjs --lean
           ls -lh dist
 
       - name: Publish GitHub Release assets

@@ -78,7 +78,7 @@ def iter_text_files(root: Path):
 
 
 def main() -> None:
-    root = Path(sys.argv[1] if len(sys.argv) > 1 else "liquid-glass-design").resolve()
+    root = Path(sys.argv[1] if len(sys.argv) > 1 else "skills/liquid-glass-design").resolve()
     if not root.exists():
         fail(f"skill directory does not exist: {root}")
     if root.name != "liquid-glass-design":
@@ -92,8 +92,8 @@ def main() -> None:
     frontmatter = parse_frontmatter(skill_text)
     if "name: liquid-glass-design" not in frontmatter:
         fail("SKILL.md frontmatter must declare name: liquid-glass-design")
-    if "version: 0.3.0" not in frontmatter:
-        fail("SKILL.md metadata.version must be 0.3.0")
+    if "version: 0.3.1" not in frontmatter:
+        fail("SKILL.md metadata.version must be 0.3.1")
     for term in REQUIRED_DESCRIPTION_TERMS:
         if term not in frontmatter:
             fail(f"SKILL.md description must include trigger term: {term}")

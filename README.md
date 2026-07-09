@@ -6,7 +6,7 @@ An AI-agent skill and template kit for building high-end Liquid Glass interfaces
 
 The refraction core uses inverse lens mapping: a canvas-generated displacement map whose interior is identity and whose edges magnify the backdrop, driven through a per-surface SVG `feDisplacementMap` at a measured — never guessed — scale.
 
-![Liquid Glass preview](docs/preview-latest.png)
+![Liquid Glass preview](https://raw.githubusercontent.com/xinlingfeiwu/liquid-glass-design-skill/gh-pages/preview/preview-latest.png)
 
 ## Join The QQ Group
 
@@ -16,28 +16,28 @@ Scan the QR code to join the `liquid-glass-skill` group chat.
 
 ## What Is Included
 
-- `liquid-glass-design/SKILL.md` - the skill entrypoint (workflow, rules, defaults, acceptance criteria).
-- `liquid-glass-design/references/` - practical workflows, design recipes, prompt patterns, showcase quality gates, the golden-glass single source of truth, web/Electron implementation contracts, GitHub research, and QA checklists.
-- `liquid-glass-design/assets/core/liquid-glass-core.js` - the single source for SDF, lens-profile, displacement-pixel, adaptive tint, and browser support logic. Template-local generated copies keep every template folder portable.
-- `liquid-glass-design/scripts/sync-template-core.mjs` - syncs generated template-local core files from the shared core and checks drift in CI.
-- `liquid-glass-design/scripts/generate-displacement-map.mjs` - a zero-dependency PNG displacement map generator that prints the exact `feDisplacementMap` scale.
-- `liquid-glass-design/scripts/check-visual-geometry.mjs` - a Playwright-based QA helper for overlap, dock centering, viewport containment, fallback behavior, contrast estimates, screenshots, and committed PNG baselines.
-- `liquid-glass-design/scripts/package-skill.mjs` - creates full or lean `.skill` packages while excluding `node_modules`, `dist`, caches, logs, and other heavy local artifacts.
-- `liquid-glass-design/scripts/run-evals.mjs` - executable smoke evals for trigger coverage and forbidden implementation patterns.
-- `liquid-glass-design/scripts/run-behavior-eval.mjs` - optional nightly behavior eval harness for agent-generated pages.
-- `liquid-glass-design/scripts/update-readme-preview.mjs` - refreshes `docs/preview-latest.png` from visual QA screenshots.
-- `liquid-glass-design/evals/evals.json` - trigger cases and static assertions for checking practical, premium Liquid Glass outcomes.
+- `skills/liquid-glass-design/SKILL.md` - the skill entrypoint (workflow, rules, defaults, acceptance criteria).
+- `skills/liquid-glass-design/references/` - practical workflows, design recipes, prompt patterns, showcase quality gates, the golden-glass single source of truth, web/Electron implementation contracts, GitHub research, and QA checklists.
+- `skills/liquid-glass-design/assets/core/liquid-glass-core.js` - the single source for SDF, lens-profile, displacement-pixel, adaptive tint, and browser support logic. Template-local generated copies keep every template folder portable.
+- `skills/liquid-glass-design/scripts/sync-template-core.mjs` - syncs generated template-local core files from the shared core and checks drift in CI.
+- `skills/liquid-glass-design/scripts/generate-displacement-map.mjs` - a zero-dependency PNG displacement map generator that prints the exact `feDisplacementMap` scale.
+- `skills/liquid-glass-design/scripts/check-visual-geometry.mjs` - a Playwright-based QA helper for overlap, dock centering, viewport containment, fallback behavior, contrast estimates, screenshots, and committed PNG baselines.
+- `skills/liquid-glass-design/scripts/package-skill.mjs` - creates full or lean `.skill` packages while excluding `node_modules`, `dist`, caches, logs, and other heavy local artifacts.
+- `skills/liquid-glass-design/scripts/run-evals.mjs` - executable smoke evals for trigger coverage and forbidden implementation patterns.
+- `skills/liquid-glass-design/scripts/run-behavior-eval.mjs` - optional nightly behavior eval harness for agent-generated pages.
+- `skills/liquid-glass-design/scripts/update-readme-preview.mjs` - prepares the README preview image from visual QA screenshots; CI publishes it to `gh-pages` instead of committing binary churn to `main`.
+- `skills/liquid-glass-design/evals/evals.json` - trigger cases and static assertions for checking practical, premium Liquid Glass outcomes.
 - `packages/liquid-glass-core/` - publish-ready core package for displacement pixels, adaptive tinting, and support detection.
 - `packages/react-liquid-glass/` - publish-ready React wrapper package with CSS and TypeScript declarations.
-- `liquid-glass-design/assets/templates/vanilla-liquid-glass/` - a no-build HTML/CSS/JS Optic Deck showcase with per-surface filters, lens profiles, pointer glare, multi-background optical QA, and lens maps.
-- `liquid-glass-design/assets/templates/web-component-liquid-glass/` - a portable `<liquid-glass>` custom element for Vue, Svelte, Angular, plain HTML, and mixed stacks.
-- `liquid-glass-design/assets/templates/react-liquid-glass/` - a React/Vite `<LiquidGlass>` component template with profile/tuning props, `.d.ts` types, and the same redesigned showcase-grade demo scene.
+- `skills/liquid-glass-design/assets/templates/vanilla-liquid-glass/` - a no-build HTML/CSS/JS Optic Deck showcase with per-surface filters, lens profiles, pointer glare, multi-background optical QA, and lens maps.
+- `skills/liquid-glass-design/assets/templates/web-component-liquid-glass/` - a portable `<liquid-glass>` custom element for Vue, Svelte, Angular, plain HTML, and mixed stacks.
+- `skills/liquid-glass-design/assets/templates/react-liquid-glass/` - a React/Vite `<LiquidGlass>` component template with profile/tuning props, `.d.ts` types, and the same redesigned showcase-grade demo scene.
 
 ## Template Portability
 
 Each template folder is intentionally self-contained. You can copy `vanilla-liquid-glass/`, `web-component-liquid-glass/`, or `react-liquid-glass/` into another project without also copying `assets/core/`.
 
-When editing this repository, modify `liquid-glass-design/assets/core/liquid-glass-core.js` first, then run:
+When editing this repository, modify `skills/liquid-glass-design/assets/core/liquid-glass-core.js` first, then run:
 
 ```bash
 npm run sync:templates
@@ -58,7 +58,7 @@ cd liquid-glass-design-skill
 
 ```bash
 mkdir -p ~/.codex/skills
-ln -sf "$(pwd)/liquid-glass-design" ~/.codex/skills/liquid-glass-design
+ln -sf "$(pwd)/skills/liquid-glass-design" ~/.codex/skills/liquid-glass-design
 ```
 
 Then ask Codex:
@@ -77,7 +77,7 @@ Use $liquid-glass-design to upgrade this existing UI into premium Liquid Glass w
 
 ```bash
 mkdir -p ~/.claude/skills
-ln -sf "$(pwd)/liquid-glass-design" ~/.claude/skills/liquid-glass-design
+ln -sf "$(pwd)/skills/liquid-glass-design" ~/.claude/skills/liquid-glass-design
 ```
 
 Then ask Claude Code to build or review Liquid Glass UI — the skill triggers on Liquid Glass / glassmorphism / refraction requests, or invoke it explicitly with `/liquid-glass-design`.
@@ -92,15 +92,15 @@ Download the latest portable package:
 Or create a portable package locally:
 
 ```bash
-node liquid-glass-design/scripts/package-skill.mjs
-node liquid-glass-design/scripts/package-skill.mjs --lean
+node skills/liquid-glass-design/scripts/package-skill.mjs
+node skills/liquid-glass-design/scripts/package-skill.mjs --lean
 ```
 
 Upload `dist/liquid-glass-design.skill` or `dist/liquid-glass-design.lean.skill` in Cowork settings. The full package includes eval/dev resources; the lean package removes `evals/`, `agents/openai.yaml`, research notes, template lockfiles, and eval-only scripts.
 
 ### Claude Code Plugin / Marketplace
 
-Use the same packaged `.skill` file for Claude-compatible plugin or marketplace submission flows. This repository also includes `.claude-plugin/` and `.codex-plugin/` metadata scaffolds so the skill can be wrapped for plugin distribution. Keep `liquid-glass-design/LICENSE` inside the skill folder so the license travels with the standalone package.
+Use the same packaged `.skill` file for Claude-compatible plugin or marketplace submission flows. This repository also includes `.claude-plugin/` and `.codex-plugin/` metadata scaffolds so the skill can be wrapped for plugin distribution. Keep `skills/liquid-glass-design/LICENSE` inside the skill folder so the license travels with the standalone package.
 
 ## NPM Packages
 
@@ -115,7 +115,7 @@ The packages are versioned with the skill. `liquid-glass-core` exposes the share
 
 ### Other agents
 
-Any agent that supports Markdown skills can consume `liquid-glass-design/SKILL.md` directly; the references and templates are plain files with no toolchain requirements.
+Any agent that supports Markdown skills can consume `skills/liquid-glass-design/SKILL.md` directly; the references and templates are plain files with no toolchain requirements.
 
 ## Try The Vanilla Demo
 
@@ -132,7 +132,7 @@ Chromium-based browsers (Chrome, Edge, Electron) get true SVG refraction. Safari
 ## Try The React Demo
 
 ```bash
-cd liquid-glass-design/assets/templates/react-liquid-glass
+cd skills/liquid-glass-design/assets/templates/react-liquid-glass
 npm install   # or pnpm install
 npm run dev
 ```
@@ -211,7 +211,7 @@ Adaptive sampling can read CSS colors/gradients and same-origin `<img>`, `<video
 ## Generate A Displacement Map
 
 ```bash
-node liquid-glass-design/scripts/generate-displacement-map.mjs \
+node skills/liquid-glass-design/scripts/generate-displacement-map.mjs \
   --width 760 \
   --height 96 \
   --radius 48 \
@@ -228,7 +228,7 @@ When a demo page is running and the project has Playwright installed:
 
 ```bash
 npm i -D playwright && npx playwright install chromium
-node liquid-glass-design/scripts/check-visual-geometry.mjs \
+node skills/liquid-glass-design/scripts/check-visual-geometry.mjs \
   --url http://127.0.0.1:4173/ \
   --screenshot-dir ./shots \
   --adaptive \
@@ -238,12 +238,12 @@ node liquid-glass-design/scripts/check-visual-geometry.mjs \
 
 The script checks dock centering, focus/dock overlap, rail/focus overlap, viewport containment, JS console errors, SVG-filter readiness/fallback, adaptive tint sync and mode diversity, estimated text contrast, and can save screenshots for desktop and mobile viewports. It accepts either `playwright` or `playwright-core`.
 
-For visual regression, compare against committed ROI baseline PNGs in `liquid-glass-design/evals/baselines/`:
+For visual regression, compare against committed ROI baseline PNGs in `skills/liquid-glass-design/evals/baselines/`:
 
 ```bash
-node liquid-glass-design/scripts/check-visual-geometry.mjs \
+node skills/liquid-glass-design/scripts/check-visual-geometry.mjs \
   --url http://127.0.0.1:4173/ \
-  --baseline-dir liquid-glass-design/evals/baselines \
+  --baseline-dir skills/liquid-glass-design/evals/baselines \
   --full-page \
   --pixel-channel-threshold 24 \
   --roi-roles dock,focus \
@@ -255,7 +255,7 @@ Only update baselines when the visual change is intentional:
 
 ```bash
 npm run qa:vanilla:update-baseline
-git diff -- liquid-glass-design/evals/baselines
+git diff -- skills/liquid-glass-design/evals/baselines
 ```
 
 To verify the fallback path:
@@ -266,14 +266,14 @@ npm run qa:vanilla:webkit-detect
 npm run qa:vanilla:reduced-motion
 ```
 
-Committed baseline PNGs are CI regression assets and are excluded from packaged `.skill` files; use `npm run package:skill` or the lean package without shipping screenshot history to end users. CI refreshes `docs/preview-latest.png` from the 1440x900 visual QA screenshot on `main`, so the README preview tracks the runnable demo instead of manual screenshots.
+Committed baseline PNGs are CI regression assets and are excluded from packaged `.skill` files; use `npm run package:skill` or the lean package without shipping screenshot history to end users. CI publishes `preview/preview-latest.png` to the orphan `gh-pages` branch from the 1440x900 visual QA screenshot, so the README preview tracks the runnable demo without adding binary churn to `main`.
 
 ## Design Rules
 
 - Use glass on controls and navigation, not as a blanket content layer.
 - Start with composition: one focal surface, one command surface, one grouped secondary information area.
 - Choose a design recipe before coding: Command Deck, Lens Inspector, Media Glass Stage, Instrument Bay, Mobile Focus Sheet, or a custom equivalent.
-- Use `liquid-glass-design/references/golden-glass-style.md` as the only numeric defaults source; choose production or showcase mode first.
+- Use `skills/liquid-glass-design/references/golden-glass-style.md` as the only numeric defaults source; choose production or showcase mode first.
 - Inverse lens mapping: identity center, edge magnification, measured scale, shape-specific profile.
 - Keep blur near zero on the refractive path; punch comes from `contrast`.
 - Chromatic dispersion only at the rim, via per-channel scale differences.
@@ -293,7 +293,7 @@ npm test
 For the React template:
 
 ```bash
-cd liquid-glass-design/assets/templates/react-liquid-glass
+cd skills/liquid-glass-design/assets/templates/react-liquid-glass
 npm install
 npm run build
 ```
